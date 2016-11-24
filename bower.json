@@ -20,5 +20,9 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "jquery-mobile-bower": "^1.4.5",
+    "jquery-touchswipe": "^1.6.18"
+  }
 }

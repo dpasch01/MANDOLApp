@@ -8,7 +8,7 @@ $(document).on("deviceready", function() {
       }else{
         $(".screenshot").attr("src", res.URI);
       }
-    });
+    }, 100);
   };
 
   function loadStartCallBack() {
@@ -113,16 +113,36 @@ $(document).on("deviceready", function() {
 });
 
 $(function(){
-  $("body").bind( "taphold", tapholdHandler );
-  function tapholdHandler(e){
-    var selection;
 
+  var selection="";
+
+  function getSelection(){
     if (window.getSelection) {
       selection = window.getSelection();
     } else if (document.selection) {
       selection = document.selection.createRange();
     }
+  }
 
+  $("body").bind( "taphold", tapholdHandler );
+  function tapholdHandler(e){
     selection.toString() !== '' && alert('"' + selection.toString() + '" was selected at ' + e.pageX + '/' + e.pageY);
   }
+
+  $("body").swipe({
+    swipe: function(e, direction, distance, duration, fingerCount, fingerData) {
+      getSelection();
+      selection.toString() !== '' && alert('"' + selection.toString() + '" was selected at ' + e.pageX + '/' + e.pageY);
+    },
+    threshold:0
+  });
+
+  $("body").swipe({
+    hold: function(e, target) {
+      getSelection();
+      selection.toString() !== '' && alert('"' + selection.toString() + '" was selected at ' + e.pageX + '/' + e.pageY);
+    },
+    threshold:50
+  });
+
 });
