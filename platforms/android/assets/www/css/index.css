@@ -1,0 +1,27 @@
+html, body{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0px 25px;
+  margin: 0px;
+}
+
+body{
+  height: 100vh;
+}
+
+.button{
+  text-align: center;
+  color: #FEFEFE;
+  background-color: #EE2D4E;
+  width: 5em;
+  font-weight: 500;
+  font-family: 'Open Sans';
+  padding: 10px;
+  margin: 10px 0px;
+}
+
+.content{
+  text-align: justify;
+}

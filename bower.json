@@ -1,0 +1,24 @@
+{
+  "name": "mandolapp",
+  "authors": [
+    "dpasch01 <dpasch01@cs.ucy.ac.cy>"
+  ],
+  "description": "Mobile application for raising hatespeech awareness and reporting online hatespeech. The developement of this application is under MANDOLA project, funded by the European Union Comission.",
+  "main": "www/index.html",
+  "keywords": [
+    "hatespeech",
+    "report",
+    "mandola"
+  ],
+  "license": "GPL 2.0",
+  "homepage": "http://mandola-project.eu",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "www/lib",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
