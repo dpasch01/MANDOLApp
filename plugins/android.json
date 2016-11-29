@@ -13,27 +13,17 @@
         "cordova-plugin-console": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "com.darktalker.cordova.screenshot": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
-        "cordova-plugin-camera": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
         "cordova-plugin-crosswalk-webview": {
-            "XWALK_VERSION": "21+",
+            "XWALK_VERSION": "22+",
             "XWALK_LITEVERSION": "xwalk_core_library_canary:17+",
             "XWALK_COMMANDLINE": "--disable-pull-to-refresh-effect",
             "XWALK_MODE": "embedded",
             "XWALK_MULTIPLEAPK": "true",
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-plugin-themeablebrowser": {
+        "cordova-plugin-inappbrowser": {
             "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
-    "dependent_plugins": {
-        "cordova-plugin-compat": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        }
-    }
+    "dependent_plugins": {}
 }

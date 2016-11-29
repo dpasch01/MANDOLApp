@@ -1,0 +1,33 @@
+
+.mandolapp-report-widget{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  height: 2.5em;
+  width: 2.5em;
+  border-radius: 50%;
+  background-color: #EE2D4E;
+  color: #FEFEFE;
+  font-weight: bold;
+  cursor: pointer;
+  animation-name: entrance;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-out;
+  animation-duration: 0.6s;
+  z-index: 1000;
+}
+
+@keyframes entrance {
+  0% {
+      transform: scale(0.0);
+  }
+  50%{
+      transform: scale(1.2);
+  }
+  100% {
+      transform: scale(1);
+  }
+}

@@ -16,12 +16,23 @@ body{
   color: #FEFEFE;
   background-color: #EE2D4E;
   width: 5em;
+  font-size: 2em;
   font-weight: 500;
-  font-family: 'Open Sans';
+  font-family: 'Monospace';
   padding: 10px;
   margin: 10px 0px;
+  cursor: pointer;
+  animation: floating 1.5s ease-in-out 0s infinite
 }
 
-.content{
-  text-align: justify;
+@keyframes floating {
+  0% {
+      transform: scale(1.0);
+  }
+  50%{
+      transform: scale(0.95);
+  }
+  100% {
+      transform: scale(1.0);
+  }
 }

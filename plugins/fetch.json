@@ -16,23 +16,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "com.darktalker.cordova.screenshot": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/gitawego/cordova-screenshot.git",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "cordova-plugin-camera": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-camera"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-compat": {
         "source": {
             "type": "registry",
@@ -43,17 +26,17 @@
     },
     "cordova-plugin-crosswalk-webview": {
         "source": {
-            "type": "git",
-            "url": "https://github.com/crosswalk-project/cordova-plugin-crosswalk-webview",
-            "subdir": "."
+            "type": "registry",
+            "id": "cordova-plugin-crosswalk-webview@2.2.0"
         },
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-themeablebrowser": {
+    "cordova-plugin-inappbrowser": {
         "source": {
-            "type": "registry",
-            "id": "cordova-plugin-themeablebrowser"
+            "type": "git",
+            "url": "https://github.com/apache/cordova-plugin-inappbrowser",
+            "subdir": "."
         },
         "is_top_level": true,
         "variables": {}
