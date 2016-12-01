@@ -1,14 +1,9 @@
-html, body{
+.home-wrapper, .hatespeech-wrapper, .report-wrapper, .faqs-wrapper{
+  height: calc(100vh - 60px);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding: 0px 25px;
-  margin: 0px;
-}
-
-body{
-  height: 100vh;
 }
 
 .button{

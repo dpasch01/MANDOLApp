@@ -40,5 +40,32 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova-plugin-image-picker": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/wymsee/cordova-imagePicker.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-crop": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jeduan/cordova-plugin-crop",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-sqlite-storage": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/brodysoft/Cordova-SQLitePlugin",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

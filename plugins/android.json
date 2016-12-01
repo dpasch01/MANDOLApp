@@ -23,6 +23,15 @@
         },
         "cordova-plugin-inappbrowser": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-image-picker": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-crop": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-sqlite-storage": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {}
