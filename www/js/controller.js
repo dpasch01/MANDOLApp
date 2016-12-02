@@ -6,7 +6,7 @@ var Controller = function() {
       initialize: function() {
           self = this;
           self.bindEvents();
-          self.renderHomeView();
+          self.renderReportView();
       },
 
       bindEvents: function() {
@@ -38,17 +38,6 @@ var Controller = function() {
           }
       },
 
-      renderHomeView: function() {
-          $('.tab-button').removeClass('active');
-          $('#home-btn').addClass('active');
-
-          var $container = $('.container');
-          $container.empty();
-          $(".container").load("./views/home.html", function(data) {
-              //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
-          });
-      },
-
       renderHatespeechView: function() {
           $('.tab-button').removeClass('active');
           $('#hatespeech-btn').addClass('active');
@@ -71,8 +60,8 @@ var Controller = function() {
             $("#browser-btn").on("click", function(e){
               var inAppBrowser = cordova.InAppBrowser.open('https://en.wikipedia.org/wiki/Main_Page', '_blank', 'location=no, toolbar=no');
               inAppBrowser.addEventListener('loadstop', function() {
-                inAppBrowser.executeScript({file:"https://a756ae6b.ngrok.io/mandolapp/www/js/report.js"});
-                inAppBrowser.insertCSS({file:"https://a756ae6b.ngrok.io/mandolapp/www/css/report.css"});
+                inAppBrowser.executeScript({file:"https://76e2afd9.ngrok.io/mandolapp/www/js/report.js"});
+                inAppBrowser.insertCSS({file:"https://76e2afd9.ngrok.io/mandolapp/www/css/report.css"});
                 inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
                 var listenForAnnotation = setInterval(function(){
                   inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
