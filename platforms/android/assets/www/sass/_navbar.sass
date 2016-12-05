@@ -1,6 +1,7 @@
 .navbar
   background-color: $blueish
   border: none
+  box-shadow: transparentize(black, 0.5) 0px 3px 3px
 
   .navbar-toggle
     border: none
@@ -20,3 +21,19 @@
 .navbar-default .navbar-nav > .active > a:hover
   background-color: $whiton
   color: $blackish
+
+.back-button
+  float: left
+  padding: 6px 10px
+  color: $whiton
+  font-size: 15px
+  visibility: hidden
+
+  &.active
+    visibility: visible
+
+.page-title
+  text-align: center
+  padding: 12px 0px
+  color: $whiton
+  font-size: 18px

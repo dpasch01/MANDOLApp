@@ -4,8 +4,13 @@
   margin: 10px 0px
   padding: 10px 10px
   background-color: $whiton
-  border-radius: 40px
   box-shadow: transparentize(black, 0.5) 0px 5px 5px
+  cursor: pointer
+
+  &:hover,
+  &:focus
+    transition-duration: 0.3s
+    box-shadow: transparentize(black, 0.5) 0px 1px 1px
 
   .source-icon
     width: 50px
@@ -13,6 +18,19 @@
     border-radius: 50%
     background-color: $reddish
     margin-right: 15px
+    position: relative
+
+    .report-browser
+      position: absolute
+      top: 4px
+      left: 7px
+      color: transparentize($whiton, 0.4)
+
+    .report-image
+      position: absolute
+      top: 3px
+      left: 4px
+      color: transparentize($whiton, 0.4)
 
   .report-info
     .report-title

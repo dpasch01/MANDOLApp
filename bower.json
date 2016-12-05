@@ -23,6 +23,8 @@
   ],
   "dependencies": {
     "jquery-mobile-bower": "^1.4.5",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "font-awesome": "^4.7.0",
+    "bootstrap-select": "^1.12.1"
   }
 }

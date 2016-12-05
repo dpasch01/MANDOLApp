@@ -11,6 +11,13 @@ var Controller = function() {
 
       bindEvents: function() {
       	$('.tab-button').on('click', this.onTabClick);
+        $('.back-button').on('click', function(){
+          $('.back-button').toggleClass('active');
+          controller.renderReportView();
+        });
+        $('#mandolapp-menu').on("click", "a", null, function () {
+          $('#mandolapp-menu').collapse('hide');
+        });
       },
 
       onTabClick: function(e) {
@@ -38,6 +45,26 @@ var Controller = function() {
           }
       },
 
+      renderCreateView: function(annotated){
+        var $container = $('.container');
+        $container.empty();
+        $(".container").load("./views/create.html", function(data) {
+          $('#report-content').text(annotated);
+        });
+        $('.back-button').on('click', function(e){
+          inAppBrowser.show();
+        });
+      },
+
+      renderReportInfo: function(){
+        var $container = $('.container');
+        $container.empty();
+        $(".container").load("./views/info.html", function(data) {
+            //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
+        });
+        $('.back-button').toggleClass('active');
+      },
+
       renderHatespeechView: function() {
           $('.tab-button').removeClass('active');
           $('#hatespeech-btn').addClass('active');
@@ -55,20 +82,21 @@ var Controller = function() {
 
           var $container = $('.container');
           $container.empty();
-          $(".container").load("./views/report.html", function(data) {
 
+          $(".container").load("./views/report.html", function(data) {
+            $(".report-item").on("click", controller.renderReportInfo);
             $("#browser-btn").on("click", function(e){
-              var inAppBrowser = cordova.InAppBrowser.open('https://en.wikipedia.org/wiki/Main_Page', '_blank', 'location=no, toolbar=no');
+              inAppBrowser = cordova.InAppBrowser.open('https://en.wikipedia.org/wiki/Main_Page', '_blank', 'location=yes, toolbar=no');
               inAppBrowser.addEventListener('loadstop', function() {
-                inAppBrowser.executeScript({file:"https://76e2afd9.ngrok.io/mandolapp/www/js/report.js"});
-                inAppBrowser.insertCSS({file:"https://76e2afd9.ngrok.io/mandolapp/www/css/report.css"});
+                inAppBrowser.executeScript({file:"https://ed0a7d4a.ngrok.io/mandolapp/www/js/report.js"});
+                inAppBrowser.insertCSS({file:"https://ed0a7d4a.ngrok.io/mandolapp/www/css/report.css"});
                 inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
                 var listenForAnnotation = setInterval(function(){
                   inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
                     if(annotated!=''){
-                      console.log(annotated);
                       inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
                       inAppBrowser.hide();
+                      controller.renderCreateView(annotated);
                     }
                   });
                 }, 500);
@@ -78,7 +106,6 @@ var Controller = function() {
                   clearInterval(listenForAnnotation);
               });
             });
-
             $("#image-btn").on("click", function(e){
               window.imagePicker.getPictures(
                 function(results) {
@@ -98,8 +125,11 @@ var Controller = function() {
                 }
               );
             });
-
+            $('.menu-button').on('click', function(){
+              $('.menu-button').toggleClass('pressed');
+            })
           });
+
       },
 
       renderFAQsView: function() {

@@ -14,5 +14,4 @@ function reporterStatusUpdate(){
   }
 
   localStorage.setItem('annotatedText', selection);
-  alert("Selection Added.");
 }

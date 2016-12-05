@@ -1,9 +1,11 @@
 body {
-  background-color: #303C4C; }
+  background-color: #f9f9f7; }
 
 .hatespeech-wrapper,
 .report-wrapper,
-.faqs-wrapper {
+.create-report,
+.faqs-wrapper,
+.info-wrapper {
   height: -webkit-calc(100vh - 60px);
   height: calc(100vh - 60px);
   margin-top: 60px; }
@@ -15,7 +17,9 @@ body {
 
 .navbar {
   background-color: #56C1F9;
-  border: none; }
+  border: none;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 3px;
+          box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 3px; }
   .navbar .navbar-toggle {
     border: none; }
     .navbar .navbar-toggle .icon-bar {
@@ -34,6 +38,21 @@ body {
   background-color: #FAFAF8;
   color: #303C4C; }
 
+.back-button {
+  float: left;
+  padding: 6px 10px;
+  color: #FAFAF8;
+  font-size: 15px;
+  visibility: hidden; }
+  .back-button.active {
+    visibility: visible; }
+
+.page-title {
+  text-align: center;
+  padding: 12px 0px;
+  color: #FAFAF8;
+  font-size: 18px; }
+
 .list .report-item {
   display: -webkit-box;
   display: -webkit-flex;
@@ -46,17 +65,32 @@ body {
   margin: 10px 0px;
   padding: 10px 10px;
   background-color: #FAFAF8;
-  -webkit-border-radius: 40px;
-          border-radius: 40px;
   -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px;
-          box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px; }
+          box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px;
+  cursor: pointer; }
+  .list .report-item:hover, .list .report-item:focus {
+    -webkit-transition-duration: 0.3s;
+            transition-duration: 0.3s;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px;
+            box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 1px; }
   .list .report-item .source-icon {
     width: 50px;
     height: 50px;
     -webkit-border-radius: 50%;
             border-radius: 50%;
     background-color: #AB434E;
-    margin-right: 15px; }
+    margin-right: 15px;
+    position: relative; }
+    .list .report-item .source-icon .report-browser {
+      position: absolute;
+      top: 4px;
+      left: 7px;
+      color: rgba(250, 250, 248, 0.6); }
+    .list .report-item .source-icon .report-image {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      color: rgba(250, 250, 248, 0.6); }
   .list .report-item .report-info .report-title {
     font-weight: bolder;
     color: #303C4C; }
@@ -66,15 +100,27 @@ body {
     color: #8389A9; }
 
 .menu-button {
-  -webkit-transition-duration: 0.4s;
-          transition-duration: 0.4s;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-transition-duration: 0.2s;
+          transition-duration: 0.2s;
   position: fixed;
   right: 20px;
   bottom: 20px;
   width: 75px;
   height: 75px;
   text-align: center;
-  line-height: 60px;
+  line-height: 75px;
   -webkit-border-radius: 50%;
           border-radius: 50%;
   background-color: #56C1F9;
@@ -83,13 +129,13 @@ body {
   -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26), 0 2px 10px 0 rgba(0, 0, 0, 0.22);
           box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26), 0 2px 10px 0 rgba(0, 0, 0, 0.22);
   cursor: pointer; }
-  .menu-button:hover {
+  .menu-button.pressed {
     background-color: #52c0f9;
-    -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.28), 0 4px 15px 0 rgba(0, 0, 0, 0.25);
-            box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.28), 0 4px 15px 0 rgba(0, 0, 0, 0.25); }
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.28), 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.28), 0 1px 3px 0 rgba(0, 0, 0, 0.25); }
   .menu-button a {
-    -webkit-transition-duration: 0.4s;
-            transition-duration: 0.4s;
+    -webkit-transition-duration: 0.2s;
+            transition-duration: 0.2s;
     opacity: 0;
     width: 0px;
     height: 0px;
@@ -106,34 +152,34 @@ body {
       -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.28), 0 4px 15px 0 rgba(0, 0, 0, 0.25);
               box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.28), 0 4px 15px 0 rgba(0, 0, 0, 0.25); }
     .menu-button a:nth-child(2) {
-      -webkit-transition-delay: 0.3s;
-              transition-delay: 0.3s;
+      -webkit-transition-delay: 0.1s;
+              transition-delay: 0.1s;
       position: absolute;
       right: 30px;
       bottom: 30px;
       background: #76DF8A; }
     .menu-button a:nth-child(3) {
-      -webkit-transition-delay: 0.4s;
-              transition-delay: 0.4s;
+      -webkit-transition-delay: 0.2s;
+              transition-delay: 0.2s;
       position: absolute;
       right: 30px;
       bottom: 30px;
       background: #76DF8A; }
-  .menu-button:hover a {
+  .menu-button.pressed a {
     opacity: 1;
     width: 50px;
     height: 50px; }
-    .menu-button:hover a:nth-child(2) {
+    .menu-button.pressed a:nth-child(2) {
       right: 80px;
       bottom: 0px; }
-      .menu-button:hover a:nth-child(2):hover {
+      .menu-button.pressed a:nth-child(2):hover {
         -webkit-transition-delay: 0s;
                 transition-delay: 0s;
         background: #56C1F9; }
-    .menu-button:hover a:nth-child(3) {
+    .menu-button.pressed a:nth-child(3) {
       right: 65px;
       bottom: 65px; }
-      .menu-button:hover a:nth-child(3):hover {
+      .menu-button.pressed a:nth-child(3):hover {
         -webkit-transition-delay: 0s;
                 transition-delay: 0s;
         background: #56C1F9; }
@@ -142,3 +188,32 @@ body {
   h1 {
     padding: 15px;
     font-size: 25px; } }
+
+button.menu-button {
+  border: none; }
+
+.info-wrapper .report-title {
+  font-size: 30px;
+  font-weight: 200;
+  margin-top: 15px; }
+  .info-wrapper .report-title i {
+    font-size: 15px;
+    padding-bottom: 5px; }
+
+.info-wrapper .report-date {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: rgba(131, 137, 169, 0.7); }
+
+.info-wrapper .report-content {
+  font-size: 16px;
+  text-align: justify; }
+
+.info-wrapper .tags-input {
+  min-height: 50px;
+  margin-bottom: 15px; }
+
+.create-report {
+  padding-top: 20px; }
+  .create-report textarea.form-control {
+    height: 150px !important; }
