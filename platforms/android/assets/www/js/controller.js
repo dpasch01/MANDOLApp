@@ -45,12 +45,76 @@ var Controller = function() {
           }
       },
 
+      renderCropView: function(uri) {
+        var $container = $('.container');
+        $container.empty();
+        $(".container").load("./views/crop.html", function(data) {
+          $("form.crop-report").submit(function(e) {
+            controller.renderCreateView(ocr_results);
+            e.preventDefault();
+          });
+          var canvas = document.getElementsByTagName('canvas')[0];
+
+          if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            var screenshot = new Image();
+            screenshot.onload = function (){
+              ctx.drawImage(screenshot, 0, 0, screenshot.width, screenshot.height, 0, 0, canvas.width, canvas.height );
+            };
+            screenshot.src = uri;
+          }
+          $('canvas.screenshot').Jcrop({
+            onSelect: function () {
+                var cropData = this.tellSelect();
+                var canvas = document.createElement('canvas');
+                var fxcanvas = fx.canvas();
+                var texture = fxcanvas.texture(document.getElementsByClassName('screenshot')[0]);
+                fxcanvas.draw(texture)
+                  .hueSaturation(-1, -1)
+                  .unsharpMask(20, 2)
+                  .brightnessContrast(0.2, 0.9)
+                  .update();
+                canvas.width = cropData.w;
+                canvas.height = cropData.h;
+                var ctx = canvas.getContext('2d');
+                var screenshot = new Image();
+                screenshot.onload = function (){
+                  ctx.drawImage(
+                    screenshot,
+                    cropData.x,
+                    cropData.y,
+                    cropData.w,
+                    cropData.h,
+                    0,
+                    0,
+                    cropData.w,
+                    cropData.h
+                  );
+                };
+                screenshot.src = fxcanvas.toDataURL();
+
+                ocr_results = OCRAD(ctx);
+                $('#ocr-button').removeClass('disabled');
+                $('#ocr-button').removeAttr('disabled');
+            }
+          });
+        });
+        $('.back-button').toggleClass('active');
+      },
+
       renderCreateView: function(annotated){
         var $container = $('.container');
         $container.empty();
         $(".container").load("./views/create.html", function(data) {
           $('#report-content').text(annotated);
+          $("form.create-report").submit(function(e) {
+            navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
+              inAppBrowser.show();
+            }, "Thank you!", "OK");
+            e.preventDefault();
+          });
         });
+        $('.back-button').toggleClass('active');
         $('.back-button').on('click', function(e){
           inAppBrowser.show();
         });
@@ -86,25 +150,31 @@ var Controller = function() {
           $(".container").load("./views/report.html", function(data) {
             $(".report-item").on("click", controller.renderReportInfo);
             $("#browser-btn").on("click", function(e){
-              inAppBrowser = cordova.InAppBrowser.open('https://en.wikipedia.org/wiki/Main_Page', '_blank', 'location=yes, toolbar=no');
-              inAppBrowser.addEventListener('loadstop', function() {
-                inAppBrowser.executeScript({file:"https://ed0a7d4a.ngrok.io/mandolapp/www/js/report.js"});
-                inAppBrowser.insertCSS({file:"https://ed0a7d4a.ngrok.io/mandolapp/www/css/report.css"});
-                inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                var listenForAnnotation = setInterval(function(){
-                  inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
-                    if(annotated!=''){
-                      inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                      inAppBrowser.hide();
-                      controller.renderCreateView(annotated);
-                    }
-                  });
-                }, 500);
-              });
-
-              inAppBrowser.addEventListener('exit', function() {
-                  clearInterval(listenForAnnotation);
-              });
+              navigator.notification.prompt("Please enter a url.", function(url){
+                inAppBrowser = cordova.InAppBrowser.open(url.input1, '_blank', 'location=yes, toolbar=no, zoom=no, editablelocation=yes');
+                inAppBrowser.addEventListener('loaderror', function(e){
+                  navigator.notification.alert(url.input1 + " could not be loaded.", function(e){
+                    inAppBrowser.close();
+                  }, "Error while loading", "OK");
+                });
+                inAppBrowser.addEventListener('loadstop', function() {
+                  inAppBrowser.executeScript({file:"https://5e3792c8.ngrok.io/mandolapp/www/js/report.js"});
+                  inAppBrowser.insertCSS({file:"https://5e3792c8.ngrok.io/mandolapp/www/css/report.css"});
+                  inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
+                  listenForAnnotation = setInterval(function(){
+                    inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
+                      if(annotated!=''){
+                        inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
+                        inAppBrowser.hide();
+                        controller.renderCreateView(annotated);
+                      }
+                    });
+                  }, 500);
+                });
+                inAppBrowser.addEventListener('exit', function() {
+                    clearInterval(listenForAnnotation);
+                });
+              }, "Report via Browser", ["OK", "Cancel"], "http://www.google.com");
             });
             $("#image-btn").on("click", function(e){
               window.imagePicker.getPictures(
@@ -114,11 +184,7 @@ var Controller = function() {
                     var options = {
                       allowEdit: true
                     };
-                    plugins.crop(function success(path) {
-                      console.log(path);
-                    }, function fail () {
-                      console.log("Error in crop.");
-                    },results[i] , options);
+                    controller.renderCropView(results[i]);
                   }
                 }, function (error) {
                   console.log('Error: ' + error);

@@ -21,16 +21,16 @@
             "XWALK_MULTIPLEAPK": "true",
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-plugin-inappbrowser": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
         "cordova-plugin-image-picker": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-plugin-crop": {
+        "cordova-sqlite-storage": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-sqlite-storage": {
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-dialogs": {
             "PACKAGE_NAME": "com.mandola.reporting"
         }
     },

@@ -2,6 +2,7 @@ body {
   background-color: #f9f9f7; }
 
 .hatespeech-wrapper,
+.crop-wrapper,
 .report-wrapper,
 .create-report,
 .faqs-wrapper,
@@ -217,3 +218,12 @@ button.menu-button {
   padding-top: 20px; }
   .create-report textarea.form-control {
     height: 150px !important; }
+
+.crop-wrapper .screenshot {
+  height: 100%;
+  width: 100%; }
+
+.crop-wrapper .crop-report #ocr-button {
+  z-index: 100000; }
+  .crop-wrapper .crop-report #ocr-button .disabled {
+    background-color: #8389A9; }
