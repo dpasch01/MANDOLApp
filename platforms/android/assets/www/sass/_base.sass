@@ -5,8 +5,15 @@ $greyish: #8389A9
 $blackish: #303C4C
 $whiton: #FAFAF8
 
+$darkish: #1565C0
+$okish: #1E88E5
+$whitish: #E3F2FD
+
+@import url('https://fonts.googleapis.com/css?family=Fredoka+One|Roboto:400,900')
+
 body
-  background-color: darken($whiton, 0.5)
+  background-color: $whitish
+  font-family: 'Roboto'
 
 .hatespeech-wrapper,
 .crop-wrapper,
@@ -14,8 +21,7 @@ body
 .create-report,
 .faqs-wrapper,
 .info-wrapper
-  height: calc(100vh - 60px)
-  margin-top: 60px
+  margin: 25px 0px 60px 0px 
 
 .list
   list-style: none

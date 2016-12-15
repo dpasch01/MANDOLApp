@@ -1,31 +1,20 @@
 .navbar
-  background-color: $blueish
+  background-color: $darkish
   border: none
-  box-shadow: transparentize(black, 0.5) 0px 3px 3px
+  box-shadow: transparentize(black, 0.5) 0px 1px 3px
 
   .navbar-toggle
     border: none
 
-    .icon-bar
-      background-color: $whiton
-
 .navbar-default .navbar-toggle:focus,
 .navbar-default .navbar-toggle:hover
-  background-color: $blueish
-
-.navbar-default .navbar-nav > li > a
-  color: $whiton
-
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:focus,
-.navbar-default .navbar-nav > .active > a:hover
-  background-color: $whiton
-  color: $blackish
+  border-radius: 0px
+  background-color: $okish
 
 .back-button
   float: left
   padding: 6px 10px
-  color: $whiton
+  color: $whitish
   font-size: 15px
   visibility: hidden
 
@@ -35,5 +24,28 @@
 .page-title
   text-align: center
   padding: 12px 0px
-  color: $whiton
+  color: $whitish
   font-size: 18px
+  font-family: 'Fredoka One'
+
+.navbar-bottom
+  background-color: $darkish
+  height: 45px
+
+  .container-fluid,
+  .row,
+  .col-xs-4
+    height: 100% !important
+    padding: 0px
+    margin: 0px
+
+  .tab-button
+    height: 100%
+    width: 100%
+    display: flex
+    justify-content: center
+    align-items: center
+    color: $whitish
+
+    &.active
+      background-color: $okish

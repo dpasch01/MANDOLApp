@@ -1,5 +1,7 @@
+@import url("https://fonts.googleapis.com/css?family=Fredoka+One|Roboto:400,900");
 body {
-  background-color: #f9f9f7; }
+  background-color: #E3F2FD;
+  font-family: 'Roboto'; }
 
 .hatespeech-wrapper,
 .crop-wrapper,
@@ -7,9 +9,7 @@ body {
 .create-report,
 .faqs-wrapper,
 .info-wrapper {
-  height: -webkit-calc(100vh - 60px);
-  height: calc(100vh - 60px);
-  margin-top: 60px; }
+  margin: 25px 0px 60px 0px; }
 
 .list {
   list-style: none;
@@ -17,32 +17,23 @@ body {
   padding: 0px; }
 
 .navbar {
-  background-color: #56C1F9;
+  background-color: #1565C0;
   border: none;
-  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 3px;
-          box-shadow: rgba(0, 0, 0, 0.5) 0px 3px 3px; }
+  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 3px;
+          box-shadow: rgba(0, 0, 0, 0.5) 0px 1px 3px; }
   .navbar .navbar-toggle {
     border: none; }
-    .navbar .navbar-toggle .icon-bar {
-      background-color: #FAFAF8; }
 
 .navbar-default .navbar-toggle:focus,
 .navbar-default .navbar-toggle:hover {
-  background-color: #56C1F9; }
-
-.navbar-default .navbar-nav > li > a {
-  color: #FAFAF8; }
-
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:focus,
-.navbar-default .navbar-nav > .active > a:hover {
-  background-color: #FAFAF8;
-  color: #303C4C; }
+  -webkit-border-radius: 0px;
+          border-radius: 0px;
+  background-color: #1E88E5; }
 
 .back-button {
   float: left;
   padding: 6px 10px;
-  color: #FAFAF8;
+  color: #E3F2FD;
   font-size: 15px;
   visibility: hidden; }
   .back-button.active {
@@ -51,8 +42,37 @@ body {
 .page-title {
   text-align: center;
   padding: 12px 0px;
-  color: #FAFAF8;
-  font-size: 18px; }
+  color: #E3F2FD;
+  font-size: 18px;
+  font-family: 'Fredoka One'; }
+
+.navbar-bottom {
+  background-color: #1565C0;
+  height: 45px; }
+  .navbar-bottom .container-fluid,
+  .navbar-bottom .row,
+  .navbar-bottom .col-xs-4 {
+    height: 100% !important;
+    padding: 0px;
+    margin: 0px; }
+  .navbar-bottom .tab-button {
+    height: 100%;
+    width: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    color: #E3F2FD; }
+    .navbar-bottom .tab-button.active {
+      background-color: #1E88E5; }
 
 .list .report-item {
   display: -webkit-box;
@@ -227,3 +247,46 @@ button.menu-button {
   z-index: 100000; }
   .crop-wrapper .crop-report #ocr-button .disabled {
     background-color: #8389A9; }
+
+.faqs-wrapper .faqs-list {
+  list-style: none;
+  margin: 0px;
+  padding: 0px; }
+
+.faqs-wrapper .header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  height: 250px; }
+  .faqs-wrapper .header h1 {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+    width: 250px; }
+    .faqs-wrapper .header h1 .subtitle {
+      text-transform: uppercase;
+      display: block;
+      font-size: 20px; }
+  .faqs-wrapper .header .filter-box {
+    width: 200px; }
+    .faqs-wrapper .header .filter-box input {
+      -webkit-border-radius: 0px;
+              border-radius: 0px; }
+    .faqs-wrapper .header .filter-box #search-addon {
+      -webkit-border-radius: 0px;
+              border-radius: 0px;
+      cursor: pointer; }

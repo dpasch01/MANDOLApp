@@ -6,7 +6,7 @@ var Controller = function() {
       initialize: function() {
           self = this;
           self.bindEvents();
-          self.renderReportView();
+          self.renderFAQsView();
       },
 
       bindEvents: function() {
@@ -48,7 +48,7 @@ var Controller = function() {
       renderCropView: function(uri) {
         var $container = $('.container');
         $container.empty();
-        $(".container").load("./views/crop.html", function(data) {
+        $(".main-container").load("./views/crop.html", function(data) {
           $("form.crop-report").submit(function(e) {
             controller.renderCreateView(ocr_results);
             e.preventDefault();
@@ -103,9 +103,9 @@ var Controller = function() {
       },
 
       renderCreateView: function(annotated){
-        var $container = $('.container');
+        var $container = $('.main-container');
         $container.empty();
-        $(".container").load("./views/create.html", function(data) {
+        $(".main-container").load("./views/create.html", function(data) {
           $('#report-content').text(annotated);
           $("form.create-report").submit(function(e) {
             navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
@@ -121,9 +121,9 @@ var Controller = function() {
       },
 
       renderReportInfo: function(){
-        var $container = $('.container');
+        var $container = $('.main-container');
         $container.empty();
-        $(".container").load("./views/info.html", function(data) {
+        $(".main-container").load("./views/info.html", function(data) {
             //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
         });
         $('.back-button').toggleClass('active');
@@ -133,7 +133,7 @@ var Controller = function() {
           $('.tab-button').removeClass('active');
           $('#hatespeech-btn').addClass('active');
 
-          var $container = $('.container');
+          var $container = $('.main-container');
           $container.empty();
           $.get("https://m.facebook.com/story.php?story_fbid=10158250118600725&substory_index=0&id=153080620724", function(fb_page) {
             console.log(fb_page);
@@ -144,10 +144,10 @@ var Controller = function() {
           $('.tab-button').removeClass('active');
           $('#report-btn').addClass('active');
 
-          var $container = $('.container');
+          var $container = $('.main-container');
           $container.empty();
 
-          $(".container").load("./views/report.html", function(data) {
+          $(".main-container").load("./views/report.html", function(data) {
             $(".report-item").on("click", controller.renderReportInfo);
             $("#browser-btn").on("click", function(e){
               navigator.notification.prompt("Please enter a url.", function(url){
@@ -202,10 +202,11 @@ var Controller = function() {
           $('.tab-button').removeClass('active');
           $('#faqs-btn').addClass('active');
 
-          var $container = $('.container');
+          var $container = $('.main-container');
           $container.empty();
-          $(".container").load("https://m.facebook.com/story.php?story_fbid=10158250118600725&substory_index=0&id=153080620724", function(data) {
-              $('body').css('background', 'red');
+
+          $(".main-container").load("./views/faqs.html", function(data) {
+            $('.ui.accordion').accordion();
           });
       }
 
