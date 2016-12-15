@@ -135,8 +135,8 @@ var Controller = function() {
 
           var $container = $('.container');
           $container.empty();
-          $(".container").load("./views/hatespeech.html", function(data) {
-              //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
+          $.get("https://m.facebook.com/story.php?story_fbid=10158250118600725&substory_index=0&id=153080620724", function(fb_page) {
+            console.log(fb_page);
           });
       },
 
@@ -158,8 +158,8 @@ var Controller = function() {
                   }, "Error while loading", "OK");
                 });
                 inAppBrowser.addEventListener('loadstop', function() {
-                  inAppBrowser.executeScript({file:"https://5e3792c8.ngrok.io/mandolapp/www/js/report.js"});
-                  inAppBrowser.insertCSS({file:"https://5e3792c8.ngrok.io/mandolapp/www/css/report.css"});
+                  inAppBrowser.executeScript({file:"https://3ed88f5d.ngrok.io/mandolapp/www/js/report.js"});
+                  inAppBrowser.insertCSS({file:"https://3ed88f5d.ngrok.io/mandolapp/www/css/report.css"});
                   inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
                   listenForAnnotation = setInterval(function(){
                     inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
@@ -204,8 +204,8 @@ var Controller = function() {
 
           var $container = $('.container');
           $container.empty();
-          $(".container").load("./views/faqs.html", function(data) {
-              //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
+          $(".container").load("https://m.facebook.com/story.php?story_fbid=10158250118600725&substory_index=0&id=153080620724", function(data) {
+              $('body').css('background', 'red');
           });
       }
 
