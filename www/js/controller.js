@@ -207,6 +207,39 @@ var Controller = function() {
 
           $(".main-container").load("./views/faqs.html", function(data) {
             $('.ui.accordion').accordion();
+            faqsList = $('.faqs-list').html();
+
+            var filterInput = document.getElementsByClassName('filter-input')[0];
+
+            filterInput.addEventListener('input', function(e){
+              var query = document.getElementsByClassName('filter-input')[0].value.trim().toLowerCase();
+
+              $('.faqs-list').html(faqsList);
+
+              if(query.length > 0){
+                var titleFlag = false;
+                var queryResults = "";
+                $.each($('.faqs-list li'), function(index, value){
+                  if(($(value).hasClass("title") && $(value).text().trim().toLowerCase().includes(query)) || titleFlag){
+                    if($(value).hasClass("title")){
+                      queryResults+=$(value).wrap("<li class='title'></li>").parent().html();
+                    }else{
+                      queryResults+=$(value).wrap("<li class='content'></li>").parent().html();
+                    }
+                    titleFlag=!titleFlag;
+                  }
+                });
+              }else{
+                var queryResults = faqsList;
+              }
+
+              if(queryResults.length==0){
+                $('.faqs-list').html("<div class='no-results'>No results found.</div>");
+              }else{
+                $('.faqs-list').html(queryResults);
+              }
+
+            });
           });
       }
 
