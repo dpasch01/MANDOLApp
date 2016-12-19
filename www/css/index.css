@@ -16,6 +16,12 @@ body {
   margin: 0px;
   padding: 0px; }
 
+hr {
+  border-color: #E3F2FD;
+  border-style: solid none;
+  border-width: 1px 0;
+  margin: 18px 0; }
+
 .navbar {
   background-color: #1565C0;
   border: none;
@@ -38,6 +44,10 @@ body {
   visibility: hidden; }
   .back-button.active {
     visibility: visible; }
+
+.navbar-fixed-top .col-xs-4 {
+  margin: 0px;
+  padding: 0px; }
 
 .page-title {
   text-align: center;
@@ -73,6 +83,9 @@ body {
     color: #E3F2FD; }
     .navbar-bottom .tab-button.active {
       background-color: #1E88E5; }
+
+.report-wrapper {
+  margin-top: 50px; }
 
 .list .report-item {
   display: -webkit-box;
@@ -248,12 +261,33 @@ button.menu-button {
   .crop-wrapper .crop-report #ocr-button .disabled {
     background-color: #8389A9; }
 
-.faqs-wrapper .faqs-list {
-  list-style: none;
-  margin: 0px;
-  padding: 0px; }
-  .faqs-wrapper .faqs-list .no-results {
-    height: 80px;
+.faqs-wrapper {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
+  .faqs-wrapper .faqs-list {
+    list-style: none;
+    margin: 0px;
+    padding: 0px; }
+    .faqs-wrapper .faqs-list .no-results {
+      text-align: center;
+      height: 80px;
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+          -ms-flex-pack: center;
+              justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+          -ms-flex-align: center;
+              align-items: center;
+      font-size: 20px;
+      color: rgba(0, 0, 0, 0.7); }
+  .faqs-wrapper .header {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -266,43 +300,296 @@ button.menu-button {
     -webkit-align-items: center;
         -ms-flex-align: center;
             align-items: center;
-    font-size: 20px;
-    color: rgba(0, 0, 0, 0.7); }
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    height: 250px; }
+    .faqs-wrapper .header h1 {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 700;
+      width: 250px; }
+      .faqs-wrapper .header h1 .subtitle {
+        text-transform: uppercase;
+        display: block;
+        font-size: 20px; }
+    .faqs-wrapper .header .filter-box {
+      width: 200px; }
+      .faqs-wrapper .header .filter-box input {
+        -webkit-border-radius: 0px;
+                border-radius: 0px; }
+      .faqs-wrapper .header .filter-box #search-addon {
+        -webkit-border-radius: 0px;
+                border-radius: 0px;
+        cursor: pointer; }
 
-.faqs-wrapper .header {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  height: 250px; }
-  .faqs-wrapper .header h1 {
-    text-align: center;
-    font-size: 30px;
+.hatespeech-wrapper {
+  margin-top: 60px;
+  text-align: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
+  .hatespeech-wrapper .hatespeech-encounter,
+  .hatespeech-wrapper .hatespeech-timeline {
+    padding: 10px; }
+  .hatespeech-wrapper .bar-container {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin: 5px 0px; }
+    .hatespeech-wrapper .bar-container .chart-label {
+      font-size: 15px;
+      font-weight: 700;
+      padding: 5px; }
+    .hatespeech-wrapper .bar-container .chart-bar {
+      background-color: #1565C0;
+      display: inline-block; }
+    .hatespeech-wrapper .bar-container .bar-percentage {
+      padding: 5px;
+      font-size: 13px;
+      font-weight: 700; }
+    .hatespeech-wrapper .bar-container .bar-0 {
+      width: 0%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-5 {
+      width: 5%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-10 {
+      width: 10%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-15 {
+      width: 15%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-20 {
+      width: 20%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-25 {
+      width: 25%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-30 {
+      width: 30%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-35 {
+      width: 35%;
+      height: 20px;
+      background-color: #56C1F9; }
+    .hatespeech-wrapper .bar-container .bar-40 {
+      width: 40%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-45 {
+      width: 45%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-50 {
+      width: 50%;
+      height: 20px;
+      background-color: rgba(21, 101, 192, 0.7); }
+    .hatespeech-wrapper .bar-container .bar-55 {
+      width: 55%;
+      height: 20px;
+      background-color: rgba(21, 101, 192, 0.7); }
+    .hatespeech-wrapper .bar-container .bar-60 {
+      width: 60%;
+      height: 20px;
+      background-color: rgba(21, 101, 192, 0.7); }
+    .hatespeech-wrapper .bar-container .bar-65 {
+      width: 65%;
+      height: 20px;
+      background-color: rgba(21, 101, 192, 0.7); }
+    .hatespeech-wrapper .bar-container .bar-70 {
+      width: 70%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-75 {
+      width: 75%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-80 {
+      width: 80%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-85 {
+      width: 85%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-90 {
+      width: 90%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-95 {
+      width: 95%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-100 {
+      width: 100%;
+      height: 20px;
+      background-color: #1565C0; }
+    .hatespeech-wrapper .bar-container .bar-105 {
+      width: 105%;
+      height: 20px;
+      background-color: #1565C0; }
+  .hatespeech-wrapper h1 {
+    font-size: 20px;
     font-weight: 700;
-    width: 250px; }
-    .faqs-wrapper .header h1 .subtitle {
-      text-transform: uppercase;
-      display: block;
-      font-size: 20px; }
-  .faqs-wrapper .header .filter-box {
-    width: 200px; }
-    .faqs-wrapper .header .filter-box input {
-      -webkit-border-radius: 0px;
-              border-radius: 0px; }
-    .faqs-wrapper .header .filter-box #search-addon {
-      -webkit-border-radius: 0px;
-              border-radius: 0px;
-      cursor: pointer; }
+    text-transform: uppercase;
+    margin: 0px; }
+  .hatespeech-wrapper .info {
+    margin: 0px;
+    margin-left: 10px;
+    padding: 5px 0px;
+    font-size: 15px;
+    border: #1565C0 2px solid; }
+  .hatespeech-wrapper .encountered {
+    text-align: center;
+    font-size: 50px;
+    margin-top: 0px;
+    padding: 0px; }
+  .hatespeech-wrapper .hatespeech-encounter .encountered i {
+    color: #1565C0; }
+    .hatespeech-wrapper .hatespeech-encounter .encountered i:nth-child(5) {
+      color: #56C1F9; }
+  .hatespeech-wrapper .attacked {
+    text-align: center;
+    font-size: 50px;
+    margin-top: 0px;
+    padding: 0px; }
+  .hatespeech-wrapper .hatespeech-encounter .attacked i {
+    color: #1565C0; }
+    .hatespeech-wrapper .hatespeech-encounter .attacked i:nth-child(4), .hatespeech-wrapper .hatespeech-encounter .attacked i:nth-child(5) {
+      color: #56C1F9; }
+  .hatespeech-wrapper .list-countries {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+        -ms-flex-pack: start;
+            justify-content: flex-start;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column; }
+  .hatespeech-wrapper .hate-country {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+        -ms-flex-pack: start;
+            justify-content: flex-start;
+    width: 100%;
+    margin: 10px 0px 5px 0px;
+    font-size: 18px; }
+    .hatespeech-wrapper .hate-country .country-name {
+      text-align: left; }
+    .hatespeech-wrapper .hate-country .first-country {
+      margin-right: 10px;
+      font-size: 50px;
+      text-align: left; }
+    .hatespeech-wrapper .hate-country .second-country {
+      margin-right: 10px;
+      font-size: 40px;
+      text-align: left; }
+    .hatespeech-wrapper .hate-country .third-country {
+      margin-right: 10px;
+      font-size: 30px;
+      text-align: left; }
+  .hatespeech-wrapper .categorized-chart {
+    text-align: left; }
+    .hatespeech-wrapper .categorized-chart .chart-label {
+      width: 80px;
+      font-size: 13px; }
+  .hatespeech-wrapper .daily-hatespeech {
+    background-color: #FFFFFF;
+    padding-bottom: 10px;
+    -webkit-box-shadow: rgba(2, 2, 2, 0.3) 0px 2px 5px 2px;
+            box-shadow: rgba(2, 2, 2, 0.3) 0px 2px 5px 2px; }
+    .hatespeech-wrapper .daily-hatespeech .hatespeech-count {
+      text-align: center;
+      font-size: 30px;
+      padding: 50px;
+      font-weight: 700;
+      background-image: url("../img/social-networks.png");
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat; }
+  .hatespeech-wrapper .hatespeech-events .olympics {
+    background-image: url("../img/olympics-rio.png");
+    background-position: -3px 95px;
+    background-size: contain;
+    background-repeat: no-repeat; }
+  .hatespeech-wrapper .hatespeech-events .elections {
+    background-image: url("../img/us-elections.png");
+    background-position: 0px 90px;
+    background-size: contain;
+    background-repeat: no-repeat; }
+  .hatespeech-wrapper .hatespeech-events .event {
+    border: #1565C0 2px solid;
+    -webkit-box-shadow: rgba(2, 2, 2, 0.3) 0px 2px 5px 2px;
+            box-shadow: rgba(2, 2, 2, 0.3) 0px 2px 5px 2px; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-a .ct-line,
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-a .ct-point {
+      stroke: #1565C0 !important; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-b .ct-line,
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-b .ct-point {
+      stroke: #56C1F9 !important; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-c .ct-line,
+    .hatespeech-wrapper .hatespeech-events .event .ct-series-c .ct-point {
+      stroke: #448AFF !important; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-label.ct-horizontal {
+      margin-top: 5px; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-label.ct-vertical {
+      margin-left: 0px; }
+    .hatespeech-wrapper .hatespeech-events .event .ct-chart-line {
+      margin: 0px; }
+  .hatespeech-wrapper .hatespeech-events .event-title {
+    font-size: 18px;
+    background-color: #1565C0;
+    color: #FAFAF8;
+    padding: 10px; }
+  .hatespeech-wrapper .hatespeech-events .event-duration {
+    display: block;
+    font-size: 14px;
+    color: rgba(250, 250, 248, 0.5); }
+  .hatespeech-wrapper .hatespeech-events .event-stats {
+    padding: 0px 10px 10px 10px;
+    text-align: justify; }
+  .hatespeech-wrapper .hatespeech-events .hate-category-religion {
+    font-weight: 700;
+    color: #56C1F9;
+    font-style: italic; }
+  .hatespeech-wrapper .hatespeech-events .hate-category-ethnicity {
+    font-weight: 700;
+    color: #1565C0;
+    font-style: italic; }
+  .hatespeech-wrapper .hatespeech-events .hate-category-gender {
+    font-weight: 700;
+    color: #448AFF;
+    font-style: italic; }
