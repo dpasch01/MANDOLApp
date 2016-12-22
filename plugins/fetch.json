@@ -66,5 +66,14 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "com.ab.cordovafloatingactivity": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dpasch01/Cordova-Floating-Activity-Plugin",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

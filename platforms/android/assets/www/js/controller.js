@@ -6,7 +6,7 @@ var Controller = function() {
       initialize: function() {
           self = this;
           self.bindEvents();
-          self.renderHatespeechView();
+          self.renderReportView();
       },
 
       bindEvents: function() {
@@ -282,6 +282,24 @@ var Controller = function() {
                   }
                 }, function (error) {
                   console.log('Error: ' + error);
+                }
+              );
+            });
+            $("#observe-btn").on("click", function(e){
+              cordovafloatingactivity.startFloatingActivity('kakka',
+                function(){
+                  console.log("Reporting bubble activated.");
+                },
+                function(){
+                  console.log("Error in activating reporting bubble.");
+                }
+              );
+              cordovafloatingactivity.onFloatPressed('kakka',
+                function(){
+                  alert("Bubble pressed.");
+                },
+                function(){
+                  alert("Error in bubble.");
                 }
               );
             });

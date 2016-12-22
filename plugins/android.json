@@ -32,6 +32,9 @@
         },
         "cordova-plugin-dialogs": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "com.ab.cordovafloatingactivity": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="com.ab.cordovafloatingactivity"
+        version="0.7.0">
+
+  <name>CordovaFloatingActivity</name>
+
+  <engines>
+    <engine name="cordova" version=">=3.4.0"/>
+  </engines>
+
+  <asset src="www/cordovafloatingactivity.js" target="js/cordovafloatingactivity.js"/>
+
+  <js-module src="www/cordovafloatingactivity.js" name="cordovafloatingactivity">
+    <clobbers target="cordovafloatingactivity" />
+  </js-module>
+
+  <platform name="android">
+
+    <config-file target="res/xml/config.xml" parent="/*">
+      <feature name="cordovafloatingactivity">
+        <param name="android-package" value="com.ab.cordovafloatingactivityPack.cordovafloatingactivity"/>
+      </feature>
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest">
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    </config-file>
+    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+    <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService">
+    </service>
+    </config-file>
+
+    <source-file src="src/android/ChatHeadService.java" target-dir="src/com/ab/cordovafloatingactivityPack/"/>
+    <source-file src="src/android/cordovafloatingactivity.java" target-dir="src/com/ab/cordovafloatingactivityPack/"/>
+    <source-file src="src/android/PermissionChecker.java" target-dir="src/com/ab/cordovafloatingactivityPack/"/>
+    <source-file src="www/img/circle.png" target-dir="res/drawable/"/>
+
+
+  </platform>
+
+</plugin>

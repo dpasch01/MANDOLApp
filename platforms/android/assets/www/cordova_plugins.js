@@ -40,6 +40,14 @@ module.exports = [
         "merges": [
             "navigator.notification"
         ]
+    },
+    {
+        "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
+        "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
+        "pluginId": "com.ab.cordovafloatingactivity",
+        "clobbers": [
+            "cordovafloatingactivity"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -51,7 +59,8 @@ module.exports.metadata =
     "cordova-plugin-image-picker": "1.1.1",
     "cordova-sqlite-storage": "1.5.1",
     "cordova-plugin-inappbrowser": "1.6.0-dev",
-    "cordova-plugin-dialogs": "1.3.0"
+    "cordova-plugin-dialogs": "1.3.0",
+    "com.ab.cordovafloatingactivity": "0.7.0"
 };
 // BOTTOM OF METADATA
 });

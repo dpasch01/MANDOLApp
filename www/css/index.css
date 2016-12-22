@@ -112,19 +112,19 @@ hr {
     height: 50px;
     -webkit-border-radius: 50%;
             border-radius: 50%;
-    background-color: #AB434E;
+    background-color: #1565C0;
     margin-right: 15px;
     position: relative; }
     .list .report-item .source-icon .report-browser {
       position: absolute;
       top: 4px;
       left: 7px;
-      color: rgba(250, 250, 248, 0.6); }
+      color: #56C1F9; }
     .list .report-item .source-icon .report-image {
       position: absolute;
       top: 3px;
       left: 4px;
-      color: rgba(250, 250, 248, 0.6); }
+      color: #56C1F9; }
   .list .report-item .report-info .report-title {
     font-weight: bolder;
     color: #303C4C; }
@@ -150,7 +150,7 @@ hr {
           transition-duration: 0.2s;
   position: fixed;
   right: 20px;
-  bottom: 20px;
+  bottom: 60px;
   width: 75px;
   height: 75px;
   text-align: center;
@@ -191,14 +191,14 @@ hr {
       position: absolute;
       right: 30px;
       bottom: 30px;
-      background: #76DF8A; }
+      background: #56C1F9; }
     .menu-button a:nth-child(3) {
       -webkit-transition-delay: 0.2s;
               transition-delay: 0.2s;
       position: absolute;
       right: 30px;
       bottom: 30px;
-      background: #76DF8A; }
+      background: #56C1F9; }
   .menu-button.pressed a {
     opacity: 1;
     width: 50px;
