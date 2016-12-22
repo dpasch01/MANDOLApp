@@ -153,7 +153,7 @@ var Controller = function() {
             };
             var options = {
               lineSmooth: true,
-              showPoint: false,
+              showPoint: true,
               axisX:{
                 showGrid: false,
                 showLabel: false
