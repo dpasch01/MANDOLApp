@@ -19,6 +19,22 @@
     <feature name="cordovafloatingactivity">
         <param name="android-package" value="com.ab.cordovafloatingactivityPack.cordovafloatingactivity" />
     </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
+    <feature name="BackgroundMode">
+        <param name="android-package" value="de.appplant.cordova.plugin.background.BackgroundMode" />
+    </feature>
+    <feature name="Screenshot">
+        <param name="android-package" value="com.darktalker.cordova.screenshot.Screenshot" />
+    </feature>
+    <feature name="Camera">
+        <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
+    </feature>
+    <feature name="Diagnostic">
+        <param name="android-package" value="cordova.plugins.Diagnostic" />
+        <param name="onload" value="true" />
+    </feature>
     <name>MandolApp</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
@@ -43,5 +59,6 @@
     <preference name="xwalkMode" value="embedded" />
     <preference name="xwalkMultipleApk" value="true" />
     <preference name="android-minSdkVersion" value="16" />
+    <preference name="KeepRunning" value="true" />
     <preference name="CrosswalkAnimatable" value="true" />
 </widget>

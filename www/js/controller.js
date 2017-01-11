@@ -105,32 +105,167 @@ var Controller = function() {
       renderCreateView: function(annotated){
         var $container = $('.main-container');
         $container.empty();
-        $(".main-container").load("./views/create.html", function(data) {
-          $('#report-content').text(annotated);
-          $("form.create-report").submit(function(e) {
-            navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
-              inAppBrowser.show();
-            }, "Thank you!", "OK");
-            e.preventDefault();
+        $(".main-container").load("./views/annotator.html", function(data) {
+
+          function hasClass(element, className) {
+            return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+          }
+
+          function addClass(element, className){
+            if (!hasClass(element, className)) {
+              element.className = element.className + " " + className;
+            }
+          }
+
+          function removeClass(element, className) {
+            if (hasClass(element, className)) {
+              var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+              element.className = element.className.replace(reg,' ');
+            }
+          }
+
+          function toggleClass(element, className){
+            if (hasClass(element, className)){
+              removeClass(element, className);
+            }else{
+              addClass(element, className);
+            }
+          }
+
+          mostRecentHighlight = {};
+          hltr = new TextHighlighter(document, {
+            onBeforeHighlight: function (range) {
+              document.querySelector(".mandola-annotator-container .mandola-annotator-url").textContent = window.location.href;
+              document.querySelector(".mandola-annotator-container .mandola-annotator-content-text").textContent = range;
+              removeClass(document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+              removeClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+              return true;
+            },
+            onAfterHighlight: function (range, highlights, timestamp) {
+              mostRecentHighlight.timestamp = timestamp;
+              mostRecentHighlight.text = range;
+            }
           });
+
+          document.querySelector('#mandola-annotator-categories').addEventListener('click', function(){
+            toggleClass(document.querySelector('#mandola-annotator-categories'), 'pressed');
+            document.querySelector('#mandola-annotator-categories').blur();
+            document.querySelector(".mandola-annotator-body").scrollTo(0, document.querySelector(".mandola-annotator-body").scrollHeight);
+          });
+
+          document.querySelectorAll('.mandola-annotator-category').forEach(function(element, index, array){
+            element.addEventListener('click', function(){
+              toggleClass(element, 'active');
+              var categories = "";
+              document.querySelectorAll(".mandola-annotator-category.active").forEach(function(element, index, array){
+                if(index === 0){
+                  categories = element.textContent;
+                }else{
+                  categories += ", " + element.textContent;
+                }
+              });
+              document.querySelector('#mandola-annotator-categories').value = categories;
+            });
+          });
+
+          document.querySelector('.mandola-annotator-close').addEventListener('click', function(event){
+            removeRecentHighlight();
+            addClass(  document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+            resetMandola();
+            event.stopPropagation();
+          });
+
+          document.querySelector('.mandola-annotator-submit-button').addEventListener('click', function(event){
+            document.querySelector('.mandola-annotator-form [type="submit"]').click();
+          });
+
+          document.querySelector('.mandola-annotator-status-button').addEventListener('click', function(event){
+            addClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+            if(hasClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success')){
+              removeClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success');
+            }else{
+              removeClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-failure');
+            }
+            addClass(document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+          });
+
+          document.querySelector('.mandola-annotator-form').addEventListener("submit", function(event){
+            var recentHightlight = document.querySelector('span.highlighted[data-timestamp="' + mostRecentHighlight.timestamp + '"]');
+            recentHightlight.addEventListener('click', function(event){
+              console.log(event.target);
+            });
+
+            showSuccessMessage();
+            resetMandola();
+            event.stopPropagation();
+            event.preventDefault();
+          });
+
+          function showSuccessMessage(){
+            document.querySelector('.mandola-annotator-status-title').innerHTML = "Thank you!";
+            document.querySelector('.mandola-annotator-status-message').innerHTML = "Your report on <span class=\"mandola-annotator-url\">" + window.location.href + "</span> has been submitted and will be reviewed. You will be informed on the analysis results.";
+            addClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+            removeClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+          }
+
+          function showFailureMessage(){
+            document.querySelector('.mandola-annotator-status-title').innerHTML = "Failed!";
+            document.querySelector('.mandola-annotator-status-message').innerHTML = "Your report on <span class=\"mandola-annotator-url\">" + window.location.href + "</span> could not be submitted due to an error. Please try again.";
+            addClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-failure');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+            removeClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+          }
+
+          function removeRecentHighlight(){
+            var recentHightlight = document.querySelector('span.highlighted[data-timestamp="' + mostRecentHighlight.timestamp + '"]');
+            recentHightlight.outerHTML = recentHightlight.innerHTML;
+          }
+
+          function resetMandola(){
+            if(hasClass(document.querySelector('#mandola-annotator-categories'), 'pressed')){
+              document.querySelectorAll('#mandola-annotator-categories').forEach(function(element, index, array){
+                removeClass(element, 'pressed');
+              });
+            }
+            document.querySelectorAll(".mandola-annotator-category.active").forEach(function(element, index, array){
+              removeClass(element, 'active');
+            });
+            document.querySelector('#mandola-annotator-categories').value = "";
+            document.querySelector('#mandola-annotator-title').value = "";
+            document.querySelector('.mandola-annotator-content-text').innerHTML = "";
+            document.querySelector('.mandola-annotator-url').innerHTML = "";
+          }
+
+        // $(".main-container").load("./views/create.html", function(data) {
+        //   $('#report-content').text(annotated);
+        //   $("form.create-report").submit(function(e) {
+        //     navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
+        //       inAppBrowser.show();
+        //     }, "Thank you!", "OK");
+        //     e.preventDefault();
+        //   });
         });
-        $('.back-button').toggleClass('active');
-        $('.back-button').on('click', function(e){
-          inAppBrowser.show();
-        });
+        // $('.back-button').toggleClass('active');
+        // $('.back-button').on('click', function(e){
+        //   inAppBrowser.show();
+        // });
       },
 
       renderReportInfo: function(){
         var $container = $('.main-container');
         $container.empty();
         $(".main-container").load("./views/info.html", function(data) {
-            //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
+
         });
-        $('.back-button').toggleClass('active');
+        $('.back-button').addClass('active');
       },
 
       renderHatespeechView: function() {
           $('.tab-button').removeClass('active');
+          $('.back-button').removeClass('active');
           $('#hatespeech-btn').addClass('active');
 
           var $container = $('.main-container');
@@ -285,24 +420,92 @@ var Controller = function() {
                 }
               );
             });
-            $("#observe-btn").on("click", function(e){
-              cordovafloatingactivity.startFloatingActivity('kakka',
+
+            function inflateBubble(){
+              cordovafloatingactivity.startFloatingActivity('screenshot-btn',
                 function(){
+                  cordova.plugins.backgroundMode.setDefaults({ text:'Still hunting for hatespeech.'});
+                  cordova.plugins.backgroundMode.enable();
                   console.log("Reporting bubble activated.");
                 },
                 function(){
                   console.log("Error in activating reporting bubble.");
                 }
               );
-              cordovafloatingactivity.onFloatPressed('kakka',
+              cordovafloatingactivity.onFloatPressed('screenshot-btn',
                 function(){
-                  alert("Bubble pressed.");
+                  console.log("Success in firing onFloatPressed.");
+                  navigator.screenshot.URI(function(error,res){
+                    if(error){
+                      console.error(error);
+                    }else{
+                      html = '<img style="width:100%;" class="hatespeech-encounter-img" src="'+res.URI+'">';
+                      document.body.innerHTML = html;
+                      console.log(res);
+                    }
+                  },50);
                 },
                 function(){
-                  alert("Error in bubble.");
+                  console.log("Error in onFloatPressed.");
                 }
               );
+            }
+            function requestPermission(){
+              cordova.plugins.diagnostic.requestRuntimePermission(
+                function(status){
+                  switch(status){
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is granted.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not yet requested.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is denied.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not permitted.");
+                      break;
+                  }
+                }, function(error){
+                    console.error("The following error occurred: " + error);
+                },
+                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+              );
+            }
+            $("#observe-btn").on("click", function(e){
+              cordova.plugins.diagnostic.getPermissionAuthorizationStatus(
+                function(status){
+                  switch(status){
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
+                      inflateBubble();
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is granted.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not yet requested.");
+                      requestPermission();
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is denied.");
+                      requestPermission();
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not permitted.");
+                      requestPermission();
+                      break;
+                  }
+                }, function(error){
+                    console.error("The following error occurred: " + error);
+                },
+                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+              );
+
             });
+
+            function generateFavicon(URL){
+              return URL.replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
+            }
+
             $('.menu-button').on('click', function(){
               $('.menu-button').toggleClass('pressed');
             })
@@ -312,6 +515,7 @@ var Controller = function() {
 
       renderFAQsView: function() {
           $('.tab-button').removeClass('active');
+          $('.back-button').removeClass('active');
           $('#faqs-btn').addClass('active');
 
           var $container = $('.main-container');

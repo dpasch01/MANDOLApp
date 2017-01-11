@@ -29,6 +29,8 @@
     "semantic-ui-accordion": "^2.2.6",
     "flag-icon-css": "^2.7.0",
     "chartist": "^0.10.1",
-    "scrollreveal": "^3.3.2"
+    "scrollreveal": "^3.3.2",
+    "annotator.touch": "https://github.com/aron/annotator.touch.js",
+    "text-highlighter": "^1.2.0"
   }
 }

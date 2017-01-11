@@ -48,6 +48,71 @@ module.exports = [
         "clobbers": [
             "cordovafloatingactivity"
         ]
+    },
+    {
+        "id": "cordova-plugin-device.device",
+        "file": "plugins/cordova-plugin-device/www/device.js",
+        "pluginId": "cordova-plugin-device",
+        "clobbers": [
+            "device"
+        ]
+    },
+    {
+        "id": "cordova-plugin-background-mode.BackgroundMode",
+        "file": "plugins/cordova-plugin-background-mode/www/background-mode.js",
+        "pluginId": "cordova-plugin-background-mode",
+        "clobbers": [
+            "cordova.plugins.backgroundMode",
+            "plugin.backgroundMode"
+        ]
+    },
+    {
+        "id": "com.darktalker.cordova.screenshot.screenshot",
+        "file": "plugins/com.darktalker.cordova.screenshot/www/Screenshot.js",
+        "pluginId": "com.darktalker.cordova.screenshot",
+        "merges": [
+            "navigator.screenshot"
+        ]
+    },
+    {
+        "id": "cordova.plugins.diagnostic.Diagnostic",
+        "file": "plugins/cordova.plugins.diagnostic/www/android/diagnostic.js",
+        "pluginId": "cordova.plugins.diagnostic",
+        "clobbers": [
+            "cordova.plugins.diagnostic"
+        ]
+    },
+    {
+        "id": "cordova-plugin-camera.Camera",
+        "file": "plugins/cordova-plugin-camera/www/CameraConstants.js",
+        "pluginId": "cordova-plugin-camera",
+        "clobbers": [
+            "Camera"
+        ]
+    },
+    {
+        "id": "cordova-plugin-camera.CameraPopoverOptions",
+        "file": "plugins/cordova-plugin-camera/www/CameraPopoverOptions.js",
+        "pluginId": "cordova-plugin-camera",
+        "clobbers": [
+            "CameraPopoverOptions"
+        ]
+    },
+    {
+        "id": "cordova-plugin-camera.camera",
+        "file": "plugins/cordova-plugin-camera/www/Camera.js",
+        "pluginId": "cordova-plugin-camera",
+        "clobbers": [
+            "navigator.camera"
+        ]
+    },
+    {
+        "id": "cordova-plugin-camera.CameraPopoverHandle",
+        "file": "plugins/cordova-plugin-camera/www/CameraPopoverHandle.js",
+        "pluginId": "cordova-plugin-camera",
+        "clobbers": [
+            "CameraPopoverHandle"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -60,7 +125,13 @@ module.exports.metadata =
     "cordova-sqlite-storage": "1.5.1",
     "cordova-plugin-inappbrowser": "1.6.0-dev",
     "cordova-plugin-dialogs": "1.3.0",
-    "com.ab.cordovafloatingactivity": "0.7.0"
+    "com.ab.cordovafloatingactivity": "0.7.0",
+    "cordova-plugin-device": "1.1.4",
+    "cordova-plugin-background-mode": "0.6.6-dev",
+    "com.darktalker.cordova.screenshot": "0.1.5",
+    "cordova.plugins.diagnostic": "3.3.2",
+    "cordova-plugin-compat": "1.1.0",
+    "cordova-plugin-camera": "2.3.2-dev"
 };
 // BOTTOM OF METADATA
 });

@@ -6,7 +6,7 @@ var Controller = function() {
       initialize: function() {
           self = this;
           self.bindEvents();
-          self.renderReportView();
+          self.renderCreateView();
       },
 
       bindEvents: function() {
@@ -105,19 +105,87 @@ var Controller = function() {
       renderCreateView: function(annotated){
         var $container = $('.main-container');
         $container.empty();
-        $(".main-container").load("./views/create.html", function(data) {
-          $('#report-content').text(annotated);
-          $("form.create-report").submit(function(e) {
-            navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
-              inAppBrowser.show();
-            }, "Thank you!", "OK");
-            e.preventDefault();
+        $(".main-container").load("./views/annotator.html", function(data) {
+          mostRecentHighlight = null;
+          hltr = new TextHighlighter(document, {
+            onBeforeHighlight: function (range) {
+              console.log('Selected text: ' + range + '\nReally highlight?');
+              $(".mandola-annotator-container").removeClass('hidden');
+              return true;
+            },
+            onAfterHighlight: function (range, highlights, timestamp) {
+              mostRecentHighlight = timestamp;
+              console.log('Created ' + highlights.length + ' highlight(s): ' + highlights.map(function (h) {
+                return '"' + h.innerText + '"';
+              }).join(', '));
+            }
           });
+
+          $('.mandola-annotator-container').addClass('hidden');
+          $('#mandola-annotator-categories').on('click', function(){
+            $(this).toggleClass('pressed');
+            $(this).blur();
+            $(".mandola-annotator-body").animate({ scrollTop: $(document).height() }, "slow");
+          });
+          $('.mandola-annotator-category').on('click', function(){
+            $(this).toggleClass('active');
+            var categories = "";
+            $(".mandola-annotator-category.active").each(function(index, value){
+              if(index===0){
+                categories=$(value).text();
+              }else{
+                categories+=", " + $(value).text();
+              }
+            });
+            $('#mandola-annotator-categories').val(categories);
+          });
+          $('.mandola-annotator-cancel-button').on('click', function(event){
+            removeRecentHighlight();
+            $('.mandola-annotator-container').addClass('hidden');
+            resetMandola();
+            event.stopPropagation();
+          });
+          $('.mandola-annotator-close').on('click', function(event){
+            removeRecentHighlight();
+            $('.mandola-annotator-container').addClass('hidden');
+            resetMandola();
+            event.stopPropagation();
+          });
+
+          $('.mandola-annotator-submit-button').on('click', function(event){
+            $('.mandola-annotator-container').addClass('hidden');
+            resetMandola();
+            event.stopPropagation();
+          });
+
+          function removeRecentHighlight(){
+            $('span.highlighted[data-timestamp="' + mostRecentHighlight + '"]').contents().unwrap();
+          }
+          function resetMandola(){
+            if($('#mandola-annotator-categories').hasClass('pressed')){
+              $('#mandola-annotator-categories').removeClass('pressed')
+            }
+            $(".mandola-annotator-category.active").each(function(index, value){
+              $(value).removeClass('active');
+            });
+            $('#mandola-annotator-categories').val("");
+            $('#mandola-annotator-title').val("");
+            $('.mandola-annotator-content-text').html("");
+            $('.mandola-annotator-url').html("");
+          }
+        // $(".main-container").load("./views/create.html", function(data) {
+        //   $('#report-content').text(annotated);
+        //   $("form.create-report").submit(function(e) {
+        //     navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
+        //       inAppBrowser.show();
+        //     }, "Thank you!", "OK");
+        //     e.preventDefault();
+        //   });
         });
-        $('.back-button').toggleClass('active');
-        $('.back-button').on('click', function(e){
-          inAppBrowser.show();
-        });
+        // $('.back-button').toggleClass('active');
+        // $('.back-button').on('click', function(e){
+        //   inAppBrowser.show();
+        // });
       },
 
       renderReportInfo: function(){
@@ -285,24 +353,88 @@ var Controller = function() {
                 }
               );
             });
-            $("#observe-btn").on("click", function(e){
-              cordovafloatingactivity.startFloatingActivity('kakka',
+
+            function inflateBubble(){
+              cordovafloatingactivity.startFloatingActivity('screenshot-btn',
                 function(){
+                  cordova.plugins.backgroundMode.setDefaults({ text:'Still hunting for hatespeech.'});
+                  cordova.plugins.backgroundMode.enable();
                   console.log("Reporting bubble activated.");
                 },
                 function(){
                   console.log("Error in activating reporting bubble.");
                 }
               );
-              cordovafloatingactivity.onFloatPressed('kakka',
+              cordovafloatingactivity.onFloatPressed('screenshot-btn',
                 function(){
-                  alert("Bubble pressed.");
+                  console.log("Success in firing onFloatPressed.");
+                  navigator.screenshot.URI(function(error,res){
+                    if(error){
+                      console.error(error);
+                    }else{
+                      html = '<img style="width:100%;" class="hatespeech-encounter-img" src="'+res.URI+'">';
+                      document.body.innerHTML = html;
+                      console.log(res);
+                    }
+                  },50);
                 },
                 function(){
-                  alert("Error in bubble.");
+                  console.log("Error in onFloatPressed.");
                 }
               );
+            }
+            function requestPermission(){
+              cordova.plugins.diagnostic.requestRuntimePermission(
+                function(status){
+                  switch(status){
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is granted.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not yet requested.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is denied.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not permitted.");
+                      break;
+                  }
+                }, function(error){
+                    console.error("The following error occurred: " + error);
+                },
+                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+              );
+            }
+            $("#observe-btn").on("click", function(e){
+              cordova.plugins.diagnostic.getPermissionAuthorizationStatus(
+                function(status){
+                  switch(status){
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
+                      inflateBubble();
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is granted.");
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not yet requested.");
+                      requestPermission();
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is denied.");
+                      requestPermission();
+                      break;
+                    case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
+                      console.log("Permission WRITE_EXTERNAL_STORAGE is not permitted.");
+                      requestPermission();
+                      break;
+                  }
+                }, function(error){
+                    console.error("The following error occurred: " + error);
+                },
+                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+              );
+
             });
+
             $('.menu-button').on('click', function(){
               $('.menu-button').toggleClass('pressed');
             })
