@@ -31,6 +31,7 @@
     "chartist": "^0.10.1",
     "scrollreveal": "^3.3.2",
     "annotator.touch": "https://github.com/aron/annotator.touch.js",
-    "text-highlighter": "^1.2.0"
+    "text-highlighter": "^1.2.0",
+    "sweetalert2": "^6.3.1"
   }
 }

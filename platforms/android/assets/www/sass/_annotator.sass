@@ -2,8 +2,19 @@
   padding: 40px 15px 15px 15px
   text-align: justify
 
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,900')
+
+.mandola-annotator-url
+  word-break: break-all
+  white-space: pre-wrap
+  overflow-wrap: break-word
+
+.mandola-annotator-hidden
+  display: none !important
+
 .mandola-annotator-container
-  user-select: none; 
+  font-family: 'Roboto' !important
+  user-select: none
   z-index: 9999
   background-color: rgba(0, 0, 0, 0.7)
   position: fixed
@@ -15,29 +26,62 @@
   align-items: center
   justify-content: center
 
-  &.hidden
-    display: none
+  .mandola-annotator-status-container
+    padding: 20px
+    z-index: 10000
+    background-color: #FEFEFE
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)
+    width: 80%
+    text-align: center
+    font-size: 20px
+
+    .mandola-annotator-status-title
+      font-size: 25px
+      font-weight: bold
+
+    .mandola-annotator-status-thumbnail
+      margin: 15px 0px
+      height: 50px
+      width: 100%
+      background-size: contain
+      background-position: center
+      background-repeat: no-repeat
+
+      &.mandola-annotator-success
+        background-image: url('../img/mandola-success.png')
+      &.mandola-annotator-failure
+        background-image: url('../img/mandola-failure.png')
+
+    .mandola-annotator-url
+      font-style: italic
+      font-weight: lighter
+
+    .mandola-annotator-status-button
+      padding-top: 15px
+      color: rgba(0,0,0,0.6)
+      cursor: pointer
+      font-size: 25px
+      font-weight: bolder
+
+      &:hover
+        color: rgba(0,0,0,1)
 
   .mandola-annotator-form
     z-index: 10000
     background-color: #FEFEFE
-    box-shadow: 0px 5px rbga(0, 0, 0, 0.8)
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22)
     width: 80%
 
     .mandola-annotator-header
       position: relative
-      padding: 10px
-      font-size: 15px
-      color: #E3F2FD
-      background-color: #1565C0
+      padding: 10px 50px
+      font-size: 22px
       text-align: center
 
     .mandola-annotator-body
       width: 80%
-      max-height: 50vh
-      overflow-y: scroll
       margin: 0px auto
-      font-size: 14px
+      font-size: 20px
 
       fieldset
         border: none
@@ -50,10 +94,10 @@
 
         input
           width: calc(100%)
-          font-size: 14px
+          font-size: 18px
           margin: 0px
           padding: 5px
-          height: 30px
+          height: 40px
 
       .mandola-annotator-content
         width: 100%
@@ -65,6 +109,10 @@
           padding: 0px
 
         .mandola-annotator-content-text
+          max-height: 50vh
+          overflow-y: scroll
+          padding: 10px
+          border: 1px solid rgba(0,0,0,0.3)
           text-align: left
           margin: 5px 0px 10px 0px
 
@@ -73,10 +121,10 @@
       #mandola-annotator-categories
         cursor: pointer
         width: calc(100%)
-        font-size: 14px
+        font-size: 18px
         margin: 0px
         padding: 5px
-        height: 30px
+        height: 40px
 
         &.pressed + .mandola-annotator-categories-list,
         &.pressed + .mandola-annotator-categories-list > .mandola-annotator-category,
@@ -117,24 +165,25 @@
     .mandola-annotator-footer
       margin-top: 10px
       font-size: 20px
-      color: #E3F2FD
-      background-color: #1565C0
+      font-weight: bolder
+      color: #EFEFEF
       text-align: center
 
       .mandola-annotator-submit-button
-        margin: 10px 10px
-        display: inline-block
-        padding: 5px 10px
+        margin: 20px 0px
+        background-image: url('../img/mandola-submit.png')
         cursor: pointer
-        background-color: #1E88E5
+        height: 50px
+        width: 100%
+        background-size: contain
+        background-position: center
+        background-repeat: no-repeat
 
       .mandola-annotator-cancel-button
         margin: 10px 10px
         display: inline-block
         padding: 5px 10px
         cursor: pointer
-        background-color: #E3F2FD
-        color: #232323
 
     .mandola-annotator-close
       position: absolute

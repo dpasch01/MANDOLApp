@@ -3,10 +3,130 @@ var Controller = function() {
   var controller = {
       self: null,
 
+      installed_languages: [],
+
+      all_languages : [
+        {"code": "afr", "text": "Afrikaans"},
+        {"code": "sqi", "text": "Albanian"},
+        {"code": "amh", "text": "Amharic"},
+        {"code": "ara", "text": "Arabic"},
+        {"code": "asm", "text": "Assamese"},
+        {"code": "aze", "text": "Azerbaijani"},
+        {"code": "aze_cyrl", "text": "Azerbaijani - Cyrilic"},
+        {"code": "eus", "text": "Basque"},
+        {"code": "bel", "text": "Belarusian"},
+        {"code": "ben", "text": "Bengali"},
+        {"code": "bos", "text": "Bosnian"},
+        {"code": "bul", "text": "Bulgarian"},
+        {"code": "mya", "text": "Burmese"},
+        {"code": "cat", "text": "Catalan; Valencian"},
+        {"code": "ceb", "text": "Cebuano"},
+        {"code": "khm", "text": "Central Khmer"},
+        {"code": "chr", "text": "Cherokee"},
+        {"code": "chi_sim", "text": "Chinese - Simplified"},
+        {"code": "chi_tra", "text": "Chinese - Traditional"},
+        {"code": "hrv", "text": "Croatian"},
+        {"code": "ces", "text": "Czech"},
+        {"code": "dan", "text": "Danish"},
+        {"code": "nld", "text": "Dutch; Flemish"},
+        {"code": "dzo", "text": "Dzongkha"},
+        {"code": "eng", "text": "English"},
+        {"code": "epo", "text": "Esperanto"},
+        {"code": "est", "text": "Estonian"},
+        {"code": "fin", "text": "Finnish"},
+        {"code": "frk", "text": "Frankish"},
+        {"code": "fra", "text": "French"},
+        {"code": "glg", "text": "Galician"},
+        {"code": "kat", "text": "Georgian"},
+        {"code": "deu", "text": "German"},
+        {"code": "ell", "text": "Greek"},
+        {"code": "guj", "text": "Gujarati"},
+        {"code": "hat", "text": "Haitian; Haitian Creole"},
+        {"code": "heb", "text": "Hebrew"},
+        {"code": "hin", "text": "Hindi"},
+        {"code": "hun", "text": "Hungarian"},
+        {"code": "isl", "text": "Icelandic"},
+        {"code": "ind", "text": "Indonesian"},
+        {"code": "iku", "text": "Inuktitut"},
+        {"code": "gle", "text": "Irish"},
+        {"code": "ita", "text": "Italian"},
+        {"code": "jav", "text": "Javanese"},
+        {"code": "jpn", "text": "Japanese"},
+        {"code": "kan", "text": "Kannada"},
+        {"code": "kaz", "text": "Kazakh"},
+        {"code": "kir", "text": "Kirghiz; Kyrgyz"},
+        {"code": "kor", "text": "Korean"},
+        {"code": "kur", "text": "Kurdish"},
+        {"code": "lao", "text": "Lao"},
+        {"code": "lat", "text": "Latin"},
+        {"code": "lav", "text": "Latvian"},
+        {"code": "lit", "text": "Lithuanian"},
+        {"code": "mkd", "text": "Macedonian"},
+        {"code": "msa", "text": "Malay"},
+        {"code": "mal", "text": "Malayalam"},
+        {"code": "mlt", "text": "Maltese"},
+        {"code": "mar", "text": "Marathi"},
+        {"code": "nep", "text": "Nepali"},
+        {"code": "nor", "text": "Norwegian"},
+        {"code": "ori", "text": "Oriya"},
+        {"code": "pan", "text": "Panjabi; Punjabi"},
+        {"code": "fas", "text": "Persian"},
+        {"code": "pol", "text": "Polish"},
+        {"code": "por", "text": "Portuguese"},
+        {"code": "pus", "text": "Pushto; Pashto"},
+        {"code": "ron", "text": "Romanian; Moldavian; Moldovan"},
+        {"code": "rus", "text": "Russian"},
+        {"code": "san", "text": "Sanskrit"},
+        {"code": "srp", "text": "Serbian"},
+        {"code": "srp_latn", "text": "Serbian - Latin"},
+        {"code": "sin", "text": "Sinhala; Sinhalese"},
+        {"code": "slk", "text": "Slovak"},
+        {"code": "slv", "text": "Slovenian"},
+        {"code": "spa", "text": "Spanish; Castilian"},
+        {"code": "swa", "text": "Swahili"},
+        {"code": "swe", "text": "Swedish"},
+        {"code": "syr", "text": "Syriac"},
+        {"code": "tgl", "text": "Tagalog"},
+        {"code": "tgk", "text": "Tajik"},
+        {"code": "tam", "text": "Tamil"},
+        {"code": "tel", "text": "Telugu"},
+        {"code": "tha", "text": "Thai"},
+        {"code": "bod", "text": "Tibetan"},
+        {"code": "tir", "text": "Tigrinya"},
+        {"code": "tur", "text": "Turkish"},
+        {"code": "uig", "text": "Uighur; Uyghur"},
+        {"code": "ukr", "text": "Ukrainian"},
+        {"code": "urd", "text": "Urdu"},
+        {"code": "uzb", "text": "Uzbek"},
+        {"code": "uzb_cyrl", "text": "Uzbek - Cyrilic"},
+        {"code": "vie", "text": "Vietnamese"},
+        {"code": "cym", "text": "Welsh"},
+        {"code": "yid", "text": "Yiddish"}
+      ],
+
       initialize: function() {
           self = this;
           self.bindEvents();
           self.renderReportView();
+
+          var path = cordova.file.dataDirectory + "/files/tessdata/";
+          window.resolveLocalFileSystemURL(path,
+            function (fileSystem) {
+              var reader = fileSystem.createReader();
+              reader.readEntries(
+                function (entries) {
+                  for (var i = 0; i < entries.length; i++) {
+                    entries[i].file(function (file) {
+                      if(file.name.indexOf(".traineddata") !== -1){
+                        lang = file.name.replace(".traineddata", "");
+                        self.installed_languages.push(lang);
+                      }
+                    });
+                  }
+                },
+              function onfail(error){console.log("error: " + error);});
+            },
+          function onfail(error){console.log("error: " + error);});
       },
 
       bindEvents: function() {
@@ -31,6 +151,9 @@ var Controller = function() {
             case "#home-tab":
               self.renderHomeView();
               break;
+            case "#settings-tab":
+              self.renderSettingsView();
+              break;
             case "#hatespeech-tab":
               self.renderHatespeechView();
               break;
@@ -43,6 +166,15 @@ var Controller = function() {
             default:
               console.log("Error rendering view.");
           }
+      },
+
+      renderLoadingView: function(){
+        var $container = $('.main-container');
+        $container.empty();
+
+        $(".main-container").load("./views/loading.html", function(data){
+
+        });
       },
 
       renderCropView: function(uri) {
@@ -135,7 +267,7 @@ var Controller = function() {
           mostRecentHighlight = {};
           hltr = new TextHighlighter(document, {
             onBeforeHighlight: function (range) {
-              document.querySelector(".mandola-annotator-container .mandola-annotator-url").textContent = window.location.href;
+              document.querySelector(".mandola-annotator-container .mandola-annotator-url").textContent = "https://www.codecourse.com/lessons/api-development-with-laravel";
               document.querySelector(".mandola-annotator-container .mandola-annotator-content-text").textContent = range;
               removeClass(document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
               removeClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
@@ -369,56 +501,96 @@ var Controller = function() {
           });
       },
 
+      renderMandolaProxyView: function(URL){
+        var $container = $('.main-container');
+        $container.empty();
+        $('#hatespeech-btn').addClass('active');
+
+        MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
+
+        $(".main-container").load("./views/iframe.html", function(data){
+          $(".iframe-wrapper").html('<object class="mandola-proxy-iframe" data="' + MANDOLA_PROXY_PREFIX + URL + '">');
+          $('.mandola-proxy-iframe').on('load', function(){
+            console.log("URL: " + MANDOLA_PROXY_PREFIX + URL);
+          });
+        });
+
+      },
+
       renderReportView: function() {
           $('.tab-button').removeClass('active');
           $('#report-btn').addClass('active');
-
           var $container = $('.main-container');
           $container.empty();
 
+          MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
+
           $(".main-container").load("./views/report.html", function(data) {
             $(".report-item").on("click", controller.renderReportInfo);
+
             $("#browser-btn").on("click", function(e){
-              navigator.notification.prompt("Please enter a url.", function(url){
-                inAppBrowser = cordova.InAppBrowser.open(url.input1, '_blank', 'location=yes, toolbar=no, zoom=no, editablelocation=yes');
+              swal({
+                title: 'Enter a URL to annotate',
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Load',
+                showLoaderOnConfirm: false,
+                preConfirm: function(mandolaURL) {
+                  return new Promise(function(resolve, reject) {
+                    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                    if(!regexp.test(mandolaURL) || mandolaURL === ""){
+                      reject('Please provide a valid URL.');
+                    }else{
+                      resolve();
+                    }
+                  });
+                },
+                allowOutsideClick: true
+              }).then(function (mandolaURL) {
+                controller.renderLoadingView();
+                inAppBrowser = cordova.InAppBrowser.open(MANDOLA_PROXY_PREFIX + mandolaURL, '_blank',  'hidden=yes, location=yes, toolbar=no, zoom=no');
                 inAppBrowser.addEventListener('loaderror', function(e){
-                  navigator.notification.alert(url.input1 + " could not be loaded.", function(e){
-                    inAppBrowser.close();
-                  }, "Error while loading", "OK");
+                  swal('Oops...', 'Could not load: ' + mandolaURL, 'error');
+                  inAppBrowser.close();
+                  controller.renderReportView();
                 });
                 inAppBrowser.addEventListener('loadstop', function() {
-                  inAppBrowser.executeScript({file:"https://3ed88f5d.ngrok.io/mandolapp/www/js/report.js"});
-                  inAppBrowser.insertCSS({file:"https://3ed88f5d.ngrok.io/mandolapp/www/css/report.css"});
-                  inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                  listenForAnnotation = setInterval(function(){
-                    inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
-                      if(annotated!=''){
-                        inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                        inAppBrowser.hide();
-                        controller.renderCreateView(annotated);
+                  MAODate = new Date();
+                  MAO = {
+                    "uuid": device.uuid,
+                    "created": MAODate,
+                    "updated": MAODate,
+                    "reports": []
+                  };
+                  inAppBrowser.executeScript({ code: "localStorage.setItem('MAO', '" + JSON.stringify(MAO) + "');" });
+                  inAppBrowser.executeScript({ code: "localStorage.setItem('TEST', '{ \"uuid\": \"kakka\"}');" });
+                  MAOObserver = setInterval(function(){
+                    inAppBrowser.executeScript({ code: "localStorage.getItem('MAO')" }, function(values) {
+                      if(values[0]){
+                        var tempMAO = JSON.parse(values[0]);
+                        if(tempMAO.updated != MAODate){
+                          MAO = tempMAO;
+                        }
+                      }else{
+                        console.log("MANDOLA Application Object not found.");
                       }
                     });
-                  }, 500);
+                  }, 100);
+                  controller.renderReportView();
+                  inAppBrowser.show();
                 });
-                inAppBrowser.addEventListener('exit', function() {
-                    clearInterval(listenForAnnotation);
+                inAppBrowser.addEventListener('exit', function(){
+                  console.log(MAO);
+                  delete MAO;
+                  clearInterval(MAOObserver);
+                  localStorage.clear();
                 });
-              }, "Report via Browser", ["OK", "Cancel"], "http://www.google.com");
+              }).catch(swal.noop);
+
             });
+
             $("#image-btn").on("click", function(e){
-              window.imagePicker.getPictures(
-                function(results) {
-                  for (var i = 0; i < results.length; i++) {
-                    console.log('Image URI: ' + results[i]);
-                    var options = {
-                      allowEdit: true
-                    };
-                    controller.renderCropView(results[i]);
-                  }
-                }, function (error) {
-                  console.log('Error: ' + error);
-                }
-              );
+              //Commands to be executed when the image select button is pressed.
             });
 
             function inflateBubble(){
@@ -450,6 +622,7 @@ var Controller = function() {
                 }
               );
             }
+
             function requestPermission(){
               cordova.plugins.diagnostic.requestRuntimePermission(
                 function(status){
@@ -473,6 +646,7 @@ var Controller = function() {
                 cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
               );
             }
+
             $("#observe-btn").on("click", function(e){
               cordova.plugins.diagnostic.getPermissionAuthorizationStatus(
                 function(status){
@@ -508,7 +682,8 @@ var Controller = function() {
 
             $('.menu-button').on('click', function(){
               $('.menu-button').toggleClass('pressed');
-            })
+            });
+
           });
 
       },
@@ -570,6 +745,119 @@ var Controller = function() {
               origin: 'bottom',
               duration: 800
             });
+          });
+      },
+
+      renderSettingsView: function() {
+          $('.tab-button').removeClass('active');
+          $('.back-button').addClass('active');
+          $('#settings-btn').addClass('active');
+
+          var $container = $('.main-container');
+          $container.empty();
+
+          $(".main-container").load("./views/settings.html", function(data) {
+            for(i = 0; i < self.all_languages.length; i++){
+              var flag = true;
+
+              for(j = 0; j < self.installed_languages.length; j++){
+                if(self.all_languages[i].code == self.installed_languages[j]){
+                  $("#lang-ul").prepend('\
+                    <li id="' + self.all_languages[i].code + '" class="delete-gradient"> \
+                      <span class="lang-text">' + self.all_languages[i].text + '<span> \
+                      <span class="lang-install-text">installed</span> \
+                      <div class="delete-icon install-icon lang-top lang-right"></div> \
+                    </li>'
+                  );
+
+                  j = self.installed_languages.length;
+                  flag = false;
+                }
+              }
+
+              if(flag){
+                $("#lang-ul").append('\
+                  <li id="' + self.all_languages[i].code + '" class="download-gradient"> \
+                    <span class="lang-text">' + self.all_languages[i].text + '<span> \
+                    <span class="lang-install-text">not installed</span> \
+                    <div class="download-icon install-icon lang-top lang-right"></div> \
+                  </li>'
+                );
+              }
+            }
+
+            $("#lang-ul li").on("click",function() {
+              var lang = this.id;
+              var text = $("#" + lang + " .lang-install-text").text();
+
+              if(text == "installed"){
+                deleteLang(lang);
+              }else if (text == "not installed"){
+                downloadLang(lang);
+              }
+            });
+
+            function deleteLang(lang){
+              var path =  cordova.file.dataDirectory + "files/tessdata/";
+              window.resolveLocalFileSystemURL(path, function(dir){
+                dir.getFile(lang+".traineddata", {create: false}, function (fileEntry) {
+                  fileEntry.remove(function (file) {
+                    alert("Lang deleted!");
+
+                    $("#" + lang + " .lang-install-text").text("not installed");
+                    $("#" + lang).toggleClass('download-gradient delete-gradient');
+                    $("#" + lang + " .install-icon").toggleClass('download-icon delete-icon');
+
+                    for (var i = self.installed_languages.length-1; i>=0; i--) {
+                      if (self.installed_languages[i] === lang) {
+                        self.installed_languages.splice(i, 1);
+                        break;
+                      }
+                    }
+                  }, function(){
+                    alert("error deleting the file " + error.code);
+                  }, function(){
+                    alert("Lang deleted!");
+                  });
+                });
+              });
+            }
+
+            function downloadLang(lang){
+              var fileTransfer = new FileTransfer();
+              var fileURL = cordova.file.dataDirectory + "files/tessdata/"+lang+".traineddata";
+              var uri = encodeURI("https://github.com/tesseract-ocr/tessdata/raw/master/"+lang+".traineddata");
+
+              fileTransfer.onprogress = function(progressEvent){
+                if (progressEvent.lengthComputable) {
+                  var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+                  $("#" + lang + " .lang-install-text").text(perc + "% loaded...");
+                } else {
+                  if($("#" + lang + " .lang-install-text").text() == "") {
+                    $("#" + lang + " .lang-install-text").text("Loading");
+                  } else {
+                    $("#" + lang + " .lang-install-text").text(".");
+                  }
+                }
+              };
+
+              fileTransfer.download(uri, fileURL, function(entry) {
+                  $("#" + lang + " .lang-install-text").text("");
+                  alert("Lang installed!");
+
+                  $("#" + lang + " .lang-install-text").text("installed");
+                  $("#" + lang).toggleClass('delete-gradient download-gradient');
+                  $("#" + lang + " .install-icon").toggleClass('delete-icon download-icon');
+
+                  self.installed_languages.push(lang);
+              },function(error) {
+                  console.log("download error source " + error.source);
+                  console.log("download error target " + error.target);
+                  console.log("download error code" + error.code);
+              }, false, {
+
+              });
+            }
           });
       }
 

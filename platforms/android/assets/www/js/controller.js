@@ -6,7 +6,7 @@ var Controller = function() {
       initialize: function() {
           self = this;
           self.bindEvents();
-          self.renderCreateView();
+          self.renderReportView();
       },
 
       bindEvents: function() {
@@ -43,6 +43,15 @@ var Controller = function() {
             default:
               console.log("Error rendering view.");
           }
+      },
+
+      renderLoadingView: function(){
+        var $container = $('.main-container');
+        $container.empty();
+
+        $(".main-container").load("./views/loading.html", function(data){
+
+        });
       },
 
       renderCropView: function(uri) {
@@ -106,73 +115,139 @@ var Controller = function() {
         var $container = $('.main-container');
         $container.empty();
         $(".main-container").load("./views/annotator.html", function(data) {
-          mostRecentHighlight = null;
+
+          function hasClass(element, className) {
+            return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+          }
+
+          function addClass(element, className){
+            if (!hasClass(element, className)) {
+              element.className = element.className + " " + className;
+            }
+          }
+
+          function removeClass(element, className) {
+            if (hasClass(element, className)) {
+              var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+              element.className = element.className.replace(reg,' ');
+            }
+          }
+
+          function toggleClass(element, className){
+            if (hasClass(element, className)){
+              removeClass(element, className);
+            }else{
+              addClass(element, className);
+            }
+          }
+
+          mostRecentHighlight = {};
           hltr = new TextHighlighter(document, {
             onBeforeHighlight: function (range) {
-              console.log('Selected text: ' + range + '\nReally highlight?');
-              $(".mandola-annotator-container").removeClass('hidden');
+              document.querySelector(".mandola-annotator-container .mandola-annotator-url").textContent = "https://www.codecourse.com/lessons/api-development-with-laravel";
+              document.querySelector(".mandola-annotator-container .mandola-annotator-content-text").textContent = range;
+              removeClass(document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+              removeClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
               return true;
             },
             onAfterHighlight: function (range, highlights, timestamp) {
-              mostRecentHighlight = timestamp;
-              console.log('Created ' + highlights.length + ' highlight(s): ' + highlights.map(function (h) {
-                return '"' + h.innerText + '"';
-              }).join(', '));
+              mostRecentHighlight.timestamp = timestamp;
+              mostRecentHighlight.text = range;
             }
           });
 
-          $('.mandola-annotator-container').addClass('hidden');
-          $('#mandola-annotator-categories').on('click', function(){
-            $(this).toggleClass('pressed');
-            $(this).blur();
-            $(".mandola-annotator-body").animate({ scrollTop: $(document).height() }, "slow");
+          document.querySelector('#mandola-annotator-categories').addEventListener('click', function(){
+            toggleClass(document.querySelector('#mandola-annotator-categories'), 'pressed');
+            document.querySelector('#mandola-annotator-categories').blur();
+            document.querySelector(".mandola-annotator-body").scrollTo(0, document.querySelector(".mandola-annotator-body").scrollHeight);
           });
-          $('.mandola-annotator-category').on('click', function(){
-            $(this).toggleClass('active');
-            var categories = "";
-            $(".mandola-annotator-category.active").each(function(index, value){
-              if(index===0){
-                categories=$(value).text();
-              }else{
-                categories+=", " + $(value).text();
-              }
+
+          document.querySelectorAll('.mandola-annotator-category').forEach(function(element, index, array){
+            element.addEventListener('click', function(){
+              toggleClass(element, 'active');
+              var categories = "";
+              document.querySelectorAll(".mandola-annotator-category.active").forEach(function(element, index, array){
+                if(index === 0){
+                  categories = element.textContent;
+                }else{
+                  categories += ", " + element.textContent;
+                }
+              });
+              document.querySelector('#mandola-annotator-categories').value = categories;
             });
-            $('#mandola-annotator-categories').val(categories);
           });
-          $('.mandola-annotator-cancel-button').on('click', function(event){
+
+          document.querySelector('.mandola-annotator-close').addEventListener('click', function(event){
             removeRecentHighlight();
-            $('.mandola-annotator-container').addClass('hidden');
-            resetMandola();
-            event.stopPropagation();
-          });
-          $('.mandola-annotator-close').on('click', function(event){
-            removeRecentHighlight();
-            $('.mandola-annotator-container').addClass('hidden');
+            addClass(  document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
             resetMandola();
             event.stopPropagation();
           });
 
-          $('.mandola-annotator-submit-button').on('click', function(event){
-            $('.mandola-annotator-container').addClass('hidden');
+          document.querySelector('.mandola-annotator-submit-button').addEventListener('click', function(event){
+            document.querySelector('.mandola-annotator-form [type="submit"]').click();
+          });
+
+          document.querySelector('.mandola-annotator-status-button').addEventListener('click', function(event){
+            addClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+            if(hasClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success')){
+              removeClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success');
+            }else{
+              removeClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-failure');
+            }
+            addClass(document.querySelector('.mandola-annotator-container'), 'mandola-annotator-hidden');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+          });
+
+          document.querySelector('.mandola-annotator-form').addEventListener("submit", function(event){
+            var recentHightlight = document.querySelector('span.highlighted[data-timestamp="' + mostRecentHighlight.timestamp + '"]');
+            recentHightlight.addEventListener('click', function(event){
+              console.log(event.target);
+            });
+
+            showSuccessMessage();
             resetMandola();
             event.stopPropagation();
+            event.preventDefault();
           });
+
+          function showSuccessMessage(){
+            document.querySelector('.mandola-annotator-status-title').innerHTML = "Thank you!";
+            document.querySelector('.mandola-annotator-status-message').innerHTML = "Your report on <span class=\"mandola-annotator-url\">" + window.location.href + "</span> has been submitted and will be reviewed. You will be informed on the analysis results.";
+            addClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-success');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+            removeClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+          }
+
+          function showFailureMessage(){
+            document.querySelector('.mandola-annotator-status-title').innerHTML = "Failed!";
+            document.querySelector('.mandola-annotator-status-message').innerHTML = "Your report on <span class=\"mandola-annotator-url\">" + window.location.href + "</span> could not be submitted due to an error. Please try again.";
+            addClass(document.querySelector('.mandola-annotator-status-thumbnail'), 'mandola-annotator-failure');
+            addClass(document.querySelector('.mandola-annotator-form'), 'mandola-annotator-hidden');
+            removeClass(document.querySelector('.mandola-annotator-status-container'), 'mandola-annotator-hidden');
+          }
 
           function removeRecentHighlight(){
-            $('span.highlighted[data-timestamp="' + mostRecentHighlight + '"]').contents().unwrap();
+            var recentHightlight = document.querySelector('span.highlighted[data-timestamp="' + mostRecentHighlight.timestamp + '"]');
+            recentHightlight.outerHTML = recentHightlight.innerHTML;
           }
+
           function resetMandola(){
-            if($('#mandola-annotator-categories').hasClass('pressed')){
-              $('#mandola-annotator-categories').removeClass('pressed')
+            if(hasClass(document.querySelector('#mandola-annotator-categories'), 'pressed')){
+              document.querySelectorAll('#mandola-annotator-categories').forEach(function(element, index, array){
+                removeClass(element, 'pressed');
+              });
             }
-            $(".mandola-annotator-category.active").each(function(index, value){
-              $(value).removeClass('active');
+            document.querySelectorAll(".mandola-annotator-category.active").forEach(function(element, index, array){
+              removeClass(element, 'active');
             });
-            $('#mandola-annotator-categories').val("");
-            $('#mandola-annotator-title').val("");
-            $('.mandola-annotator-content-text').html("");
-            $('.mandola-annotator-url').html("");
+            document.querySelector('#mandola-annotator-categories').value = "";
+            document.querySelector('#mandola-annotator-title').value = "";
+            document.querySelector('.mandola-annotator-content-text').innerHTML = "";
+            document.querySelector('.mandola-annotator-url').innerHTML = "";
           }
+
         // $(".main-container").load("./views/create.html", function(data) {
         //   $('#report-content').text(annotated);
         //   $("form.create-report").submit(function(e) {
@@ -192,13 +267,14 @@ var Controller = function() {
         var $container = $('.main-container');
         $container.empty();
         $(".main-container").load("./views/info.html", function(data) {
-            //Bind view's events e.g. $('#tab-content').find('#post-project-form').on('submit', self.postProject);
+
         });
-        $('.back-button').toggleClass('active');
+        $('.back-button').addClass('active');
       },
 
       renderHatespeechView: function() {
           $('.tab-button').removeClass('active');
+          $('.back-button').removeClass('active');
           $('#hatespeech-btn').addClass('active');
 
           var $container = $('.main-container');
@@ -302,56 +378,96 @@ var Controller = function() {
           });
       },
 
+      renderMandolaProxyView: function(URL){
+        var $container = $('.main-container');
+        $container.empty();
+        $('#hatespeech-btn').addClass('active');
+
+        MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
+
+        $(".main-container").load("./views/iframe.html", function(data){
+          $(".iframe-wrapper").html('<object class="mandola-proxy-iframe" data="' + MANDOLA_PROXY_PREFIX + URL + '">');
+          $('.mandola-proxy-iframe').on('load', function(){
+            console.log("URL: " + MANDOLA_PROXY_PREFIX + URL);
+          });
+        });
+
+      },
+
       renderReportView: function() {
           $('.tab-button').removeClass('active');
           $('#report-btn').addClass('active');
-
           var $container = $('.main-container');
           $container.empty();
 
+          MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
+
           $(".main-container").load("./views/report.html", function(data) {
             $(".report-item").on("click", controller.renderReportInfo);
+
             $("#browser-btn").on("click", function(e){
-              navigator.notification.prompt("Please enter a url.", function(url){
-                inAppBrowser = cordova.InAppBrowser.open(url.input1, '_blank', 'location=yes, toolbar=no, zoom=no, editablelocation=yes');
+              swal({
+                title: 'Enter a URL to annotate',
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonText: 'Load',
+                showLoaderOnConfirm: false,
+                preConfirm: function(mandolaURL) {
+                  return new Promise(function(resolve, reject) {
+                    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                    if(!regexp.test(mandolaURL) || mandolaURL === ""){
+                      reject('Please provide a valid URL.');
+                    }else{
+                      resolve();
+                    }
+                  });
+                },
+                allowOutsideClick: true
+              }).then(function (mandolaURL) {
+                controller.renderLoadingView();
+                inAppBrowser = cordova.InAppBrowser.open(MANDOLA_PROXY_PREFIX + mandolaURL, '_blank',  'hidden=yes, location=yes, toolbar=no, zoom=no');
                 inAppBrowser.addEventListener('loaderror', function(e){
-                  navigator.notification.alert(url.input1 + " could not be loaded.", function(e){
-                    inAppBrowser.close();
-                  }, "Error while loading", "OK");
+                  swal('Oops...', 'Could not load: ' + mandolaURL, 'error');
+                  inAppBrowser.close();
+                  controller.renderReportView();
                 });
                 inAppBrowser.addEventListener('loadstop', function() {
-                  inAppBrowser.executeScript({file:"https://3ed88f5d.ngrok.io/mandolapp/www/js/report.js"});
-                  inAppBrowser.insertCSS({file:"https://3ed88f5d.ngrok.io/mandolapp/www/css/report.css"});
-                  inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                  listenForAnnotation = setInterval(function(){
-                    inAppBrowser.executeScript({ code: "localStorage.getItem('annotatedText')" }, function(annotated) {
-                      if(annotated!=''){
-                        inAppBrowser.executeScript({code: "localStorage.setItem('annotatedText', '')"});
-                        inAppBrowser.hide();
-                        controller.renderCreateView(annotated);
+                  MAODate = new Date();
+                  MAO = {
+                    "uuid": device.uuid,
+                    "created": MAODate,
+                    "updated": MAODate,
+                    "reports": []
+                  };
+                  inAppBrowser.executeScript({ code: "localStorage.setItem('MAO', '" + JSON.stringify(MAO) + "');" });
+                  inAppBrowser.executeScript({ code: "localStorage.setItem('TEST', '{ \"uuid\": \"kakka\"}');" });
+                  MAOObserver = setInterval(function(){
+                    inAppBrowser.executeScript({ code: "localStorage.getItem('MAO')" }, function(values) {
+                      if(values[0]){
+                        var tempMAO = JSON.parse(values[0]);
+                        if(tempMAO.updated != MAODate){
+                          MAO = tempMAO;
+                        }
+                      }else{
+                        console.log("MANDOLA Application Object not found.");
                       }
                     });
-                  }, 500);
+                  }, 100);
+                  controller.renderReportView();
+                  inAppBrowser.show();
                 });
-                inAppBrowser.addEventListener('exit', function() {
-                    clearInterval(listenForAnnotation);
+                inAppBrowser.addEventListener('exit', function(){
+                  console.log(MAO);
+                  delete MAO;
+                  clearInterval(MAOObserver);
+                  localStorage.clear();
                 });
-              }, "Report via Browser", ["OK", "Cancel"], "http://www.google.com");
+              }).catch(swal.noop);
+
             });
+
             $("#image-btn").on("click", function(e){
-              window.imagePicker.getPictures(
-                function(results) {
-                  for (var i = 0; i < results.length; i++) {
-                    console.log('Image URI: ' + results[i]);
-                    var options = {
-                      allowEdit: true
-                    };
-                    controller.renderCropView(results[i]);
-                  }
-                }, function (error) {
-                  console.log('Error: ' + error);
-                }
-              );
+              //Commands to be executed when the image select button is pressed.
             });
 
             function inflateBubble(){
@@ -383,6 +499,7 @@ var Controller = function() {
                 }
               );
             }
+
             function requestPermission(){
               cordova.plugins.diagnostic.requestRuntimePermission(
                 function(status){
@@ -406,6 +523,7 @@ var Controller = function() {
                 cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
               );
             }
+
             $("#observe-btn").on("click", function(e){
               cordova.plugins.diagnostic.getPermissionAuthorizationStatus(
                 function(status){
@@ -435,15 +553,21 @@ var Controller = function() {
 
             });
 
+            function generateFavicon(URL){
+              return URL.replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
+            }
+
             $('.menu-button').on('click', function(){
               $('.menu-button').toggleClass('pressed');
-            })
+            });
+
           });
 
       },
 
       renderFAQsView: function() {
           $('.tab-button').removeClass('active');
+          $('.back-button').removeClass('active');
           $('#faqs-btn').addClass('active');
 
           var $container = $('.main-container');
