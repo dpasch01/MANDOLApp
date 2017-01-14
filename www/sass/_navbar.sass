@@ -11,18 +11,20 @@
   border-radius: 0px
   background-color: $darkish
 
-.back-button
+.back-button,
+.settings-back-button
   float: left
   padding: 6px 10px
+  margin-left: 20px
   color: $whitish
   font-size: 15px
-  visibility: hidden
+  display: none
 
   &:hover
     background-color: $darkish
 
   &.active
-    visibility: visible
+    display: block
 
 .navbar-fixed-top  .col-xs-4
   margin: 0px

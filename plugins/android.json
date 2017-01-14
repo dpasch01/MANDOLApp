@@ -47,6 +47,18 @@
         },
         "cordova-plugin-camera": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-my-tess-two": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-crop": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {

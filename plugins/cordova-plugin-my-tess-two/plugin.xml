@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-my-tess-two"
+        version="0.1.0">
+
+    <name>TesseractPlugin</name>
+    <description>Tesseract (tess-two) plugin for cordova</description>
+    <license>Apache 2.0 License</license>
+    <keywords>cordova, tess-two, tesseract, plugin</keywords>
+    
+    <engines>
+        <engine name="cordova" version=">=3.6.0" /><!-- Requires CordovaPlugin.preferences -->
+    </engines>
+    
+    <js-module src="www/tesseract_plugin.js" name="tesseract_plugin">
+        <clobbers target="tesseract_plugin" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="TesseractPlugin">
+                <param name="android-package" value="com.tesseract.plugin.TesseractPlugin"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/TesseractPlugin.java" target-dir="src/com/tesseract/plugin/"/>
+
+        <source-file src="src/android/tesseract/PageIterator.java" target-dir="src/com/googlecode/tesseract/android" />  
+        <source-file src="src/android/tesseract/ResultIterator.java" target-dir="src/com/googlecode/tesseract/android" />  
+        <source-file src="src/android/tesseract/TessBaseAPI.java" target-dir="src/com/googlecode/tesseract/android" />  
+        <source-file src="src/android/tesseract/TessPdfRenderer.java" target-dir="src/com/googlecode/tesseract/android" />
+            
+        <source-file src="src/android/leptonica/AdaptiveMap.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Binarize.java" target-dir="src/com/googlecode/leptonica/android" />
+        <source-file src="src/android/leptonica/Box.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Boxa.java" target-dir="src/com/googlecode/leptonica/android" /> 
+        <source-file src="src/android/leptonica/Clip.java" target-dir="src/com/googlecode/leptonica/android" /> 
+        <source-file src="src/android/leptonica/Constants.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Convert.java" target-dir="src/com/googlecode/leptonica/android" />   
+        <source-file src="src/android/leptonica/Edge.java" target-dir="src/com/googlecode/leptonica/android" />   
+        <source-file src="src/android/leptonica/Enhance.java" target-dir="src/com/googlecode/leptonica/android" /> 
+        <source-file src="src/android/leptonica/GrayQuant.java" target-dir="src/com/googlecode/leptonica/android" />   
+        <source-file src="src/android/leptonica/JpegIO.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/MorphApp.java" target-dir="src/com/googlecode/leptonica/android" />   
+        <source-file src="src/android/leptonica/Pix.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Pixa.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/ReadFile.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Rotate.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Scale.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/Skew.java" target-dir="src/com/googlecode/leptonica/android" />  
+        <source-file src="src/android/leptonica/WriteFile.java" target-dir="src/com/googlecode/leptonica/android" />
+    </platform>
+
+<!--   <platform name="ios">
+    
+    <config-file target="config.xml" parent="/widget">
+      <feature name="Hello">
+        <param name="ios-package" value="HWPHello" />
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/HWPHello.h" target-dir="HelloPlugin"/>
+    <source-file src="src/ios/HWPHello.m" target-dir="HelloPlugin"/>
+  </platform>
+
+  <platform name="wp7">
+    <source-file src="src/wp7/Hello.cs"/>
+  </platform> -->
+	 
+</plugin>

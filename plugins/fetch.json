@@ -119,5 +119,37 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "cordova-plugin-file": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-file"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-file-transfer": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-file-transfer"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-my-tess-two": {
+        "source": {
+            "type": "local",
+            "path": "C:\\Users\\dpasch01\\Desktop\\mandolapp\\mandolapp\\plugins\\cordova-plugin-my-tess-two"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-crop": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-crop"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }
