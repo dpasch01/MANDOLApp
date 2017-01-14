@@ -41,30 +41,49 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="cordovafloatingactivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/ab/cordovafloatingactivityPack/cordovafloatingactivity.java">
+      <file leaf-file-name="controller.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/assets/www/js/controller.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+            <state relative-caret-position="362">
+              <caret line="701" column="33" selection-start-line="0" selection-start-column="0" selection-end-line="1199" selection-end-column="0" />
               <folding>
-                <element signature="method#activateEvent#0;class#cordovafloatingactivity#0" expanded="false" />
-                <element signature="method#execute#0;class#cordovafloatingactivity#0" expanded="false" />
-                <element signature="method#initHookEvent#0;class#cordovafloatingactivity#0" expanded="false" />
-                <element signature="method#launchService#0;class#cordovafloatingactivity#0" expanded="false" />
-                <element signature="method#stopService#0;class#cordovafloatingactivity#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
+                <element signature="e#0#52317#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="controller.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/assets/www/js/controller.js">
+      <file leaf-file-name="TesseractPlugin.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tesseract/plugin/TesseractPlugin.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="28" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
-              <folding>
-                <element signature="e#0#41809#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="68">
+              <caret line="30" column="28" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TessBaseAPI.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/googlecode/tesseract/android/TessBaseAPI.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="301">
+              <caret line="496" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="977" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CropPlugin.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/jeduan/crop/CropPlugin.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="30" column="36" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="36" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -2372,7 +2391,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="C:\Xampp\htdocs\mandolapp\platforms\android" value="5929567233356" />
+        <entry key="C:\Xampp\htdocs\mandolapp\platforms\android" value="5932964561329" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -2815,6 +2834,10 @@
         <option value="$PROJECT_DIR$/src/com/ab/cordovafloatingactivityPack/ChatHeadService.java" />
         <option value="$PROJECT_DIR$/src/com/ab/cordovafloatingactivityPack/PermissionChecker.java" />
         <option value="$PROJECT_DIR$/src/com/ab/cordovafloatingactivityPack/cordovafloatingactivity.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/leptonica/android/ReadFile.java" />
+        <option value="$PROJECT_DIR$/src/com/googlecode/tesseract/android/TessBaseAPI.java" />
+        <option value="$PROJECT_DIR$/src/com/jeduan/crop/CropPlugin.java" />
+        <option value="$PROJECT_DIR$/src/com/tesseract/plugin/TesseractPlugin.java" />
         <option value="$PROJECT_DIR$/assets/www/js/controller.js" />
       </list>
     </option>
@@ -2850,12 +2873,11 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane />
       </pane>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -2864,8 +2886,29 @@
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="android" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CordovaLib" />
+              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2873,7 +2916,7 @@
     <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="last_opened_file_path" value="$USER_HOME$/Desktop/Nammu-master" />
-    <property name="device.picker.selection" value="YT9116XH0R" />
+    <property name="device.picker.selection" value="d82889bd" />
     <property name="show.do.not.ask.upgrade.gradle.plugin.version" value="2.2.0" />
   </component>
   <component name="RunManager" selected="Android App.android">
@@ -3185,7 +3228,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -3197,7 +3240,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32962137" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24749164" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24721603" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -3290,7 +3333,41 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#41809#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/ab/cordovafloatingactivityPack/cordovafloatingactivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding>
+            <element signature="method#activateEvent#0;class#cordovafloatingactivity#0" expanded="false" />
+            <element signature="method#execute#0;class#cordovafloatingactivity#0" expanded="false" />
+            <element signature="method#initHookEvent#0;class#cordovafloatingactivity#0" expanded="false" />
+            <element signature="method#launchService#0;class#cordovafloatingactivity#0" expanded="false" />
+            <element signature="method#stopService#0;class#cordovafloatingactivity#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/www/js/controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3314,7 +3391,12 @@
         <state relative-caret-position="0">
           <caret line="0" column="28" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
           <folding>
-            <element signature="e#0#41809#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3392,14 +3474,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider editor-type-id="android-manifest">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="459">
           <caret line="27" column="73" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="73" />
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="android-manifest">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/darktalker/cordova/screenshot/Screenshot.java">
@@ -3444,12 +3526,49 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/leptonica/android/ReadFile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="199">
+          <caret line="126" column="7" selection-start-line="126" selection-start-column="7" selection-end-line="126" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tesseract/plugin/TesseractPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="30" column="28" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/googlecode/tesseract/android/TessBaseAPI.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="496" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="977" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/jeduan/crop/CropPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="30" column="36" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/assets/www/js/controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="28" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
+        <state relative-caret-position="362">
+          <caret line="701" column="33" selection-start-line="0" selection-start-column="0" selection-end-line="1199" selection-end-column="0" />
           <folding>
-            <element signature="e#0#41809#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
+            <element signature="e#0#52317#0" expanded="false" />
           </folding>
         </state>
       </provider>

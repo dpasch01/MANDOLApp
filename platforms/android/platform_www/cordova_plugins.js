@@ -340,7 +340,7 @@ module.exports.metadata =
     "cordova-plugin-file": "4.3.1",
     "cordova-plugin-file-transfer": "1.6.1",
     "cordova-plugin-my-tess-two": "0.1.0",
-    "cordova-plugin-crop": "0.1.0"
+    "cordova-plugin-crop": "0.3.1"
 };
 // BOTTOM OF METADATA
 });

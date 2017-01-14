@@ -21,6 +21,8 @@ import java.io.File;
 
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.util.Log;
 
 import com.googlecode.leptonica.android.Pix;
 import com.googlecode.leptonica.android.Pixa;
@@ -306,7 +308,8 @@ public class TessBaseAPI {
         if (!datapathFile.exists())
             throw new IllegalArgumentException("Data path does not exist!");
 
-        File tessdata = new File(datapath + "tessdata");
+        Log.d("TESSDATA", datapath + "tessdata/");
+        File tessdata = new File(datapath + "tessdata/");
         if (!tessdata.exists() || !tessdata.isDirectory())
             throw new IllegalArgumentException("Data path must contain subfolder tessdata!");
 

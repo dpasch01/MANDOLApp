@@ -40,6 +40,11 @@ public class TesseractPlugin extends CordovaPlugin {
 			    String langPath = args.getString(1);
 			    String lang = args.getString(2);
 
+                Log.d("TESSERACT_EXECUTE", imagePath);
+//                Log.d("TESSERACT_EXECUTE", imagePath.replace("file:///", ""));
+//                Log.d("TESSERACT_CACHE", imagePath.replace("file:///", "").split("\\?")[0]);
+
+
 			    if (imagePath != null && imagePath.length() > 0) {
 		            callbackContext.success(TesseractExample(imagePath.replace("file:///", ""), langPath.replace("file:///", ""), lang));
 		        } else {
@@ -136,8 +141,9 @@ public class TesseractPlugin extends CordovaPlugin {
 		try {
 			TessBaseAPI baseApi = new TessBaseAPI();
 			baseApi.init(pathToLang, determineOcrLanguage(lang));
+            File tmp = new File(pathToPic);
 			baseApi.setImage(new File(pathToPic));
-			
+
 			recognizedText = baseApi.getUTF8Text();
 			
 			baseApi.end();

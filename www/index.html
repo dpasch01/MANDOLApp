@@ -63,6 +63,54 @@
         </div>
       </nav>
 
+      <div class="mandola-annotator-container mandola-annotator-hidden">
+          <div class="mandola-annotator-status-container mandola-annotator-hidden">
+            <div class="mandola-annotator-status-title"></div>
+            <div class="mandola-annotator-status-thumbnail"></div>
+            <div class="mandola-annotator-status-message"></div>
+            <div class="mandola-annotator-status-button">OK</div>
+          </div>
+          <form class="mandola-annotator-form mandola-annotator-hidden">
+              <div class="mandola-annotator-header">Append annotation to <b><i><span class="mandola-annotator-url">http://geekologie.com</span></i></b><span class="mandola-annotator-close">×</span></div>
+              <div class="mandola-annotator-body">
+                  <fieldset class="mandola-annotator-title">
+                      <input required id="mandola-annotator-title" type="text" name="title" placeholder="Title e.g. Anti-islamic content" />
+                  </fieldset>
+                  <fieldset class="mandola-annotator-categories-selection">
+                      <input required id="mandola-annotator-categories" type="text" name="categories" placeholder="Press to select categories." value="">
+                      <ul class="mandola-annotator-categories-list">
+                          <li class="mandola-annotator-category">Nationality</li>
+                          <li class="mandola-annotator-category">Ethnicity</li>
+                          <li class="mandola-annotator-category">Religion</li>
+                          <li class="mandola-annotator-category">Sexuality</li>
+                          <li class="mandola-annotator-category">Gender</li>
+                          <li class="mandola-annotator-category">Disability</li>
+                          <li class="mandola-annotator-category">Class</li>
+                          <li class="mandola-annotator-category">Historic</li>
+                          <li class="mandola-annotator-category">Other</li>
+                      </ul>
+                      <input type="checkbox" name="category" value="nationality" />
+                      <input type="checkbox" name="category" value="ethnicity" />
+                      <input type="checkbox" name="category" value="religion" />
+                      <input type="checkbox" name="category" value="sexuality" />
+                      <input type="checkbox" name="category" value="gender" />
+                      <input type="checkbox" name="category" value="disability" />
+                      <input type="checkbox" name="category" value="class" />
+                      <input type="checkbox" name="category" value="historic" />
+                      <input type="checkbox" name="category" value="other" />
+                  </fieldset>
+                  <fieldset class="mandola-annotator-content">
+                      <div class="mandola-annotator-content-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+                  </fieldset>
+
+              </div>
+              <div class="mandola-annotator-footer">
+                  <button type="submit" class="hidden" name="submit"></button>
+                  <div class="mandola-annotator-submit-button"></div>
+              </div>
+          </form>
+      </div>
+
       <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
       <script type="text/javascript" src="js/responsive-iframes.js"></script>
       <script type="text/javascript" src="js/glfx.min.js"></script>

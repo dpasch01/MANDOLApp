@@ -18,6 +18,7 @@ package com.googlecode.leptonica.android;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import java.io.File;
@@ -125,10 +126,14 @@ public class ReadFile {
      * @return a Pix object
      */
     public static Pix readFile(File file) {
+
         if (file == null) {
             Log.e(LOG_TAG, "File must be non-null");
             return null;
         }
+
+        Log.d("IMAGE FILE", file.getAbsolutePath());
+//        file = new File(Uri.fromFile(file).getPath().replace("file:///",""));
         if (!file.exists()) {
             Log.e(LOG_TAG, "File does not exist");
             return null;
