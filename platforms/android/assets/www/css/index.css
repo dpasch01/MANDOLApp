@@ -1,15 +1,11 @@
 @import url("https://fonts.googleapis.com/css?family=Fredoka+One|Roboto:400,900");
-@import url("https://fonts.googleapis.com/css?family=Roboto:400,900");
 body {
   background-color: #E3F2FD;
   font-family: 'Roboto'; }
 
 .hatespeech-wrapper,
 .settings-wrapper,
-.iframe-wrapper,
-.crop-wrapper,
 .report-wrapper,
-.create-report,
 .faqs-wrapper,
 .info-wrapper,
 .annotator-wrapper {
@@ -55,6 +51,17 @@ hr {
   .settings-back-button.active {
     display: block; }
 
+.report-url-button {
+  float: right;
+  padding: 3px 10px;
+  color: #E3F2FD;
+  font-size: 20px;
+  display: none; }
+  .report-url-button:hover {
+    background-color: #1565C0; }
+  .report-url-button.active {
+    display: block; }
+
 .navbar-fixed-top .col-xs-4 {
   margin: 0px;
   padding: 0px; }
@@ -97,7 +104,7 @@ hr {
       background-color: #1E88E5; }
 
 .report-wrapper {
-  margin-top: 50px; }
+  margin-top: 60px; }
 
 .list .report-item {
   display: -webkit-box;
@@ -110,6 +117,8 @@ hr {
           align-items: center;
   margin: 10px 0px;
   padding: 10px 10px;
+  -webkit-transition: all 0.5s ease-in;
+  transition: all 0.5s ease-in;
   background-color: #FAFAF8;
   -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px;
           box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 5px;
@@ -238,40 +247,26 @@ hr {
 button.menu-button {
   border: none; }
 
-.info-wrapper .report-title {
-  font-size: 30px;
-  font-weight: 200;
-  margin-top: 15px; }
-  .info-wrapper .report-title i {
-    font-size: 15px;
-    padding-bottom: 5px; }
-
-.info-wrapper .report-date {
-  font-size: 14px;
-  margin-bottom: 5px;
-  color: rgba(131, 137, 169, 0.7); }
-
-.info-wrapper .report-content {
-  font-size: 16px;
-  text-align: justify; }
-
-.info-wrapper .tags-input {
-  min-height: 50px;
-  margin-bottom: 15px; }
-
-.create-report {
-  padding-top: 20px; }
-  .create-report textarea.form-control {
-    height: 150px !important; }
-
-.crop-wrapper .screenshot {
-  height: 100%;
-  width: 100%; }
-
-.crop-wrapper .crop-report #ocr-button {
-  z-index: 100000; }
-  .crop-wrapper .crop-report #ocr-button .disabled {
-    background-color: #8389A9; }
+.info-wrapper {
+  margin-top: 60px;
+  font-size: 17px; }
+  .info-wrapper .report-title {
+    font-size: 30px;
+    font-weight: 200;
+    margin-top: 15px; }
+    .info-wrapper .report-title i {
+      font-size: 15px;
+      padding-bottom: 5px; }
+  .info-wrapper .report-date {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: rgba(131, 137, 169, 0.7); }
+  .info-wrapper .report-content {
+    font-size: 16px;
+    text-align: justify; }
+  .info-wrapper .tags-input {
+    min-height: 50px;
+    margin-bottom: 15px; }
 
 .faqs-wrapper {
   -webkit-user-select: none;
@@ -606,203 +601,6 @@ button.menu-button {
     color: #448AFF;
     font-style: italic; }
 
-.annotator-wrapper {
-  padding: 40px 15px 15px 15px;
-  text-align: justify; }
-
-.mandola-annotator-url {
-  word-break: break-all;
-  white-space: pre-wrap;
-  overflow-wrap: break-word; }
-
-.mandola-annotator-hidden {
-  display: none !important; }
-
-.mandola-annotator-container {
-  font-family: 'Roboto' !important;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.7);
-  position: fixed;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center; }
-  .mandola-annotator-container .mandola-annotator-status-container {
-    padding: 20px;
-    z-index: 10000;
-    background-color: #FEFEFE;
-    -webkit-box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-            box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-    width: 80%;
-    text-align: center;
-    font-size: 20px; }
-    .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-title {
-      font-size: 25px;
-      font-weight: bold; }
-    .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-thumbnail {
-      margin: 15px 0px;
-      height: 50px;
-      width: 100%;
-      background-size: contain;
-      background-position: center;
-      background-repeat: no-repeat; }
-      .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-thumbnail.mandola-annotator-success {
-        background-image: url("../img/mandola-success.png"); }
-      .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-thumbnail.mandola-annotator-failure {
-        background-image: url("../img/mandola-failure.png"); }
-    .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-url {
-      font-style: italic;
-      font-weight: lighter; }
-    .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-button {
-      padding-top: 15px;
-      color: rgba(0, 0, 0, 0.6);
-      cursor: pointer;
-      font-size: 25px;
-      font-weight: bolder; }
-      .mandola-annotator-container .mandola-annotator-status-container .mandola-annotator-status-button:hover {
-        color: black; }
-  .mandola-annotator-container .mandola-annotator-form {
-    z-index: 10000;
-    background-color: #FEFEFE;
-    -webkit-box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-            box-shadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
-    width: 80%; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-header {
-      position: relative;
-      padding: 10px 50px;
-      font-size: 22px;
-      text-align: center; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body {
-      width: 80%;
-      margin: 0px auto;
-      font-size: 20px; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body fieldset {
-        border: none;
-        margin: 0px;
-        padding: 0px;
-        width: 100%; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body .mandola-annotator-title {
-        margin: 10px 0px 5px 0px; }
-        .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body .mandola-annotator-title input {
-          width: -webkit-calc(100%);
-          width: calc(100%);
-          font-size: 18px;
-          margin: 0px;
-          padding: 5px;
-          height: 40px; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body .mandola-annotator-content {
-        width: 100%; }
-        .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body .mandola-annotator-content .mandola-annotator-content-snapshot {
-          width: 100%;
-          display: block;
-          margin: 0px;
-          padding: 0px; }
-        .mandola-annotator-container .mandola-annotator-form .mandola-annotator-body .mandola-annotator-content .mandola-annotator-content-text {
-          max-height: 50vh;
-          overflow-y: scroll;
-          padding: 10px;
-          border: 1px solid rgba(0, 0, 0, 0.3);
-          text-align: left;
-          margin: 5px 0px 10px 0px; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection #mandola-annotator-categories {
-      cursor: pointer;
-      width: -webkit-calc(100%);
-      width: calc(100%);
-      font-size: 18px;
-      margin: 0px;
-      padding: 5px;
-      height: 40px; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection #mandola-annotator-categories.pressed + .mandola-annotator-categories-list,
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection #mandola-annotator-categories.pressed + .mandola-annotator-categories-list > .mandola-annotator-category {
-        display: block;
-        opacity: 1;
-        height: auto; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection .mandola-annotator-categories-list {
-      height: 0px;
-      opacity: 0;
-      -webkit-transition: opacity 0.3s ease-in-out, height 0.5s ease-in-out;
-      transition: opacity 0.3s ease-in-out, height 0.5s ease-in-out;
-      margin: 0px;
-      padding: 0px;
-      list-style-type: none;
-      border: solid 1px rgba(21, 101, 192, 0.5);
-      border-top: none;
-      -webkit-box-shadow: 0px 5px rbga(0, 0, 0, 0.8);
-              box-shadow: 0px 5px rbga(0, 0, 0, 0.8); }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection .mandola-annotator-categories-list .mandola-annotator-category {
-        display: none;
-        cursor: pointer;
-        padding: 2.5px 0px 2.5px 10px; }
-        .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection .mandola-annotator-categories-list .mandola-annotator-category.active {
-          color: #FAFAF8;
-          background-color: #1565C0; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection .mandola-annotator-categories-list .mandola-annotator-category:nth-child(1) {
-        padding-top: 5px; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection .mandola-annotator-categories-list .mandola-annotator-category:last-child {
-        padding-bottom: 5px; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-categories-selection input[type="checkbox"] {
-      display: none; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-footer {
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: bolder;
-      color: #EFEFEF;
-      text-align: center; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-footer .mandola-annotator-submit-button {
-        margin: 20px 0px;
-        background-image: url("../img/mandola-submit.png");
-        cursor: pointer;
-        height: 50px;
-        width: 100%;
-        background-size: contain;
-        background-position: center;
-        background-repeat: no-repeat; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-footer .mandola-annotator-cancel-button {
-        margin: 10px 10px;
-        display: inline-block;
-        padding: 5px 10px;
-        cursor: pointer; }
-    .mandola-annotator-container .mandola-annotator-form .mandola-annotator-close {
-      position: absolute;
-      right: 20px;
-      color: #DDD;
-      top: 10px;
-      cursor: pointer;
-      font-size: 30px; }
-      .mandola-annotator-container .mandola-annotator-form .mandola-annotator-close:hover {
-        color: #EFF; }
-
-.iframe-wrapper {
-  margin: 0px;
-  padding: 0px;
-  overflow: hidden;
-  overflow-x: hidden;
-  overflow-y: hidden; }
-  .iframe-wrapper .mandola-proxy-iframe {
-    overflow: hidden;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    margin: 0px;
-    padding: 0px;
-    width: 100vw;
-    height: 100vh; }
-
 .loading-container {
   height: 100vh;
   width: 100vw;
@@ -954,7 +752,7 @@ button.menu-button {
 #lang-ul {
   margin: 0 auto;
   padding: 0;
-  overflow-y: auto; }
+  overflow-y: hidden; }
   #lang-ul li {
     list-style: none;
     padding: 10px 15px 10px 10px;

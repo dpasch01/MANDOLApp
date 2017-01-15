@@ -3,16 +3,15 @@
 @import "../sass/report";
 @import "../sass/material";
 @import "../sass/info";
-@import "../sass/create";
-@import "../sass/crop";
 @import "../sass/faqs";
 @import "../sass/hatespeech";
 @import "../sass/linechart";
-@import "../sass/annotator";
-@import "../sass/iframe";
 @import "../sass/loading";
 @import "../sass/settings";
-@import "../sass/toggle";
+
+.bootstrap-select .btn{
+  font-size: 20px; 
+}
 
 .toggle-btn {
     width: 60px;

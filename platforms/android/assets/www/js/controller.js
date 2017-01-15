@@ -426,7 +426,7 @@ var Controller = function() {
         initialize: function() {
             self = this;
             self.bindEvents();
-            self.renderCreateView();
+            self.renderReportView();
 
             self.request_runtime_permission();
 
@@ -523,105 +523,12 @@ var Controller = function() {
             });
         },
 
-        renderCreateView: function(annotated) {
-            var $container = $('.main-container');
-            $container.empty();
-
-            $('.back-button').addClass('active');
-            $('.settings-back-button').removeClass('active');
-            $('#settings-btn').addClass('active');
-
-            $(".main-container").load("./views/create.html", function(data) {
-
-              swal.setDefaults({
-                input: 'text',
-                confirmButtonText: 'Next',
-                showCancelButton: true,
-                animation: true,
-                progressSteps: ['1', '2', '3', '4']
-              })
-
-              var steps = [
-                {
-                  title: 'MANDOLA Report',
-                  text: 'Confirm OCR text',
-                  input: 'textarea',
-                  inputValue: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                  allowOutsideClick: false
-                },
-                {
-                  title: 'Report title',
-                  text: 'Type a title describing the report',
-                  input: 'text',
-                  allowOutsideClick: false
-                },
-                {
-                  title: 'Source URL',
-                  text: 'Type the source URL',
-                  input: 'text',
-                  allowOutsideClick: false
-                },
-                {
-                  title: 'Categories',
-                  text: 'Select hate categories',
-                  onOpen: function(){
-                    $('#report-tags').on('change', function(e){
-                      var hatestring = $('[data-id="report-tags"] .filter-option').html();
-                      $('#redirect-hate-categories').val(hatestring);
-                    });
-
-                    $('.selectpicker').selectpicker({
-                      style: 'btn-default',
-                      size: 12
-                    });
-                  },
-                  inputClass: 'hidden',
-                  inputAttributes: {
-                    'id': 'redirect-hate-categories'
-                  },
-                  html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
-                            '<option>Religious</option>' +
-                            '<option>Gender</option>' +
-                            '<option>Sexual</option>' +
-                            '<option>Class</option>' +
-                            '<option>Politics</option>' +
-                            '<option>Ethnicity</option>' +
-                            '<option>Nationality</option>' +
-                            '<option>Other</option>' +
-                          '</select>',
-                  allowOutsideClick: false
-                }
-              ]
-
-              swal.queue(steps).then(function (result) {
-                swal.resetDefaults();
-                swal({
-                  title: 'Thank you!',
-                  type: 'success',
-                  html:
-                    'Your report has been submitted. You will be notified for the results.',
-                  confirmButtonText: 'OK',
-                  showCancelButton: false
-                });
-                console.log(result);
-              }, function () {
-                swal.resetDefaults()
-              });
-
-              $('#report-content').text(annotated);
-              $("form.create-report").submit(function(e) {
-                navigator.notification.alert("Your report has been received and will be evaluated.", function(e){
-                  inAppBrowser.show();
-                }, "Thank you!", "OK");
-                e.preventDefault();
-              });
-            });
-        },
-
-        renderReportInfo: function() {
+        renderReportInfo: function(e) {
+            // var reportItem = $(e.target);
             var $container = $('.main-container');
             $('.settings-back-button').removeClass('active');
             $('.back-button').addClass('active');
+            $('.report-url-button').addClass('active');
             $container.empty();
             $(".main-container").load("./views/info.html", function(data) {
 
@@ -632,6 +539,7 @@ var Controller = function() {
             $('.tab-button').removeClass('active');
             $('.settings-back-button').removeClass('active');
             $('.back-button').removeClass('active');
+            $('.report-url-button').removeClass('active');
             $('#hatespeech-btn').addClass('active');
 
             var $container = $('.main-container');
@@ -741,26 +649,11 @@ var Controller = function() {
             });
         },
 
-        renderMandolaProxyView: function(URL) {
-            var $container = $('.main-container');
-            $container.empty();
-            $('#hatespeech-btn').addClass('active');
-
-            MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
-
-            $(".main-container").load("./views/iframe.html", function(data) {
-                $(".iframe-wrapper").html('<object class="mandola-proxy-iframe" data="' + MANDOLA_PROXY_PREFIX + URL + '">');
-                $('.mandola-proxy-iframe').on('load', function() {
-                    console.log("URL: " + MANDOLA_PROXY_PREFIX + URL);
-                });
-            });
-
-        },
-
         renderReportView: function() {
             $('.tab-button').removeClass('active');
             $('#report-btn').addClass('active');
             $('.settings-back-button').removeClass('active');
+            $('.report-url-button').removeClass('active');
             $('.back-button').removeClass('active');
             var $container = $('.main-container');
             $container.empty();
@@ -806,9 +699,6 @@ var Controller = function() {
                             };
                             inAppBrowser.executeScript({
                                 code: "localStorage.setItem('MAO', '" + JSON.stringify(MAO) + "');"
-                            });
-                            inAppBrowser.executeScript({
-                                code: "localStorage.setItem('TEST', '{ \"uuid\": \"kakka\"}');"
                             });
                             MAOObserver = setInterval(function() {
                                 inAppBrowser.executeScript({
@@ -876,8 +766,135 @@ var Controller = function() {
 
                                                     tesseract_plugin.createEvent(entry.nativeURL, newLangPath, lang, function(result) {
                                                         console.log("=== TESSERACT WORKED ===");
-                                                        alert(result);
-                                                        console.log(result);
+
+                                                        swal.setDefaults({
+                                                          input: 'text',
+                                                          confirmButtonText: 'Next',
+                                                          showCancelButton: true,
+                                                          animation: true,
+                                                          progressSteps: ['1', '2', '3', '4']
+                                                        })
+
+                                                        var steps = [
+                                                          {
+                                                            title: 'MANDOLA Report',
+                                                            text: 'Confirm OCR text',
+                                                            input: 'textarea',
+                                                            inputValue: result,
+                                                            allowOutsideClick: false,
+                                                            preConfirm: function (text) {
+                                                              return new Promise(function (resolve, reject) {
+                                                                if(!text || text == ""){
+                                                                  reject('Report text must not be empty');
+                                                                }else{
+                                                                  resolve();
+                                                                }
+                                                              })
+                                                            }
+                                                          },
+                                                          {
+                                                            title: 'Report title',
+                                                            text: 'Type a title describing the report',
+                                                            input: 'text',
+                                                            allowOutsideClick: false,
+                                                            preConfirm: function (title) {
+                                                              return new Promise(function (resolve, reject) {
+                                                                if(!title || title == ""){
+                                                                  reject('Report title must be defined');
+                                                                }else{
+                                                                  resolve();
+                                                                }
+                                                              })
+                                                            }
+                                                          },
+                                                          {
+                                                            title: 'Source URL',
+                                                            text: 'Type the source URL',
+                                                            input: 'text',
+                                                            allowOutsideClick: false,
+                                                            preConfirm: function (url) {
+                                                              return new Promise(function (resolve, reject) {
+                                                                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                                                                if (!regexp.test(url) || url === "") {
+                                                                    reject('Please provide a valid URL.');
+                                                                } else {
+                                                                    resolve();
+                                                                }
+                                                              })
+                                                            }
+                                                          },
+                                                          {
+                                                            title: 'Categories',
+                                                            text: 'Select hate categories',
+                                                            preConfirm: function(categories) {
+                                                              return new Promise(function (resolve, reject) {
+                                                                if (categories === "" || categories === "") {
+                                                                    reject('Please provide a valid URL.');
+                                                                } else {
+                                                                    resolve();
+                                                                }
+                                                              })
+                                                            },
+                                                            onOpen: function(){
+                                                              $('#report-tags').on('change', function(e){
+                                                                var hatestring = "";
+                                                                document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
+                                                                    if (index === 0) {
+                                                                        hatestring = element.textContent;
+                                                                    } else {
+                                                                        hatestring += ", " + element.textContent;
+                                                                    }
+                                                                });
+                                                                $('#redirect-hate-categories').val(hatestring);
+                                                              });
+
+                                                              $('.selectpicker').selectpicker({
+                                                                style: 'btn-default',
+                                                                size: 12
+                                                              });
+                                                            },
+                                                            inputClass: 'hidden',
+                                                            inputAttributes: {
+                                                              'id': 'redirect-hate-categories'
+                                                            },
+                                                            html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
+                                                                      '<option>Religious</option>' +
+                                                                      '<option>Gender</option>' +
+                                                                      '<option>Sexual</option>' +
+                                                                      '<option>Class</option>' +
+                                                                      '<option>Politics</option>' +
+                                                                      '<option>Ethnicity</option>' +
+                                                                      '<option>Nationality</option>' +
+                                                                      '<option>Other</option>' +
+                                                                    '</select>',
+                                                            allowOutsideClick: false
+                                                          }
+                                                        ]
+
+                                                        swal.queue(steps).then(function (result) {
+                                                          console.log(result);
+                                                          var MAO = {
+                                                            "title": title,
+                                                            "timestamp": new Date(),
+                                                            "url": document.querySelector('link[rel="canonical"]').getAttribute("href"),
+                                                            "text": text,
+                                                            "serialized": serialized,
+                                                            "categories": categories
+                                                          };
+
+                                                          swal.resetDefaults();
+                                                          swal({
+                                                            title: 'Thank you!',
+                                                            type: 'success',
+                                                            html:
+                                                              'Your report has been submitted. You will be notified for the results.',
+                                                            confirmButtonText: 'OK',
+                                                            showCancelButton: false
+                                                          });
+                                                        }, function () {
+                                                          swal.resetDefaults();
+                                                        });
+
                                                     }, function(error) {
                                                         console.log("=== TESSERACT FAILED ===");
                                                         console.log(error);
@@ -1040,6 +1057,7 @@ var Controller = function() {
             $('.tab-button').removeClass('active');
             $('.settings-back-button').removeClass('active');
             $('.back-button').removeClass('active');
+            $('.report-url-button').removeClass('active');
             $('#faqs-btn').addClass('active');
 
             var $container = $('.main-container');
@@ -1102,7 +1120,7 @@ var Controller = function() {
         renderSettingsView: function() {
             $('.tab-button').removeClass('active');
             $('#settings-btn').addClass('active');
-
+            $('.report-url-button').removeClass('active');
             $('.settings-back-button').removeClass('active');
             $('.back-button').removeClass('active');
 
@@ -1151,14 +1169,24 @@ var Controller = function() {
                 });
 
                 $('#default-ocr-language').on('click', function() {
-                    if (controller.installed_languages.length > 0) {
+                    if (controller.installed_languages.length >= 0) {
                         swal({
                             title: 'Select the default language',
                             input: 'select',
                             inputOptions: installedOptions,
                             inputValue: controller.user_settings.default_language_code,
                             inputPlaceholder: 'Select language',
+                            inputAttributes: {
+                              'data-role':"none"
+                            },
                             showCancelButton: true,
+                            onOpen: function(){
+                              $('.default-language-selectbox').selectpicker({
+                                style: 'btn-default',
+                                size: 12
+                              });
+                            },
+                            inputClass: 'default-language-selectbox',
                             inputValidator: function(value) {
                                 return new Promise(function(resolve, reject) {
                                     if (value) {
@@ -1176,7 +1204,7 @@ var Controller = function() {
                                 type: 'success',
                                 html: installedOptions[result] + " is now the default language."
                             })
-                        })
+                        }).catch(swal.noop);
                     } else {
                         swal({
                             title: 'No languages found',
@@ -1225,6 +1253,7 @@ var Controller = function() {
             $('.tab-button').removeClass('active');
             $('.settings-back-button').addClass('active');
             $('.back-button').removeClass('active');
+            $('.report-url-button').removeClass('active');
             $('#settings-btn').addClass('active');
 
             var $container = $('.main-container');

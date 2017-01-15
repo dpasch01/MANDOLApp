@@ -32,6 +32,7 @@
     "scrollreveal": "^3.3.2",
     "annotator.touch": "https://github.com/aron/annotator.touch.js",
     "text-highlighter": "^1.2.0",
-    "sweetalert2": "^6.3.1"
+    "sweetalert2": "^6.3.1",
+    "jquery-3.1.1.min": "https://code.jquery.com/jquery-3.1.1.min.js"
   }
 }
