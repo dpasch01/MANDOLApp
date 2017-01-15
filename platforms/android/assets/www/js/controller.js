@@ -524,14 +524,16 @@ var Controller = function() {
         },
 
         renderReportInfo: function(e) {
-            // var reportItem = $(e.target);
             var $container = $('.main-container');
             $('.settings-back-button').removeClass('active');
             $('.back-button').addClass('active');
             $('.report-url-button').addClass('active');
             $container.empty();
             $(".main-container").load("./views/info.html", function(data) {
-
+              var reportItem = $(e.target);
+              $('.report-url-button').on('click', function(e){
+                console.log("=== OPENING " + reportItem.attr('data-url') + " ===");
+              });
             });
         },
 
@@ -662,6 +664,33 @@ var Controller = function() {
 
             $(".main-container").load("./views/report.html", function(data) {
                 $(".report-item").on("click", controller.renderReportInfo);
+
+                function generateFavicon(URL) {
+                    return URL.replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
+                }
+
+                function imageExists(url, callback) {
+                  var img = new Image();
+                  img.onload = function() { callback(true); };
+                  img.onerror = function() { callback(false); };
+                  img.src = url;
+                }
+
+                $('.report-item').each(function(index, value){
+                  var url = $(value).attr('data-url');
+                  var favicon = generateFavicon(url);
+                  var reportIcon = $(value).find('.source-icon');
+                  var reportFavicon = $(reportIcon).find('.report-favicon');
+                  $(reportFavicon).attr('src', favicon);
+                  console.log("FAVICON: " + favicon);
+
+                  imageExists(favicon, function(value) {
+                    console.log("=== FAVICON STATUS: " + value + " ===");
+                    if(value){
+                      $(reportIcon).html('<img src="' + favicon +'" class="source-icon" alt="">');
+                    }
+                  });
+                });
 
                 $("#browser-btn").on("click", function(e) {
                     swal({
@@ -1041,10 +1070,6 @@ var Controller = function() {
 
                 });
 
-                function generateFavicon(URL) {
-                    return URL.replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
-                }
-
                 $('.menu-button').on('click', function() {
                     $('.menu-button').toggleClass('pressed');
                 });
@@ -1177,7 +1202,8 @@ var Controller = function() {
                             inputValue: controller.user_settings.default_language_code,
                             inputPlaceholder: 'Select language',
                             inputAttributes: {
-                              'data-role':"none"
+                              'data-role':"none",
+                              'id': 'default-language-selectbox'
                             },
                             showCancelButton: true,
                             onOpen: function(){
@@ -1185,6 +1211,7 @@ var Controller = function() {
                                 style: 'btn-default',
                                 size: 12
                               });
+                              $('#default-language-selectbox').addClass('hidden');
                             },
                             inputClass: 'default-language-selectbox',
                             inputValidator: function(value) {

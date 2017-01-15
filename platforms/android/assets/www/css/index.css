@@ -769,6 +769,9 @@ button.menu-button {
   color: #1565C0;
   font-family: FontAwesome; }
 
+.bootstrap-select .btn {
+  font-size: 20px; }
+
 .toggle-btn {
   width: 60px;
   height: 30px;
