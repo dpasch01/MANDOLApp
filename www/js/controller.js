@@ -1,7 +1,10 @@
 var Controller = function() {
 
     var controller = {
+
         self: null,
+
+        database: null,
 
         user_settings: {
             "default_language": 'English',
@@ -398,35 +401,45 @@ var Controller = function() {
             }
         ],
 
-        request_runtime_permission: function(){
-          cordova.plugins.diagnostic.requestRuntimePermission(
-              function(status) {
-                  switch (status) {
-                      case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
-                          console.log("=== WRITE_EXTERNAL_STORAGE GRANTED ===");
-                          break;
-                      case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
-                          console.log("=== WRITE_EXTERNAL_STORAGE NOT REQUESTED ===");
-                          break;
-                      case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
-                          console.log("=== WRITE_EXTERNAL_STORAGE DENIED ===");
-                          break;
-                      case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
-                          console.log("=== WRITE_EXTERNAL_STORAGE NOT PERMITTED ===");
-                          break;
-                  }
-              },
-              function(error) {
-                  console.error("The following error occurred: " + error);
-              },
-              cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
-          );
+        request_runtime_permission: function() {
+            cordova.plugins.diagnostic.requestRuntimePermission(
+                function(status) {
+                    switch (status) {
+                        case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
+                            console.log("=== WRITE_EXTERNAL_STORAGE GRANTED ===");
+                            break;
+                        case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
+                            console.log("=== WRITE_EXTERNAL_STORAGE NOT REQUESTED ===");
+                            break;
+                        case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
+                            console.log("=== WRITE_EXTERNAL_STORAGE DENIED ===");
+                            break;
+                        case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
+                            console.log("=== WRITE_EXTERNAL_STORAGE NOT PERMITTED ===");
+                            break;
+                    }
+                },
+                function(error) {
+                    console.error("The following error occurred: " + error);
+                },
+                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+            );
         },
 
         initialize: function() {
             self = this;
             self.bindEvents();
             self.renderReportView();
+
+            if (localStorage.getItem('mandola_settings')) {
+                console.log("=== MANDOLA SETTINGS FOUND ===");
+                self.user_settings = JSON.parse(localStorage.getItem('mandola_settings'));
+                console.log(JSON.parse(localStorage.getItem('mandola_settings')));
+            } else {
+                console.log("=== MANDOLA SETTINGS NOT FOUND ===");
+                localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
+                console.log(JSON.parse(localStorage.getItem('mandola_settings')));
+            }
 
             self.request_runtime_permission();
 
@@ -469,6 +482,25 @@ var Controller = function() {
                     console.log("error: " + error);
                 });
             });
+
+            console.log(device.uuid + " + " + Date.now());
+            console.log(device.uuid + "" + Date.now());
+
+            self.database = window.sqlitePlugin.openDatabase({
+                name: "mandola.db",
+                location: 'default'
+            });
+
+            self.database.transaction(function(transaction) {
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS mandola (id TEXT PRIMARY KEY, title TEXT, text TEXT, timestamp DATETIME, url TEXT, serialized TEXT, categories TEXT)', [], function(tx, result) {
+                    console.log("=== MANDOLA TABLE CREATED ===");
+                    console.log(tx);
+                    console.log(result);
+                }, function(error) {
+                    console.log("=== MANDOLA TABLE CREAT ERROR ===");
+                });
+            });
+
         },
 
         bindEvents: function() {
@@ -523,17 +555,62 @@ var Controller = function() {
             });
         },
 
-        renderReportInfo: function(e) {
+        openMandolaProxy: function(url, text, serialized) {
+            console.log("=== OPENING MANDOLA PROXY " + url + " ===");
+            if (serialized != null) {
+                console.log("=== DESERIALIZING TEXT ===");
+            } else {
+                console.log("=== SEARCHING FOR TEXT ===");
+            }
+
+            var containerState = $('.main-container').html();
+            controller.renderLoadingView();
+
+            inAppBrowser = cordova.InAppBrowser.open(MANDOLA_PROXY_PREFIX + url, '_blank', 'hidden=yes, location=yes, toolbar=no, zoom=no');
+            inAppBrowser.addEventListener('loaderror', function(e) {
+                swal('Oops...', 'Could not load: ' + url, 'error');
+                $('.main-container').html(containerState);
+                delete containerState;
+                inAppBrowser.close();
+            });
+            inAppBrowser.addEventListener('loadstop', function() {
+                inAppBrowser.executeScript({
+                    code: "localStorage.setItem('MANDOLA_SERIALIZED', '" + text + "');"
+                });
+                inAppBrowser.show();
+            });
+            inAppBrowser.addEventListener('exit', function() {
+                $('.main-container').html(containerState);
+                delete containerState;
+            });
+        },
+
+        renderReportInfo: function(reportItem) {
             var $container = $('.main-container');
             $('.settings-back-button').removeClass('active');
             $('.back-button').addClass('active');
             $('.report-url-button').addClass('active');
             $container.empty();
             $(".main-container").load("./views/info.html", function(data) {
-              var reportItem = $(e.target);
-              $('.report-url-button').on('click', function(e){
-                console.log("=== OPENING " + reportItem.attr('data-url') + " ===");
-              });
+
+                $(".main-container").off();
+
+                $('.info.container').attr('id', reportItem.id);
+
+                $('.report-title').html(reportItem.title);
+                $('.report-date').html(reportItem.date);
+                $('.report-content').html(reportItem.text);
+
+                reportItem.categories.split(", ").forEach(function(element) {
+                    $('.report-tags').append('<span class="tag label label-primary">' + element + '</span>');
+                });
+
+                $('.report-url-button').attr('data-url', reportItem.url);
+
+                $('.report-url-button').on('click', function(e) {
+                    console.log("=== OPENING " + reportItem.url + " ===");
+                    controller.openMandolaProxy(reportItem.url, reportItem.text, reportItem.serialized);
+                });
             });
         },
 
@@ -547,6 +624,9 @@ var Controller = function() {
             var $container = $('.main-container');
             $container.empty();
             $(".main-container").load("./views/hatespeech.html", function(data) {
+
+                $(".main-container").off();
+
                 var olympicsData = {
                     labels: ['5th', '10th', '15th', '20th'],
                     series: [
@@ -651,6 +731,52 @@ var Controller = function() {
             });
         },
 
+        loadReportSQLite: function(reportID) {
+            self.database.transaction(function(transaction) {
+                transaction.executeSql('SELECT * FROM mandola WHERE id=?', [reportID], function(tx, results) {
+                    var len = results.rows.length;
+                    if (len > 0) {
+                        console.log(results.rows.item(0));
+                        return results.rows.item(0);
+                    }
+                }, function(error) {
+                    console.log("=== SQLITE COULDNT LOAD " + reportID + " ===");
+                    return null;
+                });
+            });
+        },
+
+        appendReport: function(reportObject) {
+            controller.database.transaction(function(transaction) {
+                console.log(
+                    device.uuid + Date.now() + ", " +
+                    reportObject.title + ", " +
+                    reportObject.text + ", " +
+                    reportObject.timestamp + ", " +
+                    reportObject.url + ", " +
+                    reportObject.serialized + ", " +
+                    reportObject.categories.join(', ')
+                );
+                var executeQuery = "INSERT INTO mandola (id, title, text, timestamp, url, serialized, categories) VALUES (?,?,?,?,?,?,?)";
+                transaction.executeSql(executeQuery, [
+                    device.uuid + Date.now(),
+                    reportObject.title,
+                    reportObject.text,
+                    reportObject.timestamp,
+                    reportObject.url,
+                    reportObject.serialized,
+                    reportObject.categories.join(', ')
+                ], function(tx, result) {
+                    console.log("=== REPORT INSERTED IN SQLITE ===");
+                    console.log(tx);
+                    console.log(result);
+                }, function(error) {
+                    console.log("=== REPORT NOT INSERTED IN SQLITE ===");
+                    console.log(error);
+                });
+            });
+        },
+
         renderReportView: function() {
             $('.tab-button').removeClass('active');
             $('#report-btn').addClass('active');
@@ -663,34 +789,157 @@ var Controller = function() {
             MANDOLA_PROXY_PREFIX = "http://mandola.grid.ucy.ac.cy:9080/";
 
             $(".main-container").load("./views/report.html", function(data) {
-                $(".report-item").on("click", controller.renderReportInfo);
+
+                $(".main-container").off();
+
+                function truncate(n, useWordBoundary) {
+                    var isTooLong = this.length > n,
+                        s_ = isTooLong ? this.substr(0, n - 1) : this;
+                    s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+                    return isTooLong ? s_ + '&hellip;' : s_;
+                }
+
+                function display_time(msgtime) {
+                    var time = new Date(msgtime);
+                    time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
+                    if (time.getDate() == new Date().getDate() &&
+                        time.getMonth() == new Date().getMonth() &&
+                        time.getFullYear() == new Date().getFullYear()) {
+                        time = Math.abs(new Date().getTime() - time);
+                        time = Math.ceil(time / 1000);
+                        if (time < 60) {
+                            if (time < 2) {
+                                time = "a second ago";
+                            } else {
+                                time = time + " seconds ago";
+                            }
+
+                        } else if (time >= 60) {
+                            time = new Date(msgtime);
+                            time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
+                            time = Math.abs(new Date() - time);
+                            time = Math.ceil(time / (1000 * 60));
+                            if (time < 60) {
+                                if (time < 2) {
+                                    time = "a minute ago";
+                                } else {
+                                    time = time + " minutes ago";
+                                }
+
+                            } else if (time >= 60) {
+                                time = new Date(msgtime);
+                                time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
+                                time = Math.abs(new Date() - time);
+                                time = Math.ceil(time / (1000 * 60 * 60));
+                                if (time < 24) {
+                                    if (time < 2) {
+                                        time = "an hour ago";
+                                    } else {
+                                        time = time + " hours ago";
+                                    }
+                                }
+                            }
+                        }
+                    } else if (time.getMonth() == new Date().getMonth() &&
+                        time.getFullYear() == new Date().getFullYear()) {
+                        time = Math.abs(new Date() - time);
+                        time = Math.ceil(time / (1000 * 3600 * 24));
+                        if (time < 2) {
+                            time = "a day ago";
+                        } else {
+                            if (time < 7) {
+                                time = time + " days ago";
+                            } else {
+                                time = new Date(msgtime);
+                                time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
+                                time = Math.abs(new Date() - time);
+                                time = Math.ceil(time / (1000 * 3600 * 24 * 7));
+                                if (time < 2) {
+                                    time = "a week ago";
+                                } else {
+                                    time = time + " weeks ago";
+                                }
+                            }
+
+                        }
+                    } else if (time.getFullYear() == new Date().getFullYear()) {
+                        time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.toUTCString().split(' ')[4];
+                    } else {
+                        time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.getFullYear() + " " + time.toUTCString().split(' ')[4];
+                    }
+                    return time;
+                }
+
+                controller.database.transaction(function(transaction) {
+                    transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp DESC', [], function(tx, results) {
+                        var len = results.rows.length;
+                        var i;
+
+                        for (i = 0; i < len; i++) {
+                            var item = results.rows.item(i);
+                            $(".report-wrapper .list").append(
+                                '<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                                '<div class="source-icon">' +
+                                '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                                '</div>' +
+                                '<div class="report-info">' +
+                                '<div class="report-title">' + item.title + '</div>' +
+                                '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                                '<div class="report-date">' + display_time(item.timestamp) + '</div>' +
+                                '</div>' +
+                                '</li>'
+                            );
+                        }
+
+                        $(".report-item").on("click", function(e) {
+                            var reportID = e.currentTarget.id;
+                            self.database.transaction(function(transaction) {
+                                transaction.executeSql('SELECT * FROM mandola WHERE id=?', [reportID], function(tx, results) {
+                                    var len = results.rows.length;
+                                    if (len > 0) {
+                                        console.log(results.rows.item(0));
+                                        controller.renderReportInfo(results.rows.item(0));
+                                    }
+                                }, function(error) {
+                                    console.log("=== SQLITE COULDNT LOAD " + reportID + " ===");
+                                    return null;
+                                });
+                            });
+                        });
+
+                        $('.report-item').each(function(index, value) {
+                            var url = $(value).attr('data-url');
+                            var favicon = generateFavicon(url);
+                            var reportIcon = $(value).find('.source-icon');
+                            var reportFavicon = $(reportIcon).find('.report-favicon');
+                            $(reportFavicon).attr('src', favicon);
+                            console.log("FAVICON: " + favicon);
+
+                            imageExists(favicon, function(value) {
+                                console.log("=== FAVICON STATUS: " + value + " ===");
+                                if (value) {
+                                    $(reportIcon).html('<img src="' + favicon + '" class="source-icon" alt="">');
+                                }
+                            });
+                        });
+
+                    }, null);
+                });
 
                 function generateFavicon(URL) {
                     return URL.replace(/^(http:\/\/[^\/]+).*$/, '$1') + '/favicon.ico';
                 }
 
                 function imageExists(url, callback) {
-                  var img = new Image();
-                  img.onload = function() { callback(true); };
-                  img.onerror = function() { callback(false); };
-                  img.src = url;
+                    var img = new Image();
+                    img.onload = function() {
+                        callback(true);
+                    };
+                    img.onerror = function() {
+                        callback(false);
+                    };
+                    img.src = url;
                 }
-
-                $('.report-item').each(function(index, value){
-                  var url = $(value).attr('data-url');
-                  var favicon = generateFavicon(url);
-                  var reportIcon = $(value).find('.source-icon');
-                  var reportFavicon = $(reportIcon).find('.report-favicon');
-                  $(reportFavicon).attr('src', favicon);
-                  console.log("FAVICON: " + favicon);
-
-                  imageExists(favicon, function(value) {
-                    console.log("=== FAVICON STATUS: " + value + " ===");
-                    if(value){
-                      $(reportIcon).html('<img src="' + favicon +'" class="source-icon" alt="">');
-                    }
-                  });
-                });
 
                 $("#browser-btn").on("click", function(e) {
                     swal({
@@ -750,18 +999,9 @@ var Controller = function() {
                             console.log(MAO);
                             delete MAO;
                             clearInterval(MAOObserver);
-                            localStorage.clear();
                         });
                     }).catch(swal.noop);
 
-                });
-
-                window.sr = ScrollReveal({
-                    duration: 300
-                });
-                sr.reveal('.report-item', {
-                    origin: 'bottom',
-                    duration: 300
                 });
 
                 function onPhotoURISuccess(imageURI) {
@@ -797,116 +1037,122 @@ var Controller = function() {
                                                         console.log("=== TESSERACT WORKED ===");
 
                                                         swal.setDefaults({
-                                                          input: 'text',
-                                                          confirmButtonText: 'Next',
-                                                          showCancelButton: true,
-                                                          animation: true,
-                                                          progressSteps: ['1', '2', '3', '4']
+                                                            input: 'text',
+                                                            confirmButtonText: 'Next',
+                                                            showCancelButton: true,
+                                                            animation: true,
+                                                            progressSteps: ['1', '2', '3', '4']
                                                         })
 
-                                                        var steps = [
-                                                          {
-                                                            title: 'MANDOLA Report',
-                                                            text: 'Confirm OCR text',
-                                                            input: 'textarea',
-                                                            inputValue: result,
-                                                            allowOutsideClick: false,
-                                                            preConfirm: function (text) {
-                                                              return new Promise(function (resolve, reject) {
-                                                                if(!text || text == ""){
-                                                                  reject('Report text must not be empty');
-                                                                }else{
-                                                                  resolve();
+                                                        var steps = [{
+                                                                title: 'MANDOLA Report',
+                                                                text: 'Confirm OCR text',
+                                                                input: 'textarea',
+                                                                inputValue: result,
+                                                                allowOutsideClick: false,
+                                                                preConfirm: function(text) {
+                                                                    return new Promise(function(resolve, reject) {
+                                                                        if (!text || text == "") {
+                                                                            reject('Report text must not be empty');
+                                                                        } else {
+                                                                            resolve();
+                                                                        }
+                                                                    })
                                                                 }
-                                                              })
-                                                            }
-                                                          },
-                                                          {
-                                                            title: 'Report title',
-                                                            text: 'Type a title describing the report',
-                                                            input: 'text',
-                                                            allowOutsideClick: false,
-                                                            preConfirm: function (title) {
-                                                              return new Promise(function (resolve, reject) {
-                                                                if(!title || title == ""){
-                                                                  reject('Report title must be defined');
-                                                                }else{
-                                                                  resolve();
-                                                                }
-                                                              })
-                                                            }
-                                                          },
-                                                          {
-                                                            title: 'Source URL',
-                                                            text: 'Type the source URL',
-                                                            input: 'text',
-                                                            allowOutsideClick: false,
-                                                            preConfirm: function (url) {
-                                                              return new Promise(function (resolve, reject) {
-                                                                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-                                                                if (!regexp.test(url) || url === "") {
-                                                                    reject('Please provide a valid URL.');
-                                                                } else {
-                                                                    resolve();
-                                                                }
-                                                              })
-                                                            }
-                                                          },
-                                                          {
-                                                            title: 'Categories',
-                                                            text: 'Select hate categories',
-                                                            preConfirm: function(categories) {
-                                                              return new Promise(function (resolve, reject) {
-                                                                if (categories === "" || categories === "") {
-                                                                    reject('Please provide a valid URL.');
-                                                                } else {
-                                                                    resolve();
-                                                                }
-                                                              })
                                                             },
-                                                            onOpen: function(){
-                                                              $('#report-tags').on('change', function(e){
-                                                                var hatestring = "";
-                                                                document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
-                                                                    if (index === 0) {
-                                                                        hatestring = element.textContent;
-                                                                    } else {
-                                                                        hatestring += ", " + element.textContent;
-                                                                    }
-                                                                });
-                                                                $('#redirect-hate-categories').val(hatestring);
-                                                              });
+                                                            {
+                                                                title: 'Report title',
+                                                                text: 'Type a title describing the report',
+                                                                input: 'text',
+                                                                allowOutsideClick: false,
+                                                                preConfirm: function(title) {
+                                                                    return new Promise(function(resolve, reject) {
+                                                                        if (!title || title == "") {
+                                                                            reject('Report title must be defined');
+                                                                        } else {
+                                                                            resolve();
+                                                                        }
+                                                                    })
+                                                                }
+                                                            },
+                                                            {
+                                                                title: 'Source URL',
+                                                                text: 'Type the source URL',
+                                                                input: 'text',
+                                                                allowOutsideClick: false,
+                                                                preConfirm: function(url) {
+                                                                    return new Promise(function(resolve, reject) {
+                                                                        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                                                                        if (!regexp.test(url) || url === "") {
+                                                                            reject('Please provide a valid URL.');
+                                                                        } else {
+                                                                            resolve();
+                                                                        }
+                                                                    })
+                                                                }
+                                                            },
+                                                            {
+                                                                title: 'Categories',
+                                                                text: 'Select hate categories',
+                                                                preConfirm: function(categories) {
+                                                                    return new Promise(function(resolve, reject) {
+                                                                        if (categories === "" || categories === "") {
+                                                                            reject('Please provide a valid URL.');
+                                                                        } else {
+                                                                            resolve();
+                                                                        }
+                                                                    })
+                                                                },
+                                                                onOpen: function() {
+                                                                    $('#report-tags').on('change', function(e) {
+                                                                        var hatestring = "";
+                                                                        document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
+                                                                            if (index === 0) {
+                                                                                hatestring = element.textContent;
+                                                                            } else {
+                                                                                hatestring += ", " + element.textContent;
+                                                                            }
+                                                                        });
+                                                                        $('#redirect-hate-categories').val(hatestring);
+                                                                    });
 
-                                                              $('.selectpicker').selectpicker({
-                                                                style: 'btn-default',
-                                                                size: 12
-                                                              });
-                                                            },
-                                                            inputClass: 'hidden',
-                                                            inputAttributes: {
-                                                              'id': 'redirect-hate-categories'
-                                                            },
-                                                            html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
-                                                                      '<option>Religious</option>' +
-                                                                      '<option>Gender</option>' +
-                                                                      '<option>Sexual</option>' +
-                                                                      '<option>Class</option>' +
-                                                                      '<option>Politics</option>' +
-                                                                      '<option>Ethnicity</option>' +
-                                                                      '<option>Nationality</option>' +
-                                                                      '<option>Other</option>' +
+                                                                    $('.selectpicker').selectpicker({
+                                                                        style: 'btn-default',
+                                                                        size: 12
+                                                                    });
+                                                                },
+                                                                inputClass: 'hidden',
+                                                                inputAttributes: {
+                                                                    'id': 'redirect-hate-categories'
+                                                                },
+                                                                html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
+                                                                    '<option>Religious</option>' +
+                                                                    '<option>Gender</option>' +
+                                                                    '<option>Sexual</option>' +
+                                                                    '<option>Class</option>' +
+                                                                    '<option>Politics</option>' +
+                                                                    '<option>Ethnicity</option>' +
+                                                                    '<option>Nationality</option>' +
+                                                                    '<option>Other</option>' +
                                                                     '</select>',
-                                                            allowOutsideClick: false
-                                                          }
+                                                                allowOutsideClick: false
+                                                            }
                                                         ]
 
-                                                        swal.queue(steps).then(function (result) {
-                                                          console.log(result);
-  
-                                                          swal.resetDefaults();
+                                                        swal.queue(steps).then(function(result) {
+                                                            console.log(result);
+                                                            controller.appendReport({
+                                                                "title": result[1],
+                                                                "timestamp": Date.now(),
+                                                                "url": result[2],
+                                                                "text": result[0],
+                                                                "serialized": null,
+                                                                "categories": result[3].split(", ")
+                                                            });
+                                                            swal.resetDefaults();
 
-                                                        }, function () {
-                                                          swal.resetDefaults();
+                                                        }, function() {
+                                                            swal.resetDefaults();
                                                         });
 
                                                     }, function(error) {
@@ -1074,6 +1320,9 @@ var Controller = function() {
             $container.empty();
 
             $(".main-container").load("./views/faqs.html", function(data) {
+
+                $(".main-container").off();
+
                 $('.ui.accordion').accordion();
                 faqsList = $('.faqs-list').html();
 
@@ -1138,6 +1387,8 @@ var Controller = function() {
             $container.empty();
 
             $(".main-container").load("./views/settings.html", function(data) {
+                $(".main-container").off();
+
                 var installedOptions = {
                     'none': 'None'
                 };
@@ -1187,17 +1438,9 @@ var Controller = function() {
                             inputValue: controller.user_settings.default_language_code,
                             inputPlaceholder: 'Select language',
                             inputAttributes: {
-                              'data-role':"none",
-                              'id': 'default-language-selectbox'
+                                'id': 'default-language-selectbox'
                             },
                             showCancelButton: true,
-                            onOpen: function(){
-                              $('.default-language-selectbox').selectpicker({
-                                style: 'btn-default',
-                                size: 12
-                              });
-                              $('#default-language-selectbox').addClass('hidden');
-                            },
                             inputClass: 'default-language-selectbox',
                             inputValidator: function(value) {
                                 return new Promise(function(resolve, reject) {
@@ -1211,6 +1454,8 @@ var Controller = function() {
                         }).then(function(result) {
                             controller.user_settings.default_language_code = result;
                             controller.user_settings.default_language = installedOptions[result];
+                            localStorage.setItem('mandola_settings', JSON.stringify(controller.user_settings));
+                            console.log(JSON.parse(localStorage.getItem('mandola_settings')));
                             $('#default-ocr-language .preview').text(controller.user_settings.default_language);
                             swal({
                                 type: 'success',
@@ -1246,6 +1491,8 @@ var Controller = function() {
                         $(mainParent).removeClass('active');
                         controller.user_settings.hatespeech_analysis = false;
                     }
+                    localStorage.setItem('mandola_settings', JSON.stringify(controller.user_settings));
+                    console.log(JSON.parse(localStorage.getItem('mandola_settings')));
                 });
 
                 $('#keep-cropped-checkbox').click(function() {
@@ -1257,6 +1504,8 @@ var Controller = function() {
                         $(mainParent).removeClass('active');
                         controller.user_settings.keep_cropped = false;
                     }
+                    localStorage.setItem('mandola_settings', JSON.stringify(controller.user_settings));
+                    console.log(JSON.parse(localStorage.getItem('mandola_settings')));
                 });
             });
         },
@@ -1272,6 +1521,9 @@ var Controller = function() {
             $container.empty();
 
             $(".main-container").load("./views/languages.html", function(data) {
+
+                $(".main-container").off();
+
                 for (i = 0; i < self.all_languages.length; i++) {
                     var flag = true;
 
