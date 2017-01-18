@@ -523,7 +523,7 @@ var Controller = function() {
 
         initialize: function() {
             self = this;
-
+            console.log(device.uuid);
             //Bind the navigation button events for the whole application.
             self.bindEvents();
             //Render the homescreen of the application, which is the report list.
@@ -1656,7 +1656,6 @@ var Controller = function() {
                             self.user_settings.default_language_code = result;
                             self.user_settings.default_language = installedOptions[result];
                             localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
-                            console.log(JSON.parse(localStorage.getItem('mandola_settings')));
                             $('#default-ocr-language .preview').text(self.user_settings.default_language);
                             swal({
                                 type: 'success',
@@ -1806,6 +1805,11 @@ var Controller = function() {
                                             break;
                                         }
                                     }
+
+                                    if(self.user_settings.default_language_code == lang){
+                                      self.user_settings.default_language = "None";
+                                      self.user_settings.default_language_code = "none";
+                                    }
                                 }, function() {
                                     swal(
                                         'Oops..',
@@ -1813,11 +1817,7 @@ var Controller = function() {
                                         'error'
                                     )
                                 }, function() {
-                                    swal(
-                                        'Deleted!',
-                                        'The language data has been deleted.',
-                                        'success'
-                                    );
+
                                 });
                             });
                         });

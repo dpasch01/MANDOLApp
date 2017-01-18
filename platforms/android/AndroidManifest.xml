@@ -10,7 +10,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService" />
+        <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService" android:stopWithTask="true"  />
         <receiver android:name="cordova.plugins.Diagnostic$LocationProviderChangedReceiver">
             <intent-filter>
                 <action android:name="android.location.PROVIDERS_CHANGED" />
