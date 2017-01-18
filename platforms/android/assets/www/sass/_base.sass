@@ -12,6 +12,7 @@ $whitish: #E3F2FD
 @import url('https://fonts.googleapis.com/css?family=Fredoka+One|Roboto:400,900')
 
 body
+  user-select: none
   background-color: $whitish
   font-family: 'Roboto'
 
@@ -46,3 +47,6 @@ select.swal2-select
   border: solid 1px transparentize($blackish, 0.5)
   height: 40px !important
   font-size: 17px !important
+
+.swal2-modal .swal2-validationerror
+  margin-top: 15px ! important

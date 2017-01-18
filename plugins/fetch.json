@@ -32,15 +32,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-image-picker": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/wymsee/cordova-imagePicker.git",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-sqlite-storage": {
         "source": {
             "type": "git",
@@ -76,30 +67,12 @@
         "is_top_level": true,
         "variables": {}
     },
-    "cordova-plugin-background-mode": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/katzer/cordova-plugin-background-mode",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-device": {
         "source": {
             "type": "registry",
             "id": "cordova-plugin-device"
         },
         "is_top_level": false,
-        "variables": {}
-    },
-    "com.darktalker.cordova.screenshot": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/gitawego/cordova-screenshot",
-            "subdir": "."
-        },
-        "is_top_level": true,
         "variables": {}
     },
     "cordova.plugins.diagnostic": {
@@ -148,6 +121,24 @@
         "source": {
             "type": "git",
             "url": "https://github.com/jeduan/cordova-plugin-crop",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-background-mode": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/katzer/cordova-plugin-background-mode",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-core-android-extensions": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/chemerisuk/cordova-plugin-core-android-extensions",
             "subdir": "."
         },
         "is_top_level": true,

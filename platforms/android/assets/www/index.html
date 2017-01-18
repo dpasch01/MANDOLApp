@@ -12,6 +12,7 @@
         <link rel="stylesheet" type="text/css" href="lib/chartist/dist/chartist.min.css">
         <link rel="stylesheet" type="text/css" href="lib/sweetalert2/dist/sweetalert2.min.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
+        <link rel="stylesheet" type="text/css" href="css/animate.css">
         <title>MANDOLApp</title>
     </head>
     <body>
@@ -38,6 +39,15 @@
           </div>
         </div>
       </nav>
+
+      <div class="loading-container hidden">
+        <div class="loading-ballsack">
+          <div class="loading-ball"></div>
+          <div class="loading-ball"></div>
+          <div class="loading-ball"></div>
+        </div>
+      </div>
+
       <div class="main-container"></div>
       <nav class="navbar-bottom navbar-fixed-bottom">
         <div class="container-fluid">
@@ -48,7 +58,7 @@
               </div>
             </div>
             <div class="col-xs-3">
-              <div id="report-btn" class="tab-button" data-tab="#report-tab">
+              <div id="report-btn" class="tab-button active" data-tab="#report-tab">
                 <i class="fa fa-2x fa-flag" aria-hidden="true"></i>
               </div>
             </div>

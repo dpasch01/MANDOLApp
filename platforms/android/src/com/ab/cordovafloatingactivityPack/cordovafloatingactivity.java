@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -36,9 +37,18 @@ public class cordovafloatingactivity extends CordovaPlugin {
     public void activateEvent() {
         if (callbackContext != null) {
             Log.d("CALLBACK_STATUS", "Callback Context not null.");
-            callbackContext.success("Event fired in Javascript.");
+            if(ChatHeadService.COPIED_URL.isEmpty()){
+                PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                result.setKeepCallback(true);
+                callbackContext.sendPluginResult(result);
+            }else {
+                PluginResult result = new PluginResult(PluginResult.Status.OK, ChatHeadService.COPIED_URL);
+                result.setKeepCallback(true);
+                callbackContext.sendPluginResult(result);
+                ChatHeadService.COPIED_URL="";
+            }
         } else {
-            callbackContext.error("Error in callback.");
+            PluginResult result = new PluginResult(PluginResult.Status.ERROR, "Error in callback.");
         }
     }
 

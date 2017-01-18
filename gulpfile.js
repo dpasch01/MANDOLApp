@@ -1,3 +1,9 @@
+/*
+This is a gulp script using browserSync and sass with autoprefixer in order to create a more
+productive workflow and generating each change automaticaly in the browser without needing to
+refresh each time. It also generates the .css files from .sass and prefixes any specific prefixes.
+*/
+
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var sass = require('gulp-sass');

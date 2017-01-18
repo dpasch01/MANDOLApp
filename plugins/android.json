@@ -21,9 +21,6 @@
             "XWALK_MULTIPLEAPK": "true",
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-plugin-image-picker": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
         "cordova-sqlite-storage": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
@@ -34,12 +31,6 @@
             "PACKAGE_NAME": "com.mandola.reporting"
         },
         "com.ab.cordovafloatingactivity": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
-        "cordova-plugin-background-mode": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
-        "com.darktalker.cordova.screenshot": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
         "cordova.plugins.diagnostic": {
@@ -59,13 +50,19 @@
         },
         "cordova-plugin-crop": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-background-mode": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-core-android-extensions": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {
-        "cordova-plugin-device": {
+        "cordova-plugin-compat": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
-        "cordova-plugin-compat": {
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "com.mandola.reporting"
         }
     }

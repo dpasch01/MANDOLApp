@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+/*
+This is an ignore hook executed after preparing the application to build. It removes the unecessery files and libraries
+from the build in order to reduce the size of it and also the time needed to build it. It also ignores the .sass files and
+only takes into consideration the final .css file for the whole app.
+*/
+
 var del  = require('del');
 var fs   = require('fs');
 var path = require('path');
@@ -26,7 +32,7 @@ if (rootdir) {
         console.log('Removing test build from assets after prepare: ' + testBuildPath);
         del.sync(testBuildPath);
       } else {
-        console.log('Test build @ ' + testBuildPath + ' does not exist for removal');
+        console.log('Test build @ ' + testBuildPath + ' does not exist for removal.');
       }
 
     } catch(e) {

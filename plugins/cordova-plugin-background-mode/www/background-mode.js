@@ -1,5 +1,5 @@
 /*
-    Copyright 2013-2014 appPlant UG
+    Copyright 2013-2017 appPlant GmbH
 
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -23,45 +23,9 @@ var exec    = require('cordova/exec'),
     channel = require('cordova/channel');
 
 
-// Called before 'deviceready' listener will be called
-channel.onCordovaReady.subscribe(function () {
-    // Device plugin is ready now
-    channel.onCordovaInfoReady.subscribe(function () {
-        // Set the defaults
-        exports.setDefaults({});
-    });
-});
-
-
-/**
- * @private
- *
- * Flag indicated if the mode is enabled.
- */
-exports._isEnabled = false;
-
-/**
- * @private
- *
- * Flag indicated if the mode is active.
- */
-exports._isActive = false;
-
-/**
- * @private
- *
- * Default values of all available options.
- */
-exports._defaults = {
-    title:  'App is running in background',
-    text:   'Doing heavy tasks.',
-    ticker: 'Running in background',
-    resume: true,
-    silent: false,
-    color:  undefined,
-    icon:   'icon'
-};
-
+/*************
+ * INTERFACE *
+ *************/
 
 /**
  * Activates the background mode. When activated the application
@@ -69,8 +33,14 @@ exports._defaults = {
  * for the next time.
  */
 exports.enable = function () {
+    if (this.isEnabled())
+        return;
+
+    var me        = this,
+        fireEvent = function () { me.fireEvent('enable'); };
+
     this._isEnabled = true;
-    cordova.exec(null, null, 'BackgroundMode', 'enable', []);
+    cordova.exec(fireEvent, null, 'BackgroundMode', 'enable', []);
 };
 
 /**
@@ -78,8 +48,14 @@ exports.enable = function () {
  * will not stay awake while in background.
  */
 exports.disable = function () {
+    if (!this.isEnabled())
+        return;
+
+    var me        = this,
+        fireEvent = function () { me.fireEvent('disable'); };
+
     this._isEnabled = false;
-    cordova.exec(null, null, 'BackgroundMode', 'disable', []);
+    cordova.exec(fireEvent, null, 'BackgroundMode', 'disable', []);
 };
 
 /**
@@ -127,12 +103,53 @@ exports.configure = function (options) {
 };
 
 /**
+ * Enable GPS-tracking in background (Android).
+ */
+exports.disableWebViewOptimizations = function () {
+    if (device.platform == 'Android') {
+        cordova.exec(null, null, 'BackgroundMode', 'disableWebViewOptimizations', []);
+    }
+};
+
+/**
+ * Move app to background (Android only).
+ *
+ * @return [ Void ]
+ */
+exports.moveToBackground = function () {
+    if (device.platform == 'Android') {
+        cordova.exec(null, null, 'BackgroundMode', 'background', []);
+    }
+};
+
+/**
+ * Move app to foreground when in background (Android only).
+ *
+ * @return [ Void ]
+ */
+exports.moveToForeground = function () {
+    if (this.isActive() && device.platform == 'Android') {
+        cordova.exec(null, null, 'BackgroundMode', 'foreground', []);
+    }
+};
+
+/**
+ * Override the back button on Android to go to background
+ * instead of closing the app.
+ *
+ * @return [ Void ]
+ */
+exports.overrideBackButton = function () {
+    document.addEventListener('backbutton', this.moveToBackground, false);
+};
+
+/**
  * If the mode is enabled or disabled.
  *
  * @return {Boolean}
  */
 exports.isEnabled = function () {
-    return this._isEnabled;
+    return this._isEnabled !== false;
 };
 
 /**
@@ -141,26 +158,114 @@ exports.isEnabled = function () {
  * @return {Boolean}
  */
 exports.isActive = function () {
-    return this._isActive;
+    return this._isActive !== false;
+};
+
+
+/**********
+ * EVENTS *
+ **********/
+
+exports._listener = {};
+
+/**
+ * Fire event with given arguments.
+ *
+ * @param [ String ] event The event's name.
+ * @param {args*} The callback's arguments.
+ *
+ * @return [ Void ]
+ */
+exports.fireEvent = function (event) {
+    var args     = Array.apply(null, arguments).slice(1),
+        listener = this._listener[event];
+
+    if (!listener)
+        return;
+
+    for (var i = 0; i < listener.length; i++) {
+        var fn    = listener[i][0],
+            scope = listener[i][1];
+
+        fn.apply(scope, args);
+    }
 };
 
 /**
+ * Register callback for given event.
+ *
+ * @param [ String ] event The event's name.
+ * @param [ Function ] callback The function to be exec as callback.
+ * @param [ Object ] scope The callback function's scope.
+ *
+ * @return [ Void ]
+ */
+exports.on = function (event, callback, scope) {
+
+    if (typeof callback !== "function")
+        return;
+
+    if (!this._listener[event]) {
+        this._listener[event] = [];
+    }
+
+    var item = [callback, scope || window];
+
+    this._listener[event].push(item);
+};
+
+/**
+ * Unregister callback for given event.
+ *
+ * @param [ String ] event The event's name.
+ * @param [ Function ] callback The function to be exec as callback.
+ *
+ * @return [ Void ]
+ */
+exports.un = function (event, callback) {
+    var listener = this._listener[event];
+
+    if (!listener)
+        return;
+
+    for (var i = 0; i < listener.length; i++) {
+        var fn = listener[i][0];
+
+        if (fn == callback) {
+            listener.splice(i, 1);
+            break;
+        }
+    }
+};
+
+/**
+ * @deprecated
+ *
  * Called when the background mode has been activated.
  */
 exports.onactivate = function () {};
 
 /**
+ * @deprecated
+ *
  * Called when the background mode has been deaktivated.
  */
 exports.ondeactivate = function () {};
 
 /**
+ * @deprecated
+ *
  * Called when the background mode could not been activated.
  *
  * @param {Integer} errorCode
  *      Error code which describes the error
  */
 exports.onfailure = function () {};
+
+
+/*********
+ * UTILS *
+ *********/
 
 /**
  * @private
@@ -186,3 +291,45 @@ exports.mergeWithDefaults = function (options) {
 
     return options;
 };
+
+
+/***********
+ * PRIVATE *
+ ***********/
+
+/**
+ * @private
+ *
+ * Flag indicates if the mode is enabled.
+ */
+exports._isEnabled = false;
+
+/**
+ * @private
+ *
+ * Flag indicates if the mode is active.
+ */
+exports._isActive = false;
+
+/**
+ * @private
+ *
+ * Default values of all available options.
+ */
+exports._defaults = {
+    title:  'App is running in background',
+    text:   "Doing heavy tasks.",
+    ticker: 'Running in background',
+    bigText: false,
+    resume: true,
+    silent: false,
+    color:  undefined,
+    icon:   'icon'
+};
+
+// Called before 'deviceready' listener will be called
+channel.onCordovaReady.subscribe(function () {
+    channel.onCordovaInfoReady.subscribe(function () {
+        exports.setDefaults({});
+    });
+});
