@@ -15,13 +15,15 @@ import org.json.JSONException;
 
 public class cordovafloatingactivity extends CordovaPlugin {
 
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    private static final int REQUEST_MEDIA_PROJECTION = 2;
     private PermissionChecker mPermissionChecker;
     private CallbackContext callbackContext;
+
     public BroadcastReceiver receiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             Log.d("RECEIVED_EVENT", "Received BUBBLE_PRESSED event.");
             String action = intent.getAction();
             if (action.equals("com.ab.cordovafloatingactivityPack.BUBBLE_PRESSED")) {
@@ -32,14 +34,21 @@ public class cordovafloatingactivity extends CordovaPlugin {
     };
 
 
-    public void activateEvent(){
-        PluginResult pluginResult;
-        pluginResult = new PluginResult(PluginResult.Status.OK, "BUBBLE_PRESSED");
-        pluginResult.setKeepCallback(true);
-
-        if(callbackContext != null){
+    public void activateEvent() {
+        if (callbackContext != null) {
             Log.d("CALLBACK_STATUS", "Callback Context not null.");
-            callbackContext.sendPluginResult(pluginResult);
+            if(ChatHeadService.COPIED_URL.isEmpty()){
+                PluginResult result = new PluginResult(PluginResult.Status.OK, "");
+                result.setKeepCallback(true);
+                callbackContext.sendPluginResult(result);
+            }else {
+                PluginResult result = new PluginResult(PluginResult.Status.OK, ChatHeadService.COPIED_URL);
+                result.setKeepCallback(true);
+                callbackContext.sendPluginResult(result);
+                ChatHeadService.COPIED_URL="";
+            }
+        } else {
+            PluginResult result = new PluginResult(PluginResult.Status.ERROR, "Error in callback.");
         }
     }
 
@@ -58,7 +67,6 @@ public class cordovafloatingactivity extends CordovaPlugin {
                 Intent intent = mPermissionChecker.createRequiredPermissionIntent();
                 cordova.getActivity().startActivityForResult(intent, PermissionChecker.REQUIRED_PERMISSION_REQUEST_CODE);
             } else {
-
                 initHookEvent();
                 result = launchService(pm, context, packageName, context);
 
@@ -69,13 +77,14 @@ public class cordovafloatingactivity extends CordovaPlugin {
                 }
                 return result;
             }
-
         } else if (action.equals("stopFloatingActivity")) {
             result = stopService(pm, context, packageName, context);
             return result;
         } else if (action.equals("onBubblePress")) {
             Log.d("CALLBACK_CONTEXT", "Store callbackContext to call on event.");
-            this.callbackContext = callbackContext;
+            if (this.callbackContext == null) {
+                this.callbackContext = callbackContext;
+            }
             return true;
         } else {
             return false;
@@ -90,18 +99,15 @@ public class cordovafloatingactivity extends CordovaPlugin {
         Log.d("APPENDING_LISTENER", "Appended listener for BUBBLE_PRESSED.");
         IntentFilter filter_hook = new IntentFilter("com.ab.cordovafloatingactivityPack.BUBBLE_PRESSED");
         this.cordova.getActivity().getApplicationContext().registerReceiver(receiver, filter_hook);
-
     }
 
     public boolean launchService(PackageManager pm, Context c, String packname, final Context con) {
         cordova.getActivity().startService(new Intent(cordova.getActivity().getApplication(), ChatHeadService.class));
         return true;
-
     }
 
     public boolean stopService(PackageManager pm, Context c, String packname, final Context con) {
         cordova.getActivity().stopService(new Intent(cordova.getActivity().getApplication(), ChatHeadService.class));
         return true;
     }
-
 }

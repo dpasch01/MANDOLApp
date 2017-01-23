@@ -42,8 +42,8 @@ public class ChatHeadService extends Service {
 
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 0;
-        params.height = 140;
-        params.width = 140;
+        params.height = 180;
+        params.width = 180;
         params.y = 100;
 
         windowManager.addView(chatHead, params);

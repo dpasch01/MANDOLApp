@@ -246,7 +246,7 @@ var hasClass = function hasClass(elem, className) {
 };
 
 var focusInput = function focusInput(input) {
-  input.focus();
+  
 
   // place cursor at end of text in text input
   if (input.type !== 'file') {

@@ -8,6 +8,17 @@ var controller;
 var app = {
 
     initialize: function() {
+      
+        $.fn.extend({
+            animateCSS: function (animationName, callback) {
+                var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
+                this.addClass('animated ' + animationName).one(animationEnd, function() {
+                    $(this).removeClass('animated ' + animationName);
+                    callback();
+                });
+            }
+        });
+
         if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
             document.addEventListener("deviceready", this.onDeviceReady, false);
         } else {

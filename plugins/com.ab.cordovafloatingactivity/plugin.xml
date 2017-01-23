@@ -26,7 +26,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-    <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService">
+    <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService" android:stopWithTask="true">
     </service>
     </config-file>
 

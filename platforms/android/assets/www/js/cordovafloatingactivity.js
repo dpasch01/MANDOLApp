@@ -1,4 +1,3 @@
-/*global cordova, module*/
 
 module.exports = {
     startFloatingActivity: function (name, successCallback, errorCallback) {

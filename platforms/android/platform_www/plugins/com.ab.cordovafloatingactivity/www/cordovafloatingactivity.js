@@ -1,5 +1,4 @@
 cordova.define("com.ab.cordovafloatingactivity.cordovafloatingactivity", function(require, exports, module) {
-/*global cordova, module*/
 
 module.exports = {
     startFloatingActivity: function (name, successCallback, errorCallback) {

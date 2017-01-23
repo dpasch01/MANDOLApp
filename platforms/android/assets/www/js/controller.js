@@ -14,9 +14,32 @@ var Controller = function() {
 
         MANDOLA_PROXY_PREFIX: "http://mandola.grid.ucy.ac.cy:9080/",
 
+        previousState: {
+          states: [],
+          depth: 0,
+          load: function(){
+            if(this.states.length > 0){
+              var state = this.states[this.depth - 1];
+              $(state.selector).replaceWith(state.state);
+              this.depth = this.depth - 1;
+              this.states.splice(this.depth - 1, 1);
+            }else{
+              console.log("=== NO PREVIOUS STATE HAS BEEN DEFINED ===");
+            }
+          },
+
+          save: function(selector){
+            this.states[this.depth] = {
+              "selector": selector,
+              "state": $(selector).clone(true)
+            };
+            this.depth = this.depth + 1;
+          }
+        },
+
         user_settings: {
-            "default_language": 'English',
-            "default_language_code": 'eng',
+            "default_language": 'None',
+            "default_language_code": 'none',
             "keep_cropped": true,
             "hatespeech_analysis": false,
             "background_mandola": false
@@ -435,13 +458,19 @@ var Controller = function() {
             );
         },
 
-        setupView: function(enableURL, enableSettings, enableBack) {
+        setupView: function(enableURL, enableSettings, enableBack, enableEdit) {
             var $container = $('.main-container');
 
             if (enableURL) {
                 $('.report-url-button').addClass('active');
             } else {
                 $('.report-url-button').removeClass('active');
+            }
+
+            if (enableEdit) {
+                $('.reports-edit-button').addClass('active');
+            } else {
+                $('.reports-edit-button').removeClass('active');
             }
 
             if (enableSettings) {
@@ -513,7 +542,7 @@ var Controller = function() {
             });
 
             self.database.transaction(function(transaction) {
-                transaction.executeSql('CREATE TABLE IF NOT EXISTS mandola (id TEXT PRIMARY KEY, title TEXT, text TEXT, timestamp DATETIME, url TEXT, serialized TEXT, categories TEXT)', [], function(tx, result) {
+                transaction.executeSql('CREATE TABLE IF NOT EXISTS mandola (id TEXT PRIMARY KEY, title TEXT, text TEXT, timestamp DATETIME, url TEXT, origin TEXT, serialized TEXT, categories TEXT)', [], function(tx, result) {
                     console.log("=== MANDOLA TABLE CREATED ===");
                 }, function(error) {
                     console.log("=== MANDOLA TABLE CREATE ERROR ===");
@@ -522,8 +551,8 @@ var Controller = function() {
         },
 
         initialize: function() {
+
             self = this;
-            console.log(device.uuid);
             //Bind the navigation button events for the whole application.
             self.bindEvents();
             //Render the homescreen of the application, which is the report list.
@@ -552,7 +581,7 @@ var Controller = function() {
                         console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
 
                         swal({
-                            title: 'Report ' + copied_url,
+                            title: '<div class="float-report-url">Report ' + copied_url + '</div>',
                             text: "How do you want to do this?",
                             type: 'question',
                             showCancelButton: true,
@@ -561,7 +590,7 @@ var Controller = function() {
                             confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
                             cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
                             confirmButtonClass: 'btn btn-success mandola-option',
-                            cancelButtonClass: 'btn btn-success mandola-option',
+                            cancelButtonClass: 'btn btn-success mandola-option'
                         }).then(function() {
                             console.log("=== GO WITH SCREENSHOT ===");
                             self.screenshotReport(copied_url);
@@ -610,9 +639,22 @@ var Controller = function() {
                 $('.back-button').toggleClass('active');
                 controller.renderReportView();
             });
+            $('.edit-back-button').on('click', function() {
+                $('.edit-back-button').toggleClass('active');
+                controller.previousState.load();
+            });
             $('.settings-back-button').on('click', function() {
                 $('.settings-back-button').toggleClass('active');
                 controller.renderSettingsView();
+            });
+            $('.reports-edit-button').on('click', function() {
+                $('.reports-edit-button').toggleClass('edit-mode');
+                if ($('.reports-edit-button').hasClass('edit-mode')) {
+                    self.enterEditMode();
+                } else {
+                    self.leaveEditMode();
+                }
+
             });
             $('#mandolapp-menu').on("click", "a", null, function() {
                 $('#mandolapp-menu').collapse('hide');
@@ -673,11 +715,13 @@ var Controller = function() {
 
         openMandolaProxy: function(url, text, serialized) {
             console.log("=== OPENING MANDOLA PROXY " + url + " ===");
-
+            var MANDOLA_KEY = "";
             if (serialized != null) {
                 console.log("=== DESERIALIZING TEXT ===");
+                MANDOLA_KEY="MANDOLA_SERIALIZED";
             } else {
                 console.log("=== SEARCHING FOR TEXT ===");
+                MANDOLA_KEY="MANDOLA_TEXT";
             }
 
             self.mandolaLoading.start();
@@ -689,7 +733,10 @@ var Controller = function() {
             });
             inAppBrowser.addEventListener('loadstop', function() {
                 inAppBrowser.executeScript({
-                    code: "localStorage.setItem('MANDOLA_SERIALIZED', '" + text + "');"
+                    code: "localStorage.clear();"
+                });
+                inAppBrowser.executeScript({
+                    code: "localStorage.setItem('" + MANDOLA_KEY + "', '" + escape(text) + "');"
                 });
                 inAppBrowser.show();
             });
@@ -700,14 +747,18 @@ var Controller = function() {
 
         renderReportInfo: function(reportItem) {
 
-            self.setupView(true, false, true);
+            self.setupView(true, false, true, false);
 
             $(".main-container").load("./views/info.html", function(data) {
+                var title = "No title";
+                if (reportItem.title != "") {
+                    title = reportItem.title;
+                }
 
                 $('.info.container').attr('id', reportItem.id);
 
-                $('.report-title').html(reportItem.title);
-                $('.report-date').html(reportItem.date);
+                $('.report-title').html(title);
+                $('.report-date').html(moment(reportItem.timestamp).format('dddd, MMMM Do YYYY, HH:mm'));
                 $('.report-content').html(reportItem.text);
 
                 reportItem.categories.split(", ").forEach(function(element) {
@@ -725,7 +776,7 @@ var Controller = function() {
 
         renderHatespeechView: function() {
 
-            self.setupView(false, false, false);
+            self.setupView(false, false, false, false);
 
             $(".main-container").load("./views/hatespeech.html", function(data) {
 
@@ -838,6 +889,7 @@ var Controller = function() {
         },
 
         appendReport: function(reportObject) {
+            var uri = new URI(reportObject.url);
 
             function truncate(n, useWordBoundary) {
                 var isTooLong = this.length > n,
@@ -846,112 +898,43 @@ var Controller = function() {
                 return isTooLong ? s_ + '&hellip;' : s_;
             }
 
-            function display_time(msgtime) {
-                var time = new Date(msgtime);
-                time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                if (time.getDate() == new Date().getDate() &&
-                    time.getMonth() == new Date().getMonth() &&
-                    time.getFullYear() == new Date().getFullYear()) {
-                    time = Math.abs(new Date().getTime() - time);
-                    time = Math.ceil(time / 1000);
-                    if (time < 60) {
-                        if (time < 2) {
-                            time = "a second ago";
-                        } else {
-                            time = time + " seconds ago";
-                        }
-
-                    } else if (time >= 60) {
-                        time = new Date(msgtime);
-                        time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                        time = Math.abs(new Date() - time);
-                        time = Math.ceil(time / (1000 * 60));
-                        if (time < 60) {
-                            if (time < 2) {
-                                time = "a minute ago";
-                            } else {
-                                time = time + " minutes ago";
-                            }
-
-                        } else if (time >= 60) {
-                            time = new Date(msgtime);
-                            time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                            time = Math.abs(new Date() - time);
-                            time = Math.ceil(time / (1000 * 60 * 60));
-                            if (time < 24) {
-                                if (time < 2) {
-                                    time = "an hour ago";
-                                } else {
-                                    time = time + " hours ago";
-                                }
-                            }
-                        }
-                    }
-                } else if (time.getMonth() == new Date().getMonth() &&
-                    time.getFullYear() == new Date().getFullYear()) {
-                    time = Math.abs(new Date() - time);
-                    time = Math.ceil(time / (1000 * 3600 * 24));
-                    if (time < 2) {
-                        time = "a day ago";
-                    } else {
-                        if (time < 7) {
-                            time = time + " days ago";
-                        } else {
-                            time = new Date(msgtime);
-                            time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                            time = Math.abs(new Date() - time);
-                            time = Math.ceil(time / (1000 * 3600 * 24 * 7));
-                            if (time < 2) {
-                                time = "a week ago";
-                            } else {
-                                time = time + " weeks ago";
-                            }
-                        }
-
-                    }
-                } else if (time.getFullYear() == new Date().getFullYear()) {
-                    time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.toUTCString().split(' ')[4];
-                } else {
-                    time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.getFullYear() + " " + time.toUTCString().split(' ')[4];
-                }
-                return time;
-            }
-
             self.database.transaction(function(transaction) {
-                var executeQuery = "INSERT INTO mandola (id, title, text, timestamp, url, serialized, categories) VALUES (?,?,?,?,?,?,?)";
+                var executeQuery = "INSERT INTO mandola (id, title, text, timestamp, url, origin, serialized, categories) VALUES (?,?,?,?,?,?,?,?)";
                 transaction.executeSql(executeQuery, [
-                    device.uuid + Date.now(),
+                    device.uuid + reportObject.timestamp,
                     reportObject.title,
                     reportObject.text,
                     reportObject.timestamp,
                     reportObject.url,
+                    uri.authority,
                     reportObject.serialized,
                     reportObject.categories.join(', ')
                 ], function(tx, result) {
                     console.log("=== REPORT INSERTED IN SQLITE ===");
 
                     var title = "No title";
-                    if(reportObject.title != ""){
-                      title = reportObject.title;
+                    if (reportObject.title != "") {
+                        title = reportObject.title;
                     }
 
-                    $(".report-wrapper .list").prepend('<li id="' + reportObject.id + '" data-url="' + reportObject.url + '" class="report-item">' +
+                    $(".report-wrapper .list").prepend('<li id="' + device.uuid + "" + reportObject.timestamp + '" data-url="' + reportObject.url + '" class="report-item">' +
                         '<div class="source-icon">' +
                         '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
                         '</div>' +
                         '<div class="report-info">' +
                         '<div class="report-title">' + title + '</div>' +
                         '<div class="report-content">' + truncate.apply(reportObject.text, [35, false]) + '</div>' +
-                        '<div class="report-date">' + display_time(reportObject.timestamp) + '</div>' +
+                        '<div class="report-date">' + moment(reportObject.timestamp).fromNow() + '</div>' +
                         '</div>' +
                         '</li>');
 
-                    self.loadReport(reportObject.id);
+                    self.loadReport(device.uuid + "" + reportObject.timestamp);
 
-                    $('#' + reportObject.id).addClass('animated');
-                    $('#' + reportObject.id).addClass('bounceIn');
+                    $('#' + device.uuid + "" + reportObject.timestamp).addClass('animated');
+                    $('#' + device.uuid + "" + reportObject.timestamp).addClass('bounceIn');
 
                 }, function(error) {
+                    console.log(error);
                     console.log("=== REPORT NOT INSERTED IN SQLITE ===");
                 });
             });
@@ -995,6 +978,7 @@ var Controller = function() {
                 title: 'Enter a URL to annotate',
                 input: 'text',
                 inputValue: copied_url,
+                focusCancel: true,
                 showCancelButton: true,
                 confirmButtonText: 'Load',
                 showLoaderOnConfirm: false,
@@ -1050,7 +1034,7 @@ var Controller = function() {
                     MAO.reports.forEach(function(report) {
                         self.appendReport({
                             "title": report.title,
-                            "timestamp": report.timestamp,
+                            "timestamp": Date.now(),
                             "url": report.url,
                             "text": report.text,
                             "serialized": report.serialized,
@@ -1112,7 +1096,8 @@ var Controller = function() {
         loadReport: function(reportID) {
 
             function generateFavicon(URL) {
-                return 'http://logo.clearbit.com/' + URL.replace(/^(http:\/\/[^\/]+).*$/, '$1');
+                var uri = new URI(URL);
+                return 'http://logo.clearbit.com/' + uri.authority;
             }
 
             function imageExists(url, callback) {
@@ -1211,6 +1196,7 @@ var Controller = function() {
                                                         title: 'MANDOLA Report',
                                                         text: 'Confirm OCR text',
                                                         input: 'textarea',
+                                                        focusCancel: true,
                                                         inputValue: result,
                                                         allowOutsideClick: false,
                                                         preConfirm: function(text) {
@@ -1227,6 +1213,7 @@ var Controller = function() {
                                                         title: 'Report title',
                                                         text: 'Type a title describing the report if you want',
                                                         input: 'text',
+                                                        focusCancel: true,
                                                         inputPlaceholder: 'e.g Hatespeech filled comment',
                                                         allowOutsideClick: false
                                                     },
@@ -1234,6 +1221,7 @@ var Controller = function() {
                                                         title: 'Source URL',
                                                         text: 'Type the source URL',
                                                         input: 'text',
+                                                        focusCancel: true,
                                                         inputValue: copied_url,
                                                         allowOutsideClick: false,
                                                         preConfirm: function(url) {
@@ -1250,6 +1238,7 @@ var Controller = function() {
                                                     {
                                                         title: 'Categories',
                                                         text: 'Select hate categories',
+                                                        focusCancel: true,
                                                         preConfirm: function(categories) {
                                                             return new Promise(function(resolve, reject) {
                                                                 if (categories === "" || categories === "") {
@@ -1354,94 +1343,304 @@ var Controller = function() {
             });
         },
 
+        leaveEditMode: function() {
+            console.log("=== LEAVING EDIT MODE ===");
+
+            $('.report-action').toggleClass('hidden');
+            $('.sort-action').toggleClass('hidden');
+
+            $('.report-item').off();
+            $('.report-item').on("click", function(e) {
+                var reportID = e.currentTarget.id;
+                console.log("=== SHOWING INFO ON " + reportID.toUpperCase() + " ===");
+                self.database.transaction(function(transaction) {
+                    transaction.executeSql('SELECT * FROM mandola WHERE id=?', [reportID], function(tx, results) {
+                        var len = results.rows.length;
+                        if (len > 0) {
+                            self.renderReportInfo(results.rows.item(0));
+                        }
+                    }, function(error) {
+                        console.log("=== SQLITE COULDNT LOAD " + reportID.toUpperCase() + " ===");
+                    });
+                });
+            });
+        },
+
+        enterEditMode: function() {
+            console.log("=== ENTERING EDIT MODE ===");
+
+            $('.report-item').off();
+            $('.report-item').on("click", function(e) {
+                swal({
+                    title: 'Are you sure?',
+                    text: "This report will be deleted from your list.",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#CFCFCF',
+                    confirmButtonText: 'Yes!'
+                }).then(function() {
+                    var reportID = e.currentTarget.id;
+                    self.database.transaction(function(transaction) {
+                        transaction.executeSql('DELETE FROM mandola WHERE id=?', [reportID], function(tx, results) {
+                            $('#' + reportID).animateCSS('bounceOutLeft', function(){
+                              $('#' + reportID).remove();
+                            });
+                            console.log("=== SQLITE DELETED " + reportID.toUpperCase() + " ===");
+                        }, function(error) {
+                            swal(
+                                'Oops..',
+                                'Could not delete the selected report.',
+                                'error'
+                            );
+                            console.log("=== SQLITE COULDNT DELETE " + reportID.toUpperCase() + " ===");
+                        });
+                    });
+                });
+
+            });
+
+            $('.report-action').toggleClass('hidden');
+            $('.sort-action').toggleClass('hidden');
+        },
+
+        renderSortAscending: function(){
+
+          function truncate(n, useWordBoundary) {
+              var isTooLong = this.length > n,
+                  s_ = isTooLong ? this.substr(0, n - 1) : this;
+              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+              return isTooLong ? s_ + '&hellip;' : s_;
+          }
+
+
+          controller.previousState.save(".report-wrapper .list");
+          $(".report-wrapper .list").html("");
+
+          self.database.transaction(function(transaction) {
+              transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp DESC', [], function(tx, results) {
+
+                  var len = results.rows.length;
+                  var i;
+
+                  for (i = 0; i < len; i++) {
+                      var item = results.rows.item(i);
+
+                      var title = "No title";
+                      if (item.title != "") {
+                          title = item.title;
+                      }
+                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                          '<div class="source-icon">' +
+                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                          '</div>' +
+                          '<div class="report-info">' +
+                          '<div class="report-title">' + title + '</div>' +
+                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                          '</div>' +
+                          '</li>');
+                      self.loadReport(item.id);
+                  }
+
+                  window.sr = ScrollReveal({
+                      duration: 500
+                  });
+                  sr.reveal('.report-wrapper .list-view .list .report-item', {
+                      origin: 'bottom',
+                      duration: 500
+                  });
+
+              }, null);
+          });
+        },
+
+        renderSortDescending: function(){
+
+          function truncate(n, useWordBoundary) {
+              var isTooLong = this.length > n,
+                  s_ = isTooLong ? this.substr(0, n - 1) : this;
+              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+              return isTooLong ? s_ + '&hellip;' : s_;
+          }
+
+          $(".report-wrapper .list").html("");
+
+          self.database.transaction(function(transaction) {
+              transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp ASC', [], function(tx, results) {
+
+                  $(".report-wrapper .list").html("");
+                  var len = results.rows.length;
+                  var i;
+
+                  for (i = 0; i < len; i++) {
+                      var item = results.rows.item(i);
+                      console.log(item.timestamp);
+                      var title = "No title";
+                      if (item.title != "") {
+                          title = item.title;
+                      }
+                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                          '<div class="source-icon">' +
+                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                          '</div>' +
+                          '<div class="report-info">' +
+                          '<div class="report-title">' + title + '</div>' +
+                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                          '</div>' +
+                          '</li>');
+                      self.loadReport(item.id);
+                  }
+
+                  window.sr = ScrollReveal({
+                      duration: 500
+                  });
+                  sr.reveal('.report-wrapper .list-view .list .report-item', {
+                      origin: 'bottom',
+                      duration: 500
+                  });
+
+              }, null);
+          });
+        },
+
+        renderSearchResults: function(search){
+
+        function truncate(n, useWordBoundary) {
+              var isTooLong = this.length > n,
+                  s_ = isTooLong ? this.substr(0, n - 1) : this;
+              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+              return isTooLong ? s_ + '&hellip;' : s_;
+          }
+
+          self.database.transaction(function(transaction) {
+              transaction.executeSql("SELECT * FROM mandola WHERE mandola.text LIKE ('%" + search +"%') OR mandola.url LIKE ('%" + search +"%') OR mandola.title LIKE ('%" + search + "%') ORDER BY timestamp ASC", [], function(tx, results) {
+                  if(self.previousState.states.length > 0 && results.rows.length > 0){
+                    $('.edit-back-button').addClass('active');
+                  }
+
+                  controller.previousState.save(".report-wrapper .list");
+                  $(".report-wrapper .list").html("");
+                  var len = results.rows.length;
+                  var i;
+
+                  for (i = 0; i < len; i++) {
+                      var item = results.rows.item(i);
+
+                      var title = "No title";
+                      if (item.title != "") {
+                          title = item.title;
+                      }
+                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                          '<div class="source-icon">' +
+                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                          '</div>' +
+                          '<div class="report-info">' +
+                          '<div class="report-title">' + title + '</div>' +
+                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                          '</div>' +
+                          '</li>');
+                      self.loadReport(item.id);
+                  }
+
+                  window.sr = ScrollReveal({
+                      duration: 500
+                  });
+                  sr.reveal('.report-wrapper .list-view .list .report-item', {
+                      origin: 'bottom',
+                      duration: 500
+                  });
+
+              }, function(error){
+                console.log(error);
+              });
+          });
+
+        },
+
+        renderGroupByHost: function(){
+
+          function truncate(n, useWordBoundary) {
+              var isTooLong = this.length > n,
+                  s_ = isTooLong ? this.substr(0, n - 1) : this;
+              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+              return isTooLong ? s_ + '&hellip;' : s_;
+          }
+
+          self.database.transaction(function(transaction) {
+              transaction.executeSql("SELECT origin, count(*) AS count FROM mandola GROUP BY origin ORDER BY origin ASC", [], function(tx, results) {
+                  if(self.previousState.states.length > 0 && results.rows.length > 0){
+                    $('.edit-back-button').addClass('active');
+                  }
+
+                  controller.previousState.save(".report-wrapper .list");
+                  $(".report-wrapper .list").html("");
+
+                  var len = results.rows.length;
+                  var i;
+
+                  for (i = 0; i < len; i++) {
+                      var item = results.rows.item(i);
+                      var itemCount = "0 items";
+
+                      if(item.count == 1){
+                        itemCount = "1 item"
+                      }else{
+                        itemCount = item.count + " items"
+                      }
+
+                      $(".report-wrapper .list").append('<li data-origin="' + item.origin + '" class="host-item">' +
+                          '<div class="source-icon">' +
+                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                          '</div>' +
+                          '<div class="host-info">' +
+                          '<div class="host-name">' + item.origin + '</div>' +
+                          '<div class="host-count">' + itemCount + '</div>' +
+                          '</div>' +
+                          '</li>');
+                  }
+
+                  $('.host-item').on("click", function(e) {
+                    var url = $(e.currentTarget).attr('data-origin');
+                    self.renderSearchResults(url);
+                  });
+
+                  $('.host-item').each(function(index, reportElement){
+                    var url = $(reportElement).attr('data-origin');
+                    var favicon = 'http://logo.clearbit.com/' + url;
+
+                    $.ajax({
+                        url: favicon,
+                        type: 'get',
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {},
+                        success: function(data) {
+                            $(reportElement).find('.source-icon').html('<img src="' + favicon + '" class="source-icon" alt="">');
+                        }
+                    });
+
+                  });
+
+                  window.sr = ScrollReveal({
+                      duration: 500
+                  });
+                  sr.reveal('.report-wrapper .list-view .list .host-item', {
+                      origin: 'bottom',
+                      duration: 500
+                  });
+
+              }, function(error){
+                console.log(error);
+              });
+          });
+
+        },
+
         renderReportView: function() {
-            self.setupView(false, false, false);
+            self.setupView(false, false, false, true);
 
             $(".main-container").load("./views/report.html", function(data) {
-
-                //The truncate(length, useWordBoundary) function is used to cut of the content
-                //of the report in order to fit in the list item and easily
-                //be presented in the list view. Length is how many characters
-                //will be the limit, and useWordBoundary a boolean to cut words or not.
-                function truncate(n, useWordBoundary) {
-                    var isTooLong = this.length > n,
-                        s_ = isTooLong ? this.substr(0, n - 1) : this;
-                    s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
-                    return isTooLong ? s_ + '&hellip;' : s_;
-                }
-
-                //The display_time(time) is used to present time in a more user-friendly
-                //way like 'just now' or '2 hours ago' like facebook or twitter.
-                function display_time(msgtime) {
-                    var time = new Date(msgtime);
-                    time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                    if (time.getDate() == new Date().getDate() &&
-                        time.getMonth() == new Date().getMonth() &&
-                        time.getFullYear() == new Date().getFullYear()) {
-                        time = Math.abs(new Date().getTime() - time);
-                        time = Math.ceil(time / 1000);
-                        if (time < 60) {
-                            if (time < 2) {
-                                time = "a second ago";
-                            } else {
-                                time = time + " seconds ago";
-                            }
-
-                        } else if (time >= 60) {
-                            time = new Date(msgtime);
-                            time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                            time = Math.abs(new Date() - time);
-                            time = Math.ceil(time / (1000 * 60));
-                            if (time < 60) {
-                                if (time < 2) {
-                                    time = "a minute ago";
-                                } else {
-                                    time = time + " minutes ago";
-                                }
-
-                            } else if (time >= 60) {
-                                time = new Date(msgtime);
-                                time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                                time = Math.abs(new Date() - time);
-                                time = Math.ceil(time / (1000 * 60 * 60));
-                                if (time < 24) {
-                                    if (time < 2) {
-                                        time = "an hour ago";
-                                    } else {
-                                        time = time + " hours ago";
-                                    }
-                                }
-                            }
-                        }
-                    } else if (time.getMonth() == new Date().getMonth() &&
-                        time.getFullYear() == new Date().getFullYear()) {
-                        time = Math.abs(new Date() - time);
-                        time = Math.ceil(time / (1000 * 3600 * 24));
-                        if (time < 2) {
-                            time = "a day ago";
-                        } else {
-                            if (time < 7) {
-                                time = time + " days ago";
-                            } else {
-                                time = new Date(msgtime);
-                                time = new Date(time.getUTCFullYear(), time.getUTCMonth(), time.getUTCDate(), time.getUTCHours(), time.getUTCMinutes(), time.getUTCSeconds());
-                                time = Math.abs(new Date() - time);
-                                time = Math.ceil(time / (1000 * 3600 * 24 * 7));
-                                if (time < 2) {
-                                    time = "a week ago";
-                                } else {
-                                    time = time + " weeks ago";
-                                }
-                            }
-
-                        }
-                    } else if (time.getFullYear() == new Date().getFullYear()) {
-                        time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.toUTCString().split(' ')[4];
-                    } else {
-                        time = time.getDate() + " " + time.toUTCString().split(' ')[2] + " " + time.getFullYear() + " " + time.toUTCString().split(' ')[4];
-                    }
-                    return time;
-                }
 
                 window.sr = ScrollReveal({
                     duration: 500
@@ -1451,42 +1650,7 @@ var Controller = function() {
                     duration: 500
                 });
 
-                //Access mandola.db in SQLite and present all the user's reports for now. This should be done in
-                //a lazy loading manner and later be done in more sorting like date, source etc.
-                self.database.transaction(function(transaction) {
-                    transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp DESC', [], function(tx, results) {
-                        var len = results.rows.length;
-                        var i;
-
-                        for (i = 0; i < len; i++) {
-                            var item = results.rows.item(i);
-                            var title = "No title";
-                            if(item.title != ""){
-                              title = item.title;
-                            }
-                            $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
-                                '<div class="source-icon">' +
-                                '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                                '</div>' +
-                                '<div class="report-info">' +
-                                '<div class="report-title">' + title + '</div>' +
-                                '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
-                                '<div class="report-date">' + display_time(item.timestamp) + '</div>' +
-                                '</div>' +
-                                '</li>');
-                            self.loadReport(item.id);
-                        }
-
-                        window.sr = ScrollReveal({
-                            duration: 500
-                        });
-                        sr.reveal('.report-wrapper .list-view .list .report-item', {
-                            origin: 'bottom',
-                            duration: 500
-                        });
-
-                    }, null);
-                });
+                self.renderSortAscending();
 
                 //The reporting functionality provides two options, via browser and via screenshot.
                 //This here is the browser button which enables the browser reporting functionality.
@@ -1507,13 +1671,47 @@ var Controller = function() {
                     $('.menu-button').toggleClass('pressed');
                 });
 
+                $("#report-sort-desc-btn").on("click", function(e) {
+                  $('.sort-button').toggleClass('pressed');
+                  self.renderSortDescending();
+                });
+
+                $("#report-sort-asc-btn").on("click", function(e) {
+                  $('.sort-button').toggleClass('pressed');
+                  self.renderSortAscending();
+                });
+
+                $("#report-search-btn").on("click", function(e) {
+                  $('.sort-button').toggleClass('pressed');
+                  swal({
+                      type: 'question',
+                      title: 'What do you want to search for?',
+                      input: 'text',
+                      showCancelButton: true,
+                      confirmButtonText: '<i class="fa fa-search" aria-hidden="true"></i>',
+                      showLoaderOnConfirm: false,
+                      allowOutsideClick: true
+                  }).then(function(searchKey) {
+                      self.renderSearchResults(searchKey);
+                  });
+                });
+
+                $("#report-group-by-host-btn").on("click", function(e) {
+                  self.renderGroupByHost();
+                  $('.sort-button').toggleClass('pressed');
+                });
+
+                $('.sort-button').on('click', function() {
+                    $('.sort-button').toggleClass('pressed');
+                });
+
             });
 
         },
 
         renderFAQsView: function() {
 
-            self.setupView(false, false, false);
+            self.setupView(false, false, false, false);
 
             $(".main-container").load("./views/faqs.html", function(data) {
 
@@ -1573,7 +1771,7 @@ var Controller = function() {
 
         renderSettingsView: function() {
 
-            self.setupView(false, false, false);
+            self.setupView(false, false, false, false);
 
             $(".main-container").load("./views/settings.html", function(data) {
 
@@ -1724,7 +1922,7 @@ var Controller = function() {
 
         renderLanguagesView: function() {
 
-            self.setupView(false, true, false);
+            self.setupView(false, true, false, false);
 
             $(".main-container").load("./views/languages.html", function(data) {
 
@@ -1806,9 +2004,9 @@ var Controller = function() {
                                         }
                                     }
 
-                                    if(self.user_settings.default_language_code == lang){
-                                      self.user_settings.default_language = "None";
-                                      self.user_settings.default_language_code = "none";
+                                    if (self.user_settings.default_language_code == lang) {
+                                        self.user_settings.default_language = "None";
+                                        self.user_settings.default_language_code = "none";
                                     }
                                 }, function() {
                                     swal(
@@ -1821,7 +2019,7 @@ var Controller = function() {
                                 });
                             });
                         });
-                    });
+                    }).catch(swal.noop);
 
                 }
 

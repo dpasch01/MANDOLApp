@@ -1,14 +1,6 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
     {
-        "id": "cordova-sqlite-storage.SQLitePlugin",
-        "file": "plugins/cordova-sqlite-storage/www/SQLitePlugin.js",
-        "pluginId": "cordova-sqlite-storage",
-        "clobbers": [
-            "SQLitePlugin"
-        ]
-    },
-    {
         "id": "cordova-plugin-inappbrowser.inappbrowser",
         "file": "plugins/cordova-plugin-inappbrowser/www/inappbrowser.js",
         "pluginId": "cordova-plugin-inappbrowser",
@@ -31,14 +23,6 @@ module.exports = [
         "pluginId": "cordova-plugin-dialogs",
         "merges": [
             "navigator.notification"
-        ]
-    },
-    {
-        "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
-        "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
-        "pluginId": "com.ab.cordovafloatingactivity",
-        "clobbers": [
-            "cordovafloatingactivity"
         ]
     },
     {
@@ -310,6 +294,22 @@ module.exports = [
         "merges": [
             "navigator.app"
         ]
+    },
+    {
+        "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
+        "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
+        "pluginId": "com.ab.cordovafloatingactivity",
+        "clobbers": [
+            "cordovafloatingactivity"
+        ]
+    },
+    {
+        "id": "cordova-sqlite-storage.SQLitePlugin",
+        "file": "plugins/cordova-sqlite-storage/www/SQLitePlugin.js",
+        "pluginId": "cordova-sqlite-storage",
+        "clobbers": [
+            "SQLitePlugin"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -317,11 +317,8 @@ module.exports.metadata =
 {
     "cordova-plugin-whitelist": "1.3.0",
     "cordova-plugin-console": "1.0.5-dev",
-    "cordova-plugin-crosswalk-webview": "2.2.0",
-    "cordova-sqlite-storage": "1.5.1",
     "cordova-plugin-inappbrowser": "1.6.0-dev",
     "cordova-plugin-dialogs": "1.3.0",
-    "com.ab.cordovafloatingactivity": "0.7.0",
     "cordova.plugins.diagnostic": "3.3.2",
     "cordova-plugin-compat": "1.1.0",
     "cordova-plugin-camera": "2.3.2-dev",
@@ -331,7 +328,10 @@ module.exports.metadata =
     "cordova-plugin-crop": "0.3.1",
     "cordova-plugin-device": "1.1.4",
     "cordova-plugin-background-mode": "0.6.6-dev",
-    "cordova-plugin-core-android-extensions": "1.1.0"
+    "cordova-plugin-core-android-extensions": "1.1.0",
+    "com.ab.cordovafloatingactivity": "0.7.0",
+    "cordova-sqlite-storage": "1.5.2",
+    "cordova-plugin-crosswalk-webview": "2.2.0"
 };
 // BOTTOM OF METADATA
 });

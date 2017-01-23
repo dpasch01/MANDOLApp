@@ -1,6 +1,7 @@
 package com.ab.cordovafloatingactivityPack;
 
 import android.app.Service;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
@@ -12,6 +13,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 public class ChatHeadService extends Service {
+
+    public static String COPIED_URL = "";
 
     private WindowManager windowManager;
     private ImageView chatHead;
@@ -44,6 +47,18 @@ public class ChatHeadService extends Service {
         params.y = 100;
 
         windowManager.addView(chatHead, params);
+
+        ClipboardManager.OnPrimaryClipChangedListener mPrimaryChangeListener = new ClipboardManager.OnPrimaryClipChangedListener() {
+            public void onPrimaryClipChanged() {
+                chatHead.setImageResource(com.mandola.reporting.R.drawable.circle_sensed);
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ChatHeadService.COPIED_URL = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
+                Log.d("CLIPBOARD_CONTENT", clipboard.getPrimaryClip().toString());
+            }
+        };
+
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        clipboardManager.addPrimaryClipChangedListener(mPrimaryChangeListener);
 
         chatHead.setOnTouchListener(new View.OnTouchListener() {
             boolean flag = false;
@@ -101,6 +116,7 @@ public class ChatHeadService extends Service {
                         sendBroadcast(i);
 
                         Log.d("FIRED_EVENT", "Fired BUBBLE_PRESSED event.");
+                        chatHead.setImageResource(com.mandola.reporting.R.drawable.circle);
                     }
                 }
 

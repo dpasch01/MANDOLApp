@@ -24,23 +24,6 @@
         "is_top_level": false,
         "variables": {}
     },
-    "cordova-plugin-crosswalk-webview": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-crosswalk-webview@2.2.0"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "cordova-sqlite-storage": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/brodysoft/Cordova-SQLitePlugin",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-plugin-inappbrowser": {
         "source": {
             "type": "git",
@@ -54,15 +37,6 @@
         "source": {
             "type": "registry",
             "id": "cordova-plugin-dialogs"
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
-    "com.ab.cordovafloatingactivity": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dpasch01/Cordova-Floating-Activity-Plugin",
-            "subdir": "."
         },
         "is_top_level": true,
         "variables": {}
@@ -139,6 +113,33 @@
         "source": {
             "type": "git",
             "url": "https://github.com/chemerisuk/cordova-plugin-core-android-extensions",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "com.ab.cordovafloatingactivity": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/dpasch01/Cordova-Floating-Activity-Plugin",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-sqlite-storage": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/litehelpers/Cordova-sqlite-storage",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-crosswalk-webview": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/crosswalk-project/cordova-plugin-crosswalk-webview",
             "subdir": "."
         },
         "is_top_level": true,

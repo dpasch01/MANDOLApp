@@ -11,8 +11,13 @@
   border-radius: 0px
   background-color: $darkish
 
+.reports-edit-button.edit-mode
+  color: transparentize($whitish, 0.5)
+
 .back-button,
-.settings-back-button
+.settings-back-button,
+.edit-back-button,
+.reports-edit-button
   float: left
   padding: 6px 10px
   margin-left: 20px
@@ -26,7 +31,8 @@
   &.active
     display: block
 
-.report-url-button
+.report-url-button,
+.reports-edit-button
   float: right
   padding: 3px 10px
   color: $whitish

@@ -1,78 +1,176 @@
-.menu-button
-  display: flex
-  justify-content: center
-  align-items: center
-  transition-duration: 0.2s
+.sort-action
+  display: inline-block
   position: fixed
+  width: 70px
+  height: 70px
+  margin: 300px 0 0 -28px
   right: 20px
   bottom: 60px
-  width: 75px
-  height: 75px
-  text-align: center
-  line-height: 75px
-  border-radius: 50%
-  background-color: $blueish
-  color: $whiton
-  font-size: 24px
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26), 0 2px 10px 0 rgba(0, 0, 0, 0.22)
-  cursor: pointer
 
-  &.pressed
-    background-color: darken($blueish, 0.8)
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.28), 0 1px 3px 0 rgba(0, 0, 0, 0.25)
-
-  a
-    transition-duration: 0.2s
-    opacity: 0
-    width: 0px
-    height: 0px
-    text-align: center
-    line-height: 50px
+  .sort-button
+    position: fixed
+    width: 70px
+    height: 70px
     border-radius: 50%
-    color: $whiton
+    border: 0
+    outline: 0
+    background: $reddish
     font-size: 24px
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26), 0 2px 10px 0 rgba(0, 0, 0, 0.22)
-    cursor: pointer
+    color: white
+    z-index: 2
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26)
+    transition: all .3s
+
+  .actions
+    position: absolute
+    list-style: none inside none
+    margin: 0 0 0 0
+    padding: 0
+    width: auto
+    float: left
+    background-color: transparent
+    top: 8px
+    left: 15px
+    z-index: 1
+    width: 40px
+    height: 40px
+    border-radius: 50%
 
     &:hover
-      box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.28), 0 4px 15px 0 rgba(0, 0, 0, 0.25)
+      cursor: pointer
 
-    &:nth-child(2)
-      transition-delay: 0.1s
+    li
       position: absolute
-      right: 30px
-      bottom: 30px
-      background: $blueish
+      display: block
+      width: 40px
+      height: 40px
+      border-radius: 50%
+      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26)
+      margin: 0
+      background: #212121
+      color: #ffffff
+      transition: all .3s
+      transform: scale(0.3)
+      background-color: $reddish
 
-    &:nth-child(3)
-      transition-delay: 0.2s
+      a
+        background: inherit
+        color: inherit
+        display: block
+        width: 40px
+        height: 40px
+        border-radius: 50%
+        line-height: 40px
+        text-align: center
+      &:pressed
+        box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19), 0 8px 17px 0 rgba(0, 0, 0, 0.2)
+
+  .sort-button
+    &.pressed
+      box-shadow: 0 17px 50px 0 rgba(0, 0, 0, 0.19), 0 12px 15px 0 rgba(0, 0, 0, 0.24)
+      ~ .actions li
+        transition: all .3s
+        transform: scale(1)
+        &:nth-child(1)
+          margin-top: -56px
+        &:nth-child(2)
+          margin-top: -104px
+        &:nth-child(3)
+          margin-top: -152px
+        &:nth-child(4)
+          margin-top: -200px
+        &:nth-child(5)
+          margin-top: -248px
+    i
+      transition: all .3s
+    &.pressed:not(.no-rotate) i
+      transform: scale(1.5) rotate(-45deg)
+
+
+.report-action
+  display: inline-block
+  position: fixed
+  width: 70px
+  height: 70px
+  margin: 300px 0 0 -28px
+  right: 20px
+  bottom: 60px
+
+  .menu-button
+    position: fixed
+    width: 70px
+    height: 70px
+    border-radius: 50%
+    border: 0
+    outline: 0
+    background: $blueish
+    font-size: 24px
+    color: white
+    z-index: 2
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26)
+    transition: all .3s
+
+  .actions
+    position: absolute
+    list-style: none inside none
+    margin: 0 0 0 0
+    padding: 0
+    width: auto
+    float: left
+    background-color: transparent
+    top: 8px
+    left: 15px
+    z-index: 1
+    width: 40px
+    height: 40px
+    border-radius: 50%
+
+    &:hover
+      cursor: pointer
+
+    li
       position: absolute
-      right: 30px
-      bottom: 30px
-      background: $blueish
+      display: block
+      width: 40px
+      height: 40px
+      border-radius: 50%
+      box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26)
+      margin: 0
+      background: #212121
+      color: #ffffff
+      transition: all .3s
+      transform: scale(0.3)
+      background-color: $blueish
 
-  &.pressed a
-    opacity: 1
-    width: 50px
-    height: 50px
+      a
+        background: inherit
+        color: inherit
+        display: block
+        width: 40px
+        height: 40px
+        border-radius: 50%
+        line-height: 40px
+        text-align: center
+      &:pressed
+        box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.19), 0 8px 17px 0 rgba(0, 0, 0, 0.2)
 
-    &:nth-child(2)
-      right: 80px
-      bottom: 0px
-
-      &:hover
-        transition-delay: 0s
-        background: $blueish
-
-    &:nth-child(3)
-      right: 65px
-      bottom: 65px
-
-      &:hover
-        transition-delay: 0s
-        background: $blueish
-
-@media screen and (max-width: 400px)
-  h1
-    padding: 15px
-    font-size: 25px
+  .menu-button
+    &.pressed
+      box-shadow: 0 17px 50px 0 rgba(0, 0, 0, 0.19), 0 12px 15px 0 rgba(0, 0, 0, 0.24)
+      ~ .actions li
+        transition: all .3s
+        transform: scale(1)
+        &:nth-child(1)
+          margin-top: -56px
+        &:nth-child(2)
+          margin-top: -104px
+        &:nth-child(3)
+          margin-top: -152px
+        &:nth-child(4)
+          margin-top: -200px
+        &:nth-child(5)
+          margin-top: -248px
+    i
+      transition: all .3s
+    &.pressed:not(.no-rotate) i
+      transform: scale(1.5) rotate(-45deg)
