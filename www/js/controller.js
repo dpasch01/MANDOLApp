@@ -14,27 +14,29 @@ var Controller = function() {
 
         MANDOLA_PROXY_PREFIX: "http://mandola.grid.ucy.ac.cy:9080/",
 
-        previousState: {
-          states: [],
-          depth: 0,
-          load: function(){
-            if(this.states.length > 0){
-              var state = this.states[this.depth - 1];
-              $(state.selector).replaceWith(state.state);
-              this.depth = this.depth - 1;
-              this.states.splice(this.depth - 1, 1);
-            }else{
-              console.log("=== NO PREVIOUS STATE HAS BEEN DEFINED ===");
-            }
-          },
+        animationDuration: 450,
 
-          save: function(selector){
-            this.states[this.depth] = {
-              "selector": selector,
-              "state": $(selector).clone(true)
-            };
-            this.depth = this.depth + 1;
-          }
+        previousState: {
+            states: [],
+            depth: 0,
+            load: function() {
+                if (this.states.length > 0) {
+                    var state = this.states[this.depth - 1];
+                    $(state.selector).replaceWith(state.state);
+                    this.depth = this.depth - 1;
+                    this.states.splice(this.depth - 1, 1);
+                } else {
+                    console.log("=== NO PREVIOUS STATE HAS BEEN DEFINED ===");
+                }
+            },
+
+            save: function(selector) {
+                this.states[this.depth] = {
+                    "selector": selector,
+                    "state": $(selector).clone(true)
+                };
+                this.depth = this.depth + 1;
+            }
         },
 
         user_settings: {
@@ -718,10 +720,10 @@ var Controller = function() {
             var MANDOLA_KEY = "";
             if (serialized != null) {
                 console.log("=== DESERIALIZING TEXT ===");
-                MANDOLA_KEY="MANDOLA_SERIALIZED";
+                MANDOLA_KEY = "MANDOLA_SERIALIZED";
             } else {
                 console.log("=== SEARCHING FOR TEXT ===");
-                MANDOLA_KEY="MANDOLA_TEXT";
+                MANDOLA_KEY = "MANDOLA_TEXT";
             }
 
             self.mandolaLoading.start();
@@ -814,30 +816,30 @@ var Controller = function() {
                 new Chartist.Line('.election-chart.ct-chart', electionsData, options);
 
                 window.sr = ScrollReveal({
-                    duration: 600
+                    duration: self.animationDuration
                 });
 
                 sr.reveal('.hatespeech-encounter .encountered i', 25);
                 sr.reveal('.hatespeech-encounter .attacked i', 25);
                 sr.reveal('.hatespeech-encounter .info', {
                     origin: 'bottom',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('h1', {
                     origin: 'top',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('.bar-container', {
                     origin: 'left',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('.hate-country', {
                     origin: 'left',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('.event', {
                     origin: 'bottom',
-                    duration: 800
+                    duration: self.animationDuration
                 });
 
                 $(window).scroll(startCounter);
@@ -1383,8 +1385,8 @@ var Controller = function() {
                     var reportID = e.currentTarget.id;
                     self.database.transaction(function(transaction) {
                         transaction.executeSql('DELETE FROM mandola WHERE id=?', [reportID], function(tx, results) {
-                            $('#' + reportID).animateCSS('bounceOutLeft', function(){
-                              $('#' + reportID).remove();
+                            $('#' + reportID).animateCSS('bounceOutLeft', function() {
+                                $('#' + reportID).remove();
                             });
                             console.log("=== SQLITE DELETED " + reportID.toUpperCase() + " ===");
                         }, function(error) {
@@ -1404,236 +1406,228 @@ var Controller = function() {
             $('.sort-action').toggleClass('hidden');
         },
 
-        renderSortAscending: function(){
+        renderSortAscending: function() {
 
-          function truncate(n, useWordBoundary) {
-              var isTooLong = this.length > n,
-                  s_ = isTooLong ? this.substr(0, n - 1) : this;
-              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
-              return isTooLong ? s_ + '&hellip;' : s_;
-          }
+            function truncate(n, useWordBoundary) {
+                var isTooLong = this.length > n,
+                    s_ = isTooLong ? this.substr(0, n - 1) : this;
+                s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+                return isTooLong ? s_ + '&hellip;' : s_;
+            }
 
+            self.database.transaction(function(transaction) {
+                transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp DESC', [], function(tx, results) {
 
-          controller.previousState.save(".report-wrapper .list");
-          $(".report-wrapper .list").html("");
+                    $(".report-wrapper .list").html("");
+                    var len = results.rows.length;
+                    var i;
 
-          self.database.transaction(function(transaction) {
-              transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp DESC', [], function(tx, results) {
+                    for (i = 0; i < len; i++) {
+                        var item = results.rows.item(i);
 
-                  var len = results.rows.length;
-                  var i;
-
-                  for (i = 0; i < len; i++) {
-                      var item = results.rows.item(i);
-
-                      var title = "No title";
-                      if (item.title != "") {
-                          title = item.title;
-                      }
-                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
-                          '<div class="source-icon">' +
-                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                          '</div>' +
-                          '<div class="report-info">' +
-                          '<div class="report-title">' + title + '</div>' +
-                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
-                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
-                          '</div>' +
-                          '</li>');
-                      self.loadReport(item.id);
-                  }
-
-                  window.sr = ScrollReveal({
-                      duration: 500
-                  });
-                  sr.reveal('.report-wrapper .list-view .list .report-item', {
-                      origin: 'bottom',
-                      duration: 500
-                  });
-
-              }, null);
-          });
-        },
-
-        renderSortDescending: function(){
-
-          function truncate(n, useWordBoundary) {
-              var isTooLong = this.length > n,
-                  s_ = isTooLong ? this.substr(0, n - 1) : this;
-              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
-              return isTooLong ? s_ + '&hellip;' : s_;
-          }
-
-          $(".report-wrapper .list").html("");
-
-          self.database.transaction(function(transaction) {
-              transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp ASC', [], function(tx, results) {
-
-                  $(".report-wrapper .list").html("");
-                  var len = results.rows.length;
-                  var i;
-
-                  for (i = 0; i < len; i++) {
-                      var item = results.rows.item(i);
-                      console.log(item.timestamp);
-                      var title = "No title";
-                      if (item.title != "") {
-                          title = item.title;
-                      }
-                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
-                          '<div class="source-icon">' +
-                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                          '</div>' +
-                          '<div class="report-info">' +
-                          '<div class="report-title">' + title + '</div>' +
-                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
-                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
-                          '</div>' +
-                          '</li>');
-                      self.loadReport(item.id);
-                  }
-
-                  window.sr = ScrollReveal({
-                      duration: 500
-                  });
-                  sr.reveal('.report-wrapper .list-view .list .report-item', {
-                      origin: 'bottom',
-                      duration: 500
-                  });
-
-              }, null);
-          });
-        },
-
-        renderSearchResults: function(search){
-
-        function truncate(n, useWordBoundary) {
-              var isTooLong = this.length > n,
-                  s_ = isTooLong ? this.substr(0, n - 1) : this;
-              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
-              return isTooLong ? s_ + '&hellip;' : s_;
-          }
-
-          self.database.transaction(function(transaction) {
-              transaction.executeSql("SELECT * FROM mandola WHERE mandola.text LIKE ('%" + search +"%') OR mandola.url LIKE ('%" + search +"%') OR mandola.title LIKE ('%" + search + "%') ORDER BY timestamp ASC", [], function(tx, results) {
-                  if(self.previousState.states.length > 0 && results.rows.length > 0){
-                    $('.edit-back-button').addClass('active');
-                  }
-
-                  controller.previousState.save(".report-wrapper .list");
-                  $(".report-wrapper .list").html("");
-                  var len = results.rows.length;
-                  var i;
-
-                  for (i = 0; i < len; i++) {
-                      var item = results.rows.item(i);
-
-                      var title = "No title";
-                      if (item.title != "") {
-                          title = item.title;
-                      }
-                      $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
-                          '<div class="source-icon">' +
-                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                          '</div>' +
-                          '<div class="report-info">' +
-                          '<div class="report-title">' + title + '</div>' +
-                          '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
-                          '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
-                          '</div>' +
-                          '</li>');
-                      self.loadReport(item.id);
-                  }
-
-                  window.sr = ScrollReveal({
-                      duration: 500
-                  });
-                  sr.reveal('.report-wrapper .list-view .list .report-item', {
-                      origin: 'bottom',
-                      duration: 500
-                  });
-
-              }, function(error){
-                console.log(error);
-              });
-          });
-
-        },
-
-        renderGroupByHost: function(){
-
-          function truncate(n, useWordBoundary) {
-              var isTooLong = this.length > n,
-                  s_ = isTooLong ? this.substr(0, n - 1) : this;
-              s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
-              return isTooLong ? s_ + '&hellip;' : s_;
-          }
-
-          self.database.transaction(function(transaction) {
-              transaction.executeSql("SELECT origin, count(*) AS count FROM mandola GROUP BY origin ORDER BY origin ASC", [], function(tx, results) {
-                  if(self.previousState.states.length > 0 && results.rows.length > 0){
-                    $('.edit-back-button').addClass('active');
-                  }
-
-                  controller.previousState.save(".report-wrapper .list");
-                  $(".report-wrapper .list").html("");
-
-                  var len = results.rows.length;
-                  var i;
-
-                  for (i = 0; i < len; i++) {
-                      var item = results.rows.item(i);
-                      var itemCount = "0 items";
-
-                      if(item.count == 1){
-                        itemCount = "1 item"
-                      }else{
-                        itemCount = item.count + " items"
-                      }
-
-                      $(".report-wrapper .list").append('<li data-origin="' + item.origin + '" class="host-item">' +
-                          '<div class="source-icon">' +
-                          '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                          '</div>' +
-                          '<div class="host-info">' +
-                          '<div class="host-name">' + item.origin + '</div>' +
-                          '<div class="host-count">' + itemCount + '</div>' +
-                          '</div>' +
-                          '</li>');
-                  }
-
-                  $('.host-item').on("click", function(e) {
-                    var url = $(e.currentTarget).attr('data-origin');
-                    self.renderSearchResults(url);
-                  });
-
-                  $('.host-item').each(function(index, reportElement){
-                    var url = $(reportElement).attr('data-origin');
-                    var favicon = 'http://logo.clearbit.com/' + url;
-
-                    $.ajax({
-                        url: favicon,
-                        type: 'get',
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {},
-                        success: function(data) {
-                            $(reportElement).find('.source-icon').html('<img src="' + favicon + '" class="source-icon" alt="">');
+                        var title = "No title";
+                        if (item.title != "") {
+                            title = item.title;
                         }
+                        $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                            '<div class="source-icon">' +
+                            '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '<div class="report-info">' +
+                            '<div class="report-title">' + title + '</div>' +
+                            '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                            '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                            '</div>' +
+                            '</li>');
+                        self.loadReport(item.id);
+                    }
+
+                    window.sr = ScrollReveal({
+                        duration: self.animationDuration
+                    });
+                    sr.reveal('.report-wrapper .list-view .list .report-item', {
+                        origin: 'bottom',
+                        duration: self.animationDuration
                     });
 
-                  });
+                }, null);
+            });
+        },
 
-                  window.sr = ScrollReveal({
-                      duration: 500
-                  });
-                  sr.reveal('.report-wrapper .list-view .list .host-item', {
-                      origin: 'bottom',
-                      duration: 500
-                  });
+        renderSortDescending: function() {
 
-              }, function(error){
-                console.log(error);
-              });
-          });
+            function truncate(n, useWordBoundary) {
+                var isTooLong = this.length > n,
+                    s_ = isTooLong ? this.substr(0, n - 1) : this;
+                s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+                return isTooLong ? s_ + '&hellip;' : s_;
+            }
+
+            $(".report-wrapper .list").html("");
+            self.database.transaction(function(transaction) {
+                transaction.executeSql('SELECT * FROM mandola ORDER BY timestamp ASC', [], function(tx, results) {
+
+                    $(".report-wrapper .list").html("");
+                    var len = results.rows.length;
+                    var i;
+
+                    for (i = 0; i < len; i++) {
+                        var item = results.rows.item(i);
+                        console.log(item.timestamp);
+                        var title = "No title";
+                        if (item.title != "") {
+                            title = item.title;
+                        }
+                        $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                            '<div class="source-icon">' +
+                            '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '<div class="report-info">' +
+                            '<div class="report-title">' + title + '</div>' +
+                            '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                            '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                            '</div>' +
+                            '</li>');
+                        self.loadReport(item.id);
+                    }
+
+                    window.sr = ScrollReveal({
+                        duration: self.animationDuration
+                    });
+                    sr.reveal('.report-wrapper .list-view .list .report-item', {
+                        origin: 'bottom',
+                        duration: self.animationDuration
+                    });
+
+                }, null);
+            });
+        },
+
+        renderSearchResults: function(search) {
+
+            function truncate(n, useWordBoundary) {
+                var isTooLong = this.length > n,
+                    s_ = isTooLong ? this.substr(0, n - 1) : this;
+                s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+                return isTooLong ? s_ + '&hellip;' : s_;
+            }
+
+            self.database.transaction(function(transaction) {
+                transaction.executeSql("SELECT * FROM mandola WHERE mandola.text LIKE ('%" + search + "%') OR mandola.url LIKE ('%" + search + "%') OR mandola.title LIKE ('%" + search + "%') ORDER BY timestamp ASC", [], function(tx, results) {
+
+                    $(".report-wrapper .list").html("");
+                    var len = results.rows.length;
+                    var i;
+
+                    for (i = 0; i < len; i++) {
+                        var item = results.rows.item(i);
+
+                        var title = "No title";
+                        if (item.title != "") {
+                            title = item.title;
+                        }
+                        $(".report-wrapper .list").append('<li id="' + item.id + '" data-url="' + item.url + '" class="report-item">' +
+                            '<div class="source-icon">' +
+                            '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '<div class="report-info">' +
+                            '<div class="report-title">' + title + '</div>' +
+                            '<div class="report-content">' + truncate.apply(item.text, [35, false]) + '</div>' +
+                            '<div class="report-date">' + moment(item.timestamp).fromNow() + '</div>' +
+                            '</div>' +
+                            '</li>');
+                        self.loadReport(item.id);
+                    }
+
+                    window.sr = ScrollReveal({
+                        duration: self.animationDuration
+                    });
+                    sr.reveal('.report-wrapper .list-view .list .report-item', {
+                        origin: 'bottom',
+                        duration: self.animationDuration
+                    });
+
+                }, function(error) {
+                    console.log(error);
+                });
+            });
+
+        },
+
+        renderGroupByHost: function() {
+
+            function truncate(n, useWordBoundary) {
+                var isTooLong = this.length > n,
+                    s_ = isTooLong ? this.substr(0, n - 1) : this;
+                s_ = (useWordBoundary && isTooLong) ? s_.substr(0, s_.lastIndexOf(' ')) : s_;
+                return isTooLong ? s_ + '&hellip;' : s_;
+            }
+
+            self.database.transaction(function(transaction) {
+                transaction.executeSql("SELECT origin, count(*) AS count FROM mandola GROUP BY origin ORDER BY origin ASC", [], function(tx, results) {
+                    if (self.previousState.states.length > 0 && results.rows.length > 0) {
+                        $('.edit-back-button').addClass('active');
+                    }
+
+                    controller.previousState.save(".report-wrapper .list");
+                    $(".report-wrapper .list").html("");
+
+                    var len = results.rows.length;
+                    var i;
+
+                    for (i = 0; i < len; i++) {
+                        var item = results.rows.item(i);
+                        var itemCount = "0 items";
+
+                        if (item.count == 1) {
+                            itemCount = "1 item"
+                        } else {
+                            itemCount = item.count + " items"
+                        }
+
+                        $(".report-wrapper .list").append('<li data-origin="' + item.origin + '" class="host-item">' +
+                            '<div class="source-icon">' +
+                            '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                            '</div>' +
+                            '<div class="host-info">' +
+                            '<div class="host-name">' + item.origin + '</div>' +
+                            '<div class="host-count">' + itemCount + '</div>' +
+                            '</div>' +
+                            '</li>');
+                    }
+
+                    $('.host-item').on("click", function(e) {
+                        var url = $(e.currentTarget).attr('data-origin');
+                        self.renderSearchResults(url);
+                    });
+
+                    $('.host-item').each(function(index, reportElement) {
+                        var url = $(reportElement).attr('data-origin');
+                        var favicon = 'http://logo.clearbit.com/' + url;
+
+                        $.ajax({
+                            url: favicon,
+                            type: 'get',
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {},
+                            success: function(data) {
+                                $(reportElement).find('.source-icon').html('<img src="' + favicon + '" class="source-icon" alt="">');
+                            }
+                        });
+
+                    });
+
+                    window.sr = ScrollReveal({
+                        duration: self.animationDuration
+                    });
+                    sr.reveal('.report-wrapper .list-view .list .host-item', {
+                        origin: 'bottom',
+                        duration: self.animationDuration
+                    });
+
+                }, function(error) {
+                    console.log(error);
+                });
+            });
 
         },
 
@@ -1643,11 +1637,11 @@ var Controller = function() {
             $(".main-container").load("./views/report.html", function(data) {
 
                 window.sr = ScrollReveal({
-                    duration: 500
+                    duration: self.animationDuration
                 });
                 sr.reveal('.report-wrapper .list-view .list', {
                     origin: 'bottom',
-                    duration: 500
+                    duration: self.animationDuration
                 });
 
                 self.renderSortAscending();
@@ -1672,33 +1666,33 @@ var Controller = function() {
                 });
 
                 $("#report-sort-desc-btn").on("click", function(e) {
-                  $('.sort-button').toggleClass('pressed');
-                  self.renderSortDescending();
+                    $('.sort-button').toggleClass('pressed');
+                    self.renderSortDescending();
                 });
 
                 $("#report-sort-asc-btn").on("click", function(e) {
-                  $('.sort-button').toggleClass('pressed');
-                  self.renderSortAscending();
+                    $('.sort-button').toggleClass('pressed');
+                    self.renderSortAscending();
                 });
 
                 $("#report-search-btn").on("click", function(e) {
-                  $('.sort-button').toggleClass('pressed');
-                  swal({
-                      type: 'question',
-                      title: 'What do you want to search for?',
-                      input: 'text',
-                      showCancelButton: true,
-                      confirmButtonText: '<i class="fa fa-search" aria-hidden="true"></i>',
-                      showLoaderOnConfirm: false,
-                      allowOutsideClick: true
-                  }).then(function(searchKey) {
-                      self.renderSearchResults(searchKey);
-                  });
+                    $('.sort-button').toggleClass('pressed');
+                    swal({
+                        type: 'question',
+                        title: 'What do you want to search for?',
+                        input: 'text',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fa fa-search" aria-hidden="true"></i>',
+                        showLoaderOnConfirm: false,
+                        allowOutsideClick: true
+                    }).then(function(searchKey) {
+                        self.renderSearchResults(searchKey);
+                    });
                 });
 
                 $("#report-group-by-host-btn").on("click", function(e) {
-                  self.renderGroupByHost();
-                  $('.sort-button').toggleClass('pressed');
+                    self.renderGroupByHost();
+                    $('.sort-button').toggleClass('pressed');
                 });
 
                 $('.sort-button').on('click', function() {
@@ -1752,19 +1746,19 @@ var Controller = function() {
                 });
 
                 window.sr = ScrollReveal({
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('h1', {
                     origin: 'top',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('.filter-box', {
                     origin: 'left',
-                    duration: 800
+                    duration: self.animationDuration
                 });
                 sr.reveal('.container', {
                     origin: 'bottom',
-                    duration: 800
+                    duration: self.animationDuration
                 });
             });
         },
@@ -1821,11 +1815,11 @@ var Controller = function() {
                 }
 
                 window.sr = ScrollReveal({
-                    duration: 300
+                    duration: self.animationDuration
                 });
                 sr.reveal('.settings-item', {
                     origin: 'bottom',
-                    duration: 300
+                    duration: self.animationDuration
                 });
 
                 $('#default-ocr-language').on('click', function() {
@@ -1967,11 +1961,11 @@ var Controller = function() {
                 });
 
                 window.sr = ScrollReveal({
-                    duration: 300
+                    duration: self.animationDuration
                 });
                 sr.reveal('#lang-ul li', {
                     origin: 'bottom',
-                    duration: 300
+                    duration: self.animationDuration
                 });
 
                 function deleteLang(lang) {
@@ -2082,7 +2076,6 @@ var Controller = function() {
                 }
             });
         }
-
     }
 
     controller.initialize();
