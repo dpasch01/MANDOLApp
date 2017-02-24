@@ -483,6 +483,8 @@ button.menu-button {
     list-style: none;
     margin: 0px;
     padding: 0px; }
+    .faqs-wrapper .faqs-list li.content {
+      text-align: justify; }
     .faqs-wrapper .faqs-list .no-results {
       text-align: center;
       height: 80px;
