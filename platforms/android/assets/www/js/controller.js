@@ -718,6 +718,7 @@ var Controller = function() {
         openMandolaProxy: function(url, text, serialized) {
             console.log("=== OPENING MANDOLA PROXY " + url + " ===");
             var MANDOLA_KEY = "";
+
             if (serialized != null) {
                 console.log("=== DESERIALIZING TEXT ===");
                 MANDOLA_KEY = "MANDOLA_SERIALIZED";
@@ -737,9 +738,18 @@ var Controller = function() {
                 inAppBrowser.executeScript({
                     code: "localStorage.clear();"
                 });
-                inAppBrowser.executeScript({
-                    code: "localStorage.setItem('" + MANDOLA_KEY + "', '" + escape(text) + "');"
-                });
+
+                if(MANDOLA_KEY == "MANDOLA_SERIALIZED"){
+                  console.log("Appending serialized in Local Storage: ");
+                  console.log("localStorage.setItem(\"" + MANDOLA_KEY + "', '" + serialized + "\");");
+                  inAppBrowser.executeScript({
+                      code: "localStorage.setItem('" + MANDOLA_KEY + "', \"" + escape(serialized) + "\");"
+                  });
+                }else{
+                  inAppBrowser.executeScript({
+                      code: "localStorage.setItem('" + MANDOLA_KEY + "', '" + escape(text) + "');"
+                  });
+                }
                 inAppBrowser.show();
             });
             inAppBrowser.addEventListener('exit', function() {
@@ -770,6 +780,7 @@ var Controller = function() {
                 $('.report-url-button').attr('data-url', reportItem.url);
 
                 $('.report-url-button').on('click', function(e) {
+                    console.log(reportItem);
                     console.log("=== OPENING " + reportItem.url.toUpperCase() + " ===");
                     self.openMandolaProxy(reportItem.url, reportItem.text, reportItem.serialized);
                 });
@@ -892,6 +903,8 @@ var Controller = function() {
 
         appendReport: function(reportObject) {
             var uri = new URI(reportObject.url);
+
+            console.log(reportObject);
 
             function truncate(n, useWordBoundary) {
                 var isTooLong = this.length > n,
