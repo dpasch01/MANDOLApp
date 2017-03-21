@@ -42,6 +42,9 @@
     <feature name="SQLitePlugin">
         <param name="android-package" value="io.sqlc.SQLitePlugin" />
     </feature>
+    <feature name="LocalNotification">
+        <param name="android-package" value="de.appplant.cordova.plugin.localnotification.LocalNotification" />
+    </feature>
     <feature name="Diagnostic">
         <param name="android-package" value="cordova.plugins.Diagnostic" />
         <param name="onload" value="true" />
@@ -75,5 +78,6 @@
     <preference name="Orientation" value="portrait" />
     <preference name="CrosswalkAnimatable" value="true" />
     <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+    <preference name="BackupWebStorage" value="local" />
     <preference name="android-targetSdkVersion" value="23" />
 </widget>

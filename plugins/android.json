@@ -56,6 +56,12 @@
         },
         "cordova.plugins.diagnostic": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "urlcopynotification": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {
@@ -63,6 +69,9 @@
             "PACKAGE_NAME": "com.mandola.reporting"
         },
         "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "cordova-plugin-app-event": {
             "PACKAGE_NAME": "com.mandola.reporting"
         }
     }

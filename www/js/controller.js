@@ -10,7 +10,11 @@ var Controller = function() {
 
         self: null,
 
+        platform: device.platform,
+
         database: null,
+
+        mostRecentURL: "",
 
         MANDOLA_PROXY_PREFIX: "http://mandola.grid.ucy.ac.cy:9080/",
 
@@ -538,10 +542,17 @@ var Controller = function() {
         },
 
         setupSQLite: function() {
-            self.database = window.sqlitePlugin.openDatabase({
-                name: "mandola.db",
-                location: 'default'
-            });
+            if(self.platform == "Android"){
+              self.database = window.sqlitePlugin.openDatabase({
+                  name: "mandola.db",
+                  location: 'default'
+              });
+            }else{
+              self.database = window.sqlitePlugin.openDatabase({
+                   name: "mandola.db",
+                   iosDatabaseLocation: 'Library'
+               });
+            }
 
             self.database.transaction(function(transaction) {
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS mandola (id TEXT PRIMARY KEY, title TEXT, text TEXT, timestamp DATETIME, url TEXT, origin TEXT, serialized TEXT, categories TEXT)', [], function(tx, result) {
@@ -559,8 +570,12 @@ var Controller = function() {
             self.bindEvents();
             //Render the homescreen of the application, which is the report list.
             self.renderReportView();
-            //Request WRITE_EXTERNAL_STORAGE runtime permission for the tesseract filesystem to be copied.
-            self.request_runtime_permission();
+
+            if(self.platform == "Android"){
+              //Request WRITE_EXTERNAL_STORAGE runtime permission for the tesseract filesystem to be copied.
+              self.request_runtime_permission();
+            }
+
             //Copy and setup tesseract filesystem for the optical character recognition functionality.
             self.setupTesseract();
             //Setup and instanciate the SQLite and mandola table for the application.
@@ -576,40 +591,91 @@ var Controller = function() {
                 localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
             }
 
-            cordovafloatingactivity.onFloatPressed('mandola-btn',
-                function(copied_url) {
-                    navigator.app.resumeApp(true);
-                    if (copied_url != "") {
-                        console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
 
-                        swal({
-                            title: '<div class="float-report-url">Report ' + copied_url + '</div>',
-                            text: "How do you want to do this?",
-                            type: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
-                            cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
-                            confirmButtonClass: 'btn btn-success mandola-option',
-                            cancelButtonClass: 'btn btn-success mandola-option'
-                        }).then(function() {
-                            console.log("=== GO WITH SCREENSHOT ===");
-                            self.screenshotReport(copied_url);
-                        }, function(dismiss) {
-                            if (dismiss === 'cancel') {
-                                console.log("=== GO WITH BROWSER ===");
-                                self.browserReport(copied_url);
-                            }
-                        });
+            if(self.platform == "Android"){
+              cordovafloatingactivity.onFloatPressed('mandola-btn',
+                  function(copied_url) {
+                      navigator.app.resumeApp(true);
+                      if (copied_url != "") {
+                          console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
 
-                    }
-                    console.log("=== MANDOLA BUBBLE PRESSED ===");
-                },
-                function() {
-                    console.log("=== MANDOLA BUBBLE PRESS FAILED ===");
-                }
-            );
+                          swal({
+                              title: '<div class="float-report-url">Report ' + copied_url + '</div>',
+                              text: "How do you want to do this?",
+                              type: 'question',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#3085d6',
+                              confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
+                              cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
+                              confirmButtonClass: 'btn btn-success mandola-option',
+                              cancelButtonClass: 'btn btn-success mandola-option'
+                          }).then(function() {
+                              console.log("=== GO WITH SCREENSHOT ===");
+                              self.screenshotReport(copied_url);
+                          }, function(dismiss) {
+                              if (dismiss === 'cancel') {
+                                  console.log("=== GO WITH BROWSER ===");
+                                  self.browserReport(copied_url);
+                              }
+                          });
+
+                      }
+                      console.log("=== MANDOLA BUBBLE PRESSED ===");
+                  },
+                  function() {
+                      console.log("=== MANDOLA BUBBLE PRESS FAILED ===");
+                  }
+              );
+            }else{
+
+              cordova.plugins.URLCopyNotification.onNotificationReceived('mandola-btn',
+                  function(url) {
+                      console.log("=== A URL HAS BEEN COPIED ===");
+                      self.mostRecentURL = url;
+                  },
+                  function() {
+                      console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
+                  }
+              );
+
+              cordova.plugins.notification.local.on("click",
+                  function() {
+                      if(!self.mostRecentURL){
+                          return;
+                      }
+
+                      copied_url = self.mostRecentURL;
+
+                      if (copied_url != "") {
+                          console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
+
+                          swal({
+                              title: '<div class="float-report-url">Report ' + copied_url + '</div>',
+                              text: "How do you want to do this?",
+                              type: 'question',
+                              showCancelButton: true,
+                              confirmButtonColor: '#3085d6',
+                              cancelButtonColor: '#3085d6',
+                              confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
+                              cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
+                              confirmButtonClass: 'btn btn-success mandola-option',
+                              cancelButtonClass: 'btn btn-success mandola-option'
+                          }).then(function() {
+                              console.log("=== GO WITH SCREENSHOT ===");
+                              self.screenshotReport(copied_url);
+                          }, function(dismiss) {
+                              if (dismiss === 'cancel') {
+                                  console.log("=== GO WITH BROWSER ===");
+                                  self.browserReport(copied_url);
+                              }
+                          });
+
+                      }
+                      console.log("=== MANDOLA BUBBLE PRESSED ===");
+                  }
+              );
+            }
 
             cordova.plugins.backgroundMode.setDefaults({
                 text: 'You are still hunting for hatespeech.'
@@ -958,6 +1024,7 @@ var Controller = function() {
         mandolaBubble: {
 
             start: function() {
+              if(self.platform == "Android"){
                 cordovafloatingactivity.startFloatingActivity('mandola-btn',
                     function() {
                         console.log("=== MANDOLA BUBBLE ACTIVATED ===");
@@ -966,10 +1033,30 @@ var Controller = function() {
                         console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
                     }
                 );
+              }else{
+                cordova.plugins.URLCopyNotification.startURLCopyMonitoring('mandola-btn',
+                    function() {
+                        console.log("=== MANDOLA BUBBLE ACTIVATED ===");
+                    },
+                    function() {
+                        console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
+                    }
+                );
+              }
             },
 
             stop: function() {
-                cordovafloatingactivity.stopFloatingActivity('mandola-btn',
+                if(self.platform == "Android"){
+                  cordovafloatingactivity.stopFloatingActivity('mandola-btn',
+                      function() {
+                          console.log("=== MANDOLA BUBBLE DEACTIVATED ===");
+                      },
+                      function() {
+                          console.log("=== MANDOLA BUBBLE DEACTIVATION FAILED ===");
+                      }
+                  );
+                }else{
+                  cordova.plugins.URLCopyNotification.cancelURLCopyMonitoring('mandola-btn',
                     function() {
                         console.log("=== MANDOLA BUBBLE DEACTIVATED ===");
                     },
@@ -977,7 +1064,7 @@ var Controller = function() {
                         console.log("=== MANDOLA BUBBLE DEACTIVATION FAILED ===");
                     }
                 );
-
+                }
             }
 
         },

@@ -1,0 +1,66 @@
+@import "../sass/base";
+@import "../sass/navbar";
+@import "../sass/report";
+@import "../sass/material";
+@import "../sass/info";
+@import "../sass/faqs";
+@import "../sass/hatespeech";
+@import "../sass/linechart";
+@import "../sass/loading";
+@import "../sass/settings";
+
+.bootstrap-select .btn{
+  font-size: 20px; 
+}
+
+.toggle-btn {
+    width: 60px;
+    height: 30px;
+    margin: 10px;
+    border-radius: 50px;
+    display: inline-block;
+    position: relative;
+    background-color: #8389A9;
+    cursor: pointer;
+    -webkit-transition: background-color 0.40s ease-in-out;
+    -moz-transition: background-color 0.40s ease-in-out;
+    -o-transition: background-color 0.40s ease-in-out;
+    transition: background-color 0.40s ease-in-out;
+    cursor: pointer;
+
+    &.active {
+
+        background-color: #1565C0;
+        .round-btn {
+            left: 32px;
+        }
+    }
+
+    .round-btn {
+        width: 25px;
+        height: 25px;
+        background-color: #fff;
+        border-radius: 50%;
+        display: inline-block;
+        position: absolute;
+        left: 3px;
+        top: 55%;
+        margin-top: -15px;
+        -webkit-transition: all 0.30s ease-in-out;
+        -moz-transition: all 0.30s ease-in-out;
+        -o-transition: all 0.30s ease-in-out;
+        transition: all 0.30s ease-in-out;
+    }
+
+    .cb-value {
+        position: absolute;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 9;
+        cursor: pointer;
+        -ms-filter:  "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    }
+}

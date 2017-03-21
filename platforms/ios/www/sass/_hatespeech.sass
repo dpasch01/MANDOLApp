@@ -1,0 +1,200 @@
+.hatespeech-wrapper
+  margin-top: 60px
+  text-align: center
+  user-select: none
+
+  .hatespeech-encounter,
+  .hatespeech-timeline
+    padding: 10px
+
+  .bar-container
+    display: flex
+    align-items: center
+    margin: 5px 0px
+
+    .chart-label
+      font-size: 15px
+      font-weight: 700
+      padding: 5px
+
+    .chart-bar
+      background-color: $darkish
+      display: inline-block
+
+    .bar-percentage
+      padding: 5px
+      font-size: 13px
+      font-weight: 700
+
+    @for $i from 0 through 10
+      .bar-#{$i*10}
+        width: 10% * $i
+        height: 20px
+        @if $i<4
+          background-color: $blueish
+        @else if $i>4 and $i<7
+          background-color: transparentize($darkish, 0.3)
+        @else
+          background-color: $darkish
+
+      .bar-#{$i*10 + 5}
+        width: 10% * $i + 5%
+        height: 20px
+        @if $i<4
+          background-color: $blueish
+        @else if $i>4 and $i<7
+          background-color: transparentize($darkish, 0.3)
+        @else
+          background-color: $darkish
+  h1
+    font-size: 20px
+    font-weight: 700
+    text-transform: uppercase
+    padding: 10px 0px
+    margin: 0px
+
+  .info
+    margin: 0px
+    margin-left: 10px
+    padding: 5px 0px
+    font-size: 15px
+    border: $darkish 2px solid
+
+  .encountered
+    text-align: center
+    font-size: 50px
+    margin-top: 0px
+    padding: 0px
+
+  .hatespeech-encounter .encountered i
+    color: $darkish
+    &:nth-child(5)
+      color: $blueish
+
+  .attacked
+    text-align: center
+    font-size: 50px
+    margin-top: 0px
+    padding: 0px
+
+  .hatespeech-encounter .attacked i
+    color: $darkish
+    &:nth-child(4),
+    &:nth-child(5)
+      color: $blueish
+
+  .list-countries
+    display: flex
+    justify-content: flex-start
+    align-items: center
+    flex-direction: column
+
+  .hate-country
+    display: flex
+    align-items: center
+    justify-content: flex-start
+    width: 100%
+    margin: 10px 0px 5px 0px
+    font-size: 18px
+
+    .country-name
+      text-align: left
+
+    .first-country
+      margin-right: 10px
+      font-size: 50px
+      text-align: left
+    .second-country
+      margin-right: 10px
+      font-size: 40px
+      text-align: left
+    .third-country
+      margin-right: 10px
+      font-size: 30px
+      text-align: left
+
+  .categorized-chart
+    text-align: left
+
+    .chart-label
+      width: 80px
+      font-size: 13px
+
+  .daily-hatespeech
+    background-color: #FFFFFF
+    padding-bottom: 10px
+    box-shadow: transparentize(#020202, 0.7) 0px 2px 5px 2px
+
+    .hatespeech-count
+      text-align: center
+      font-size: 30px
+      padding: 50px
+      font-weight: 700
+      background-image: url('../img/social-networks.png')
+      background-position: center
+      background-size: contain
+      background-repeat: no-repeat
+
+  .hatespeech-events
+    .olympics
+      background-image: url('../img/olympics-rio.png')
+      background-position: -3px 95px
+      background-size: contain
+      background-repeat: no-repeat
+
+    .elections
+      background-image: url('../img/us-elections.png')
+      background-position: 0px 90px
+      background-size: contain
+      background-repeat: no-repeat
+
+    .event
+      border: $darkish 2px solid
+      box-shadow: transparentize(#020202, 0.7) 0px 2px 5px 2px
+
+
+      .ct-series-a .ct-line,
+      .ct-series-a .ct-point
+        stroke: $darkish !important
+      .ct-series-b .ct-line,
+      .ct-series-b .ct-point
+        stroke: $blueish !important
+      .ct-series-c .ct-line,
+      .ct-series-c .ct-point
+        stroke: #448AFF !important
+      .ct-label.ct-horizontal
+        margin-top: 5px
+      .ct-label.ct-vertical
+        margin-left: 0px
+      .ct-chart-line
+        margin: 0px
+
+    .event-title
+      font-size: 18px
+      background-color: $darkish
+      color: $whiton
+      padding: 10px
+
+    .event-duration
+      display: block
+      font-size: 14px
+      color: transparentize($whiton, 0.5)
+
+    .event-stats
+      padding: 0px 10px 10px 10px
+      text-align: justify
+
+    .hate-category-religion
+      font-weight: 700
+      color: $blueish
+      font-style: italic
+
+    .hate-category-ethnicity
+      font-weight: 700
+      color: $darkish
+      font-style: italic
+
+    .hate-category-gender
+      font-weight: 700
+      color: #448AFF
+      font-style: italic
