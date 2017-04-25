@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Your mini app here"
+        android:id="@+id/textView" android:layout_gravity="center" android:textSize="30dp"/>
+    <FrameLayout
+        android:layout_width="50dp"
+        android:layout_height="5dp" android:background="#FFFFFF">
+    </FrameLayout>
+    <FrameLayout android:layout_width="50dp" android:layout_height="5dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout" android:layout_gravity="bottom"/>
+    <FrameLayout android:layout_width="50dp" android:layout_height="5dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout2" android:layout_gravity="bottom|right"/>
+    <FrameLayout android:layout_width="50dp" android:layout_height="5dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout3" android:layout_gravity="right"/>
+    <FrameLayout android:layout_width="5dp" android:layout_height="50dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout4" android:layout_gravity="right"/>
+    <FrameLayout android:layout_width="5dp" android:layout_height="50dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout5" android:layout_gravity="bottom|right"/>
+    <FrameLayout android:layout_width="5dp" android:layout_height="50dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout6"/>
+    <FrameLayout android:layout_width="5dp" android:layout_height="50dp" android:background="#FFFFFF"
+        android:id="@+id/frameLayout7" android:layout_gravity="bottom"/>
+</FrameLayout>

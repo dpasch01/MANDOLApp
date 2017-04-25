@@ -53,7 +53,8 @@ var Controller = function() {
 
         installed_languages: [],
 
-        all_languages: [{
+        all_languages: [
+            {
                 "code": "afr",
                 "text": "Afrikaans"
             },
@@ -591,42 +592,55 @@ var Controller = function() {
                 localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
             }
 
-
             if(self.platform == "Android"){
+
               cordovafloatingactivity.onFloatPressed('mandola-btn',
                   function(copied_url) {
-                      navigator.app.resumeApp(true);
-                      if (copied_url != "") {
-                          console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
-
-                          swal({
-                              title: '<div class="float-report-url">Report ' + copied_url + '</div>',
-                              text: "How do you want to do this?",
-                              type: 'question',
-                              showCancelButton: true,
-                              confirmButtonColor: '#3085d6',
-                              cancelButtonColor: '#3085d6',
-                              confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
-                              cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
-                              confirmButtonClass: 'btn btn-success mandola-option',
-                              cancelButtonClass: 'btn btn-success mandola-option'
-                          }).then(function() {
-                              console.log("=== GO WITH SCREENSHOT ===");
-                              self.screenshotReport(copied_url);
-                          }, function(dismiss) {
-                              if (dismiss === 'cancel') {
-                                  console.log("=== GO WITH BROWSER ===");
-                                  self.browserReport(copied_url);
-                              }
-                          });
-
-                      }
-                      console.log("=== MANDOLA BUBBLE PRESSED ===");
+                    navigator.app.resumeApp(true);
+                    var json = JSON.parse(copied_url);
+                    if(json.status == "error"){
+                        console.log("ERROR: "+ json.message);
+                    }else{
+                        if(json.screenshot != "" ){
+                         if (self.installed_languages.length == 0) {
+                                        swal({
+                                            title: 'No OCR languages found',
+                                            text: "You will have to download a language in order to use this functionality.",
+                                            type: 'error',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#3085d6',
+                                            cancelButtonColor: '#CFCFCF',
+                                            confirmButtonText: 'Download'
+                                        }).then(function() {
+                                            self.renderLanguagesView();
+                                        }).catch(swal.noop);
+                                    } else if (self.user_settings.default_language_code == "none") {
+                                        swal({
+                                            title: 'No default OCR language selected',
+                                            text: "You will have to set a default language in order to use this functionality.",
+                                            type: 'error',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#3085d6',
+                                            cancelButtonColor: '#CFCFCF',
+                                            confirmButtonText: 'Set default'
+                                        }).then(function() {
+                                            self.renderSettingsView();
+                                        }).catch(swal.noop);
+                                    } else {
+                            self.onPhotoURISuccess(json.screenshot, json.url);}
+                        }else if(json.url != ""){
+                            self.browserReport(json.url);
+                        }else{
+                            alert("SUPPORT ME!");
+                        }
+                    }
+                    console.log("=== MANDOLA BUBBLE PRESSED ===");
                   },
                   function() {
                       console.log("=== MANDOLA BUBBLE PRESS FAILED ===");
                   }
               );
+
             }else{
 
               cordova.plugins.URLCopyNotification.onNotificationReceived('mandola-btn',
@@ -998,16 +1012,30 @@ var Controller = function() {
                         title = reportObject.title;
                     }
 
+                    if(reportObject.url == ""){
                     $(".report-wrapper .list").prepend('<li id="' + device.uuid + "" + reportObject.timestamp + '" data-url="' + reportObject.url + '" class="report-item">' +
-                        '<div class="source-icon">' +
-                        '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
-                        '</div>' +
-                        '<div class="report-info">' +
-                        '<div class="report-title">' + title + '</div>' +
-                        '<div class="report-content">' + truncate.apply(reportObject.text, [35, false]) + '</div>' +
-                        '<div class="report-date">' + moment(reportObject.timestamp).fromNow() + '</div>' +
-                        '</div>' +
-                        '</li>');
+                                            '<div class="source-icon">' +
+                                            '<i class="report-browser fa fa-3x fa-eye" aria-hidden="true"></i>' +
+                                            '</div>' +
+                                            '<div class="report-info">' +
+                                            '<div class="report-title">' + title + '</div>' +
+                                            '<div class="report-content">' + truncate.apply(reportObject.text, [35, false]) + '</div>' +
+                                            '<div class="report-date">' + moment(reportObject.timestamp).fromNow() + '</div>' +
+                                            '</div>' +
+                                            '</li>');
+                    }else{
+                    $(".report-wrapper .list").prepend('<li id="' + device.uuid + "" + reportObject.timestamp + '" data-url="' + reportObject.url + '" class="report-item">' +
+                                            '<div class="source-icon">' +
+                                            '<i class="report-browser fa fa-3x fa-globe" aria-hidden="true"></i>' +
+                                            '</div>' +
+                                            '<div class="report-info">' +
+                                            '<div class="report-title">' + title + '</div>' +
+                                            '<div class="report-content">' + truncate.apply(reportObject.text, [35, false]) + '</div>' +
+                                            '<div class="report-date">' + moment(reportObject.timestamp).fromNow() + '</div>' +
+                                            '</div>' +
+                                            '</li>');
+                    }
+
 
                     self.loadReport(device.uuid + "" + reportObject.timestamp);
 
@@ -1183,6 +1211,7 @@ var Controller = function() {
                 }).catch(swal.noop);
             } else {
                 navigator.camera.getPicture(function(uri) {
+                    alert(uri);
                     self.onPhotoURISuccess(uri, copied_url);
                 }, function(error) {
                     console.log(error);
@@ -1329,7 +1358,7 @@ var Controller = function() {
                                                         preConfirm: function(url) {
                                                             return new Promise(function(resolve, reject) {
                                                                 var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-                                                                if (!regexp.test(url) || url === "") {
+                                                                if (!regexp.test(url) && !url === "") {
                                                                     reject('Please provide a valid URL.');
                                                                 } else {
                                                                     resolve();
@@ -2025,25 +2054,14 @@ var Controller = function() {
 
                     for (j = 0; j < self.installed_languages.length; j++) {
                         if (self.all_languages[i].code == self.installed_languages[j]) {
-                            $("#lang-ul").prepend('\
-                    <li id="' + self.all_languages[i].code + '" class="delete-gradient"> \
-                      <span class="lang-text">' + self.all_languages[i].text + '<span> \
-                      <span class="lang-install-text">installed</span> \
-                      <div class="delete-icon install-icon lang-top lang-right"></div> \
-                    </li>');
-
+                            $("#lang-ul").prepend('<li id="' + self.all_languages[i].code + '" class="delete-gradient"><span class="lang-text">' + self.all_languages[i].text + '<span><span class="lang-install-text">installed</span><div class="delete-icon install-icon lang-top lang-right"></div></li>');
                             j = self.installed_languages.length;
                             flag = false;
                         }
                     }
 
                     if (flag) {
-                        $("#lang-ul").append('\
-                  <li id="' + self.all_languages[i].code + '" class="download-gradient"> \
-                    <span class="lang-text">' + self.all_languages[i].text + '<span> \
-                    <span class="lang-install-text">not installed</span> \
-                    <div class="download-icon install-icon lang-top lang-right"></div> \
-                  </li>');
+                        $("#lang-ul").append('<li id="' + self.all_languages[i].code + '" class="download-gradient"><span class="lang-text">' + self.all_languages[i].text + '<span><span class="lang-install-text">not installed</span><div class="download-icon install-icon lang-top lang-right"></div></li>');
                     }
                 }
 

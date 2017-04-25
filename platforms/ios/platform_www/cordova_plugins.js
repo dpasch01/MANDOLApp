@@ -1,14 +1,6 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
     {
-        "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
-        "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
-        "pluginId": "com.ab.cordovafloatingactivity",
-        "clobbers": [
-            "cordovafloatingactivity"
-        ]
-    },
-    {
         "id": "cordova-plugin-device.device",
         "file": "plugins/cordova-plugin-device/www/device.js",
         "pluginId": "cordova-plugin-device",
@@ -345,12 +337,19 @@ module.exports = [
             "cordova.plugins.notification.local.core",
             "plugin.notification.local.core"
         ]
+    },
+    {
+        "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
+        "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
+        "pluginId": "com.ab.cordovafloatingactivity",
+        "clobbers": [
+            "cordovafloatingactivity"
+        ]
     }
 ];
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "com.ab.cordovafloatingactivity": "0.7.0",
     "cordova-plugin-device": "1.1.4",
     "cordova-plugin-background-mode": "0.6.6-dev",
     "cordova-plugin-compat": "1.1.0",
@@ -369,7 +368,8 @@ module.exports.metadata =
     "cordova.plugins.diagnostic": "3.3.2",
     "urlcopynotification": "0.1",
     "cordova-plugin-app-event": "1.2.0",
-    "de.appplant.cordova.plugin.local-notification": "0.8.4"
+    "de.appplant.cordova.plugin.local-notification": "0.8.4",
+    "com.ab.cordovafloatingactivity": "0.7.0"
 };
 // BOTTOM OF METADATA
 });

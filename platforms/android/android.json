@@ -9,10 +9,6 @@
                 "parents": {
                     "/*": [
                         {
-                            "xml": "<feature name=\"cordovafloatingactivity\"><param name=\"android-package\" value=\"com.ab.cordovafloatingactivityPack.cordovafloatingactivity\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
                             "count": 1
                         },
@@ -99,6 +95,10 @@
                         {
                             "xml": "<feature name=\"LocalNotification\"><param name=\"android-package\" value=\"de.appplant.cordova.plugin.localnotification.LocalNotification\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"cordovafloatingactivity\"><param name=\"android-package\" value=\"com.ab.cordovafloatingactivityPack.cordovafloatingactivity\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -106,10 +106,6 @@
             "AndroidManifest.xml": {
                 "parents": {
                     "/manifest": [
-                        {
-                            "xml": "<uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\" />",
-                            "count": 1
-                        },
                         {
                             "xml": "<uses-permission android:name=\"android.permission.WAKE_LOCK\" />",
                             "count": 1
@@ -125,13 +121,13 @@
                         {
                             "xml": "<uses-permission android:name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />",
                             "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\" />",
+                            "count": 1
                         }
                     ],
                     "/manifest/application": [
-                        {
-                            "xml": "<service android:name=\"com.ab.cordovafloatingactivityPack.ChatHeadService\" android:stopWithTask=\"true\"></service>",
-                            "count": 1
-                        },
                         {
                             "xml": "<service android:name=\"de.appplant.cordova.plugin.background.ForegroundService\" />",
                             "count": 1
@@ -171,6 +167,10 @@
                         {
                             "xml": "<activity android:exported=\"false\" android:launchMode=\"singleInstance\" android:name=\"de.appplant.cordova.plugin.notification.ClickActivity\" android:theme=\"@android:style/Theme.NoDisplay\" />",
                             "count": 1
+                        },
+                        {
+                            "xml": "<service android:name=\"com.ab.cordovafloatingactivityPack.ChatHeadService\" android:stopWithTask=\"true\"></service>",
+                            "count": 1
                         }
                     ],
                     "/*": [
@@ -208,9 +208,6 @@
         }
     },
     "installed_plugins": {
-        "com.ab.cordovafloatingactivity": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
@@ -272,18 +269,13 @@
         },
         "de.appplant.cordova.plugin.local-notification": {
             "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "com.ab.cordovafloatingactivity": {
+            "PACKAGE_NAME": "com.mandola.reporting"
         }
     },
     "dependent_plugins": {},
     "modules": [
-        {
-            "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
-            "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
-            "pluginId": "com.ab.cordovafloatingactivity",
-            "clobbers": [
-                "cordovafloatingactivity"
-            ]
-        },
         {
             "id": "cordova-plugin-device.device",
             "file": "plugins/cordova-plugin-device/www/device.js",
@@ -621,10 +613,17 @@
                 "cordova.plugins.notification.local.core",
                 "plugin.notification.local.core"
             ]
+        },
+        {
+            "id": "com.ab.cordovafloatingactivity.cordovafloatingactivity",
+            "file": "plugins/com.ab.cordovafloatingactivity/www/cordovafloatingactivity.js",
+            "pluginId": "com.ab.cordovafloatingactivity",
+            "clobbers": [
+                "cordovafloatingactivity"
+            ]
         }
     ],
     "plugin_metadata": {
-        "com.ab.cordovafloatingactivity": "0.7.0",
         "cordova-plugin-device": "1.1.4",
         "cordova-plugin-background-mode": "0.6.6-dev",
         "cordova-plugin-compat": "1.1.0",
@@ -643,6 +642,7 @@
         "cordova.plugins.diagnostic": "3.3.2",
         "urlcopynotification": "0.1",
         "cordova-plugin-app-event": "1.2.0",
-        "de.appplant.cordova.plugin.local-notification": "0.8.4"
+        "de.appplant.cordova.plugin.local-notification": "0.8.4",
+        "com.ab.cordovafloatingactivity": "0.7.0"
     }
 }

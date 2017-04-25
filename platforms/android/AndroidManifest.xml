@@ -9,8 +9,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService" android:stopWithTask="true" />
         <service android:name="de.appplant.cordova.plugin.background.ForegroundService" />
+        <service android:name="com.tooleap.sdk.TooleapAppService" />
+        <service android:exported="true" android:name="com.tooleap.sdk.TooleapUIService" android:process=":UIService">
+            <intent-filter>
+                <action android:name="com.tooleap.sdk.BIND_UI_SERVICE" />
+            </intent-filter>
+        </service>
+        <receiver android:name="com.tooleap.sdk.TooleapReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.tooleap.sdk.TOOLEAP_ACTION" />
+            </intent-filter>
+        </receiver>
         <provider android:authorities="${applicationId}.provider" android:exported="false" android:grantUriPermissions="true" android:name="android.support.v4.content.FileProvider">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
         </provider>
@@ -31,13 +45,21 @@
             </intent-filter>
         </receiver>
         <activity android:exported="false" android:launchMode="singleInstance" android:name="de.appplant.cordova.plugin.notification.ClickActivity" android:theme="@android:style/Theme.NoDisplay" />
+        <activity android:launchMode="singleInstance" android:name="tooleap.TooleapMiniApp" android:taskAffinity=".tooleap" android:theme="@android:style/Theme.Translucent">
+            <intent-filter>
+                <action android:name="com.tooleap.sdk.TOOLEAP_SHOW" />
+            </intent-filter>
+        </activity>
+        <meta-data android:name="com.tooleap.sdk.apiKey" android:value="635DE0F0CEA3D9F772C" />
+        <service android:name="com.ab.cordovafloatingactivityPack.ChatHeadService" android:stopWithTask="true" />
     </application>
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 </manifest>

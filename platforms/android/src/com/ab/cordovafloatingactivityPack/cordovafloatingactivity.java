@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.apache.cordova.CallbackContext;
@@ -13,12 +15,17 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 public class cordovafloatingactivity extends CordovaPlugin {
 
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
     private static final int REQUEST_MEDIA_PROJECTION = 2;
     private PermissionChecker mPermissionChecker;
     private CallbackContext callbackContext;
+    private CallbackContext screenshotCallback;
+    private static File cache;
 
     public BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -31,29 +38,61 @@ public class cordovafloatingactivity extends CordovaPlugin {
                 activateEvent();
             }
         }
+
     };
 
+    public BroadcastReceiver scrReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("RECEIVED_EVENT", "Received BUBBLE_SCREENSHOT event.");
+            String action = intent.getAction();
+            if (action.equals("com.ab.cordovafloatingactivityPack.BUBBLE_SCREENSHOT")) {
+                Log.d("RECEIVED_ACTION", "Received BUBBLE_SCREENSHOT action.");
+                Log.d("SCREENSHOT_STATUS", "file://" + ChatHeadService.SCREENSHOT);
+
+                Bitmap bitmap = BitmapFactory.decodeFile(ChatHeadService.SCREENSHOT);
+                File jpeg = new File(cache.getAbsolutePath(), System.currentTimeMillis() + ".jpg");
+                if (jpeg.exists()) {
+                    jpeg.delete();
+                }
+
+                try {
+                    FileOutputStream out = new FileOutputStream(jpeg);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                ChatHeadService.SCREENSHOT = "file://" + jpeg.getAbsolutePath();
+                ChatHeadService.changeView();
+            }
+        }
+
+    };
 
     public void activateEvent() {
         if (callbackContext != null) {
             Log.d("CALLBACK_STATUS", "Callback Context not null.");
-            if(ChatHeadService.COPIED_URL.isEmpty()){
-                PluginResult result = new PluginResult(PluginResult.Status.OK, "");
-                result.setKeepCallback(true);
-                callbackContext.sendPluginResult(result);
-            }else {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, ChatHeadService.COPIED_URL);
-                result.setKeepCallback(true);
-                callbackContext.sendPluginResult(result);
-                ChatHeadService.COPIED_URL="";
-            }
+            PluginResult result = new PluginResult(PluginResult.Status.OK,
+                    "{\"status\":\"success\", \"url\": \"" + ChatHeadService.COPIED_URL + "\", \"screenshot\":\"" + ChatHeadService.SCREENSHOT + "\"}"
+            );
+            result.setKeepCallback(true);
+            callbackContext.sendPluginResult(result);
+            ChatHeadService.COPIED_URL = "";
+            ChatHeadService.SCREENSHOT = "";
         } else {
-            PluginResult result = new PluginResult(PluginResult.Status.ERROR, "Error in callback.");
+            PluginResult result = new PluginResult(PluginResult.Status.ERROR, "{\"status\": \"error\", \"message\":\"Callback context not found.\"}");
+            callbackContext.sendPluginResult(result);
         }
     }
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
+        cache = cordova.getActivity().getCacheDir();
+        cache.mkdirs();
 
         PackageManager pm = cordova.getActivity().getPackageManager();
         Context context = cordova.getActivity().getApplicationContext();
@@ -86,6 +125,7 @@ public class cordovafloatingactivity extends CordovaPlugin {
                 this.callbackContext = callbackContext;
             }
             return true;
+
         } else {
             return false;
         }
@@ -97,8 +137,13 @@ public class cordovafloatingactivity extends CordovaPlugin {
     public void initHookEvent() {
         Log.d("APPENDING_EVENT", "Appended event onBubblePress.");
         Log.d("APPENDING_LISTENER", "Appended listener for BUBBLE_PRESSED.");
+
         IntentFilter filter_hook = new IntentFilter("com.ab.cordovafloatingactivityPack.BUBBLE_PRESSED");
         this.cordova.getActivity().getApplicationContext().registerReceiver(receiver, filter_hook);
+
+        IntentFilter screenshot_hook = new IntentFilter("com.ab.cordovafloatingactivityPack.BUBBLE_SCREENSHOT");
+        this.cordova.getActivity().getApplicationContext().registerReceiver(scrReceiver, screenshot_hook);
+
     }
 
     public boolean launchService(PackageManager pm, Context c, String packname, final Context con) {
@@ -110,4 +155,5 @@ public class cordovafloatingactivity extends CordovaPlugin {
         cordova.getActivity().stopService(new Intent(cordova.getActivity().getApplication(), ChatHeadService.class));
         return true;
     }
+
 }

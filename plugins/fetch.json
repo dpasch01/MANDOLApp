@@ -118,15 +118,6 @@
         "is_top_level": true,
         "variables": {}
     },
-    "com.ab.cordovafloatingactivity": {
-        "source": {
-            "type": "git",
-            "url": "https://github.com/dpasch01/Cordova-Floating-Activity-Plugin",
-            "subdir": "."
-        },
-        "is_top_level": true,
-        "variables": {}
-    },
     "cordova-sqlite-storage": {
         "source": {
             "type": "git",
@@ -169,6 +160,14 @@
             "id": "cordova-plugin-app-event"
         },
         "is_top_level": false,
+        "variables": {}
+    },
+    "com.ab.cordovafloatingactivity": {
+        "source": {
+            "type": "local",
+            "path": "..\\cordovafloating"
+        },
+        "is_top_level": true,
         "variables": {}
     }
 }

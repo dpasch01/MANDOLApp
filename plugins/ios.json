@@ -7,9 +7,6 @@
         "files": {}
     },
     "installed_plugins": {
-        "com.ab.cordovafloatingactivity": {
-            "PACKAGE_NAME": "com.mandola.reporting"
-        },
         "cordova-plugin-background-mode": {
             "PACKAGE_NAME": "com.mandola.reporting"
         },
@@ -58,6 +55,9 @@
             "PACKAGE_NAME": "com.mandola.reporting"
         },
         "de.appplant.cordova.plugin.local-notification": {
+            "PACKAGE_NAME": "com.mandola.reporting"
+        },
+        "com.ab.cordovafloatingactivity": {
             "PACKAGE_NAME": "com.mandola.reporting"
         }
     },

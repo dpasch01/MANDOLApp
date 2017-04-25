@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 
 import com.soundcloud.android.crop.Crop;
 
@@ -26,8 +27,11 @@ public class CropPlugin extends CordovaPlugin {
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
       if (action.equals("cropImage")) {
           String imagePath = args.getString(0);
+          Log.d("FROM_CROP_PLUGIN", "String: " + imagePath);
 
           this.inputUri = Uri.parse(imagePath);
+          Log.d("FROM_CROP_PLUGIN", "URI: " + this.inputUri.toString());
+
           this.outputUri = Uri.fromFile(new File(getTempDirectoryPath() + "/" + System.currentTimeMillis()+ "-cropped.jpg"));
 
           PluginResult pr = new PluginResult(PluginResult.Status.NO_RESULT);
@@ -48,8 +52,12 @@ public class CropPlugin extends CordovaPlugin {
         if (requestCode == Crop.REQUEST_CROP) {
             if (resultCode == Activity.RESULT_OK) {
                 Uri imageUri = Crop.getOutput(intent);
+                Log.d("FROM_CROP_PLUGIN", "REQUEST_CROP: " + imageUri.toString());
+
+                Log.d("FROM_CROP_PLUGIN", "CALLBACK_SUCCESS: file://" + imageUri.toString());
                 this.callbackContext.success("file://" + imageUri.getPath());
                 this.callbackContext = null;
+
             } else if (resultCode == Crop.RESULT_ERROR) {
                 try {
                     JSONObject err = new JSONObject();
