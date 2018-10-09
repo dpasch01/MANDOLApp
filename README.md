@@ -1,6 +1,6 @@
 # MANDOLApp: Mobile Application for Anonymous Hate-speech Reporting 
 
-MANDOLApp is a hate-speech reporting mobile application that is aims to provide:
+MANDOLApp is a hate-speech reporting mobile application that aims to provide:
 
   - The ability of anonymous reporting of hate-speech and other material found in the web and social media.
   - Cross platform compatibility between Android, IOS and Windows mobile devices.
