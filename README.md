@@ -12,6 +12,8 @@ The MANDOLApp consists of the following two main modules:
 - The **awareness module**, where static data is presented to the user in order to raise his/her awareness on the online hate-speech matter;
 - The **anonymous reporting module**, which provides the users with methods in order to report hate-speech encounters anonymously.
 
+![MANDOLApp Architectural Diagram](./mandolapp-architecture.png "MANDOLApp Architectural Diagram")
+
 The MANDOLApp provides two methods for reporting hate speech. The first one is via the MANDOLA Proxy server, which uses a way back machine and loads the selected URL in a web browser within the application (referred to as InAppBrowser) in order for the user to highlight the hate speech content. The MANDOLA Proxy is mainly used  for public encounters of hate speech in sources such as YouTube, Twitter, news sites and forums, where the content can be viewed publicly and the user is not required to provide any personal information. The second method for reporting hate speech is through the Photos or Screenshots via Optical Character Recognition. While the user is browsing with his/her private social media accounts via their native applications, he/she can take a screenshot and report the hate speech encounter without providing any personal information.
 
 ## Application Design
