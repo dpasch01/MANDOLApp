@@ -65,23 +65,23 @@ Android devices. For IOS devices the MANDOLA Bubble is still functional but inst
 ### Install from source code
 Installing Cordova - Cordova command-line runs on NodeJS and is available on NPM. Follow platform specific guides to install additional platform dependencies. Open a command prompt or Terminal, and type:
 ```
-$sudo install -g cordova
+$ sudo install -g cordova@6.1.1
 ```
 After the successful installation of Cordova, proceed on cloning this repository to your local machine by doing:
 ```
-$git clone https://github.com/dpasch01/MANDOLApp
+$ git clone https://github.com/dpasch01/MANDOLApp
 ```
 Now you need to install the front and backend dependencies. For this we use ``npm`` and ``bower``. From your terminal window, enter the ``MANDOLApp`` directory and execute the following:
 ```
-$bower install
-$npm install
-$npm install del
-$npm install fs
-$npm install path
+$ bower install
+$ npm install
+$ npm install del
+$ npm install fs
+$ npm install path
 ```
 Now connect your mobile device(or simply use an emulator) and execute the following:
 ```
-$cordova run android
+$ cordova run android
 ```
 ### Install from binary
 To install from the latest Android binary version, please follow the instructions [here](http://mandola.grid.ucy.ac.cy/~mandola/mandolapp/), until there is an official Google Play release.
