@@ -12,7 +12,8 @@ body {
 .report-wrapper,
 .faqs-wrapper,
 .info-wrapper,
-.annotator-wrapper {
+.annotator-wrapper,
+.hatespeech-feed-wrapper {
   margin: 25px 0px 60px 0px; }
 
 .list {
@@ -240,6 +241,10 @@ select.swal2-select {
     color: #303C4C; }
   .list .host-item .host-info .host-count {
     color: #8389A9; }
+
+.faded{
+  opacity: 0.55;
+}
 
 .sort-action {
   display: inline-block;
@@ -1057,3 +1062,13 @@ button.menu-button {
     z-index: 9;
     cursor: pointer;
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; }
+
+  .hatespeech-feed-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hatespeech-feed-wrapper .country-item{
+    height: 75px;
+  }
