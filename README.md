@@ -12,7 +12,7 @@ The MANDOLApp consists of the following two main modules:
 - The **awareness module**, where static data is presented to the user in order to raise his/her awareness on the online hate-speech matter;
 - The **anonymous reporting module**, which provides the users with methods in order to report hate-speech encounters anonymously.
 
-![MANDOLApp Architectural Diagram](./mandolapp-architecture.png "MANDOLApp Architectural Diagram")
+![MANDOLApp Architectural Diagram](./assets/mandolapp-architecture.png "MANDOLApp Architectural Diagram")
 
 The MANDOLApp provides two methods for reporting hate speech. The first one is via the MANDOLA Proxy server, which uses a way back machine and loads the selected URL in a web browser within the application (referred to as InAppBrowser) in order for the user to highlight the hate speech content. The MANDOLA Proxy is mainly used  for public encounters of hate speech in sources such as YouTube, Twitter, news sites and forums, where the content can be viewed publicly and the user is not required to provide any personal information. The second method for reporting hate speech is through the Photos or Screenshots via Optical Character Recognition. While the user is browsing with his/her private social media accounts via their native applications, he/she can take a screenshot and report the hate speech encounter without providing any personal information.
 
@@ -22,14 +22,14 @@ The MANDOLApp provides two methods for reporting hate speech. The first one is v
 
 ## Developed with Cordova
 
-![Cordova Basic Architecture](./cordova-architecture.png "Cordova Basic Architecture")
+![Cordova Basic Architecture](./assets/cordova-architecture.png "Cordova Basic Architecture")
 
 The MANDOLApp is compatible with Android, iOS and Windows platforms. The application has been developed using the [Apache Cordova framework](https://cordova.apache.org/). Apache Cordova is a popular mobile application development framework which enables wrapping up of CSS, HTML, and JavaScript code depending upon the platform of the device. It extends the features of HTML and JavaScript to work with the device. The resulting applications are hybrid, meaning that they are neither truly native mobile application nor purely Web-based.
 
 ## Application Features
 ### Photo or Screenshot Reporting
 
-![OCR Architectural Diagram](./ocr-architecture.png "OCR Architectural Diagram")
+![OCR Architectural Diagram](./assets/ocr-architecture.png "OCR Architectural Diagram")
 
 The Optical Character Recognition module utilizes the Tesseract OCR system. The Tesseract OCR system is available under the Apache license and its development was sponsored by Google. It is also considered as one of the most accurate open-source OCR engines that are currently available. It can recognize a total of 100 languages, including English, Greek, French, Spanish and Bulgarian. It is available for Linux, Windows and Mac OSX but there are several implementations of it in order to run on mobile devices. The application uses the Javascript library of Tesseract, [TesseractJS](http://tesseract.projectnaptha.com/).
 
@@ -39,7 +39,7 @@ The selected language can be downloaded and configured from the application sett
 
 ### Reporting via MANDOLA Proxy
 
-![MANDOLA Proxy Architectural Diagram](./proxy-architecture.png "MANDOLA Proxy Architectural Diagram")
+![MANDOLA Proxy Architectural Diagram](./assets/proxy-architecture.png "MANDOLA Proxy Architectural Diagram")
 
 he MANDOLA Proxy method, as stated earlier, is for any public encounter of online hate speech. By public, we mean an encounter in web sites or social media where no credentials are necessary in order to view the content of the URL, e.g. a YouTube video link, a public Facebook group, a web site etc. The MANDOLA Proxy utilizes the [Wayback Machine](http://web.archive.org/), which is a digital archive of the World Wide Web.
 By 2015, the Wayback Machine had archived 452 billion web pages over time and is still growing at a rate of about 20 terabytes each week.
@@ -65,7 +65,7 @@ Android devices. For IOS devices the MANDOLA Bubble is still functional but inst
 ### Install from source code
 Installing Cordova - Cordova command-line runs on NodeJS and is available on NPM. Follow platform specific guides to install additional platform dependencies. Open a command prompt or Terminal, and type:
 ```
-$ sudo install -g cordova@6.1.1
+$ sudo install -g cordova@8.1.2 (latest at the time of the edit)
 ```
 After the successful installation of Cordova, proceed on cloning this repository to your local machine by doing:
 ```
@@ -74,10 +74,7 @@ $ git clone https://github.com/dpasch01/MANDOLApp
 Now you need to install the front and backend dependencies. For this we use ``npm`` and ``bower``. From your terminal window, enter the ``MANDOLApp`` directory and execute the following:
 ```
 $ bower install
-$ npm install
-$ npm install del
-$ npm install fs
-$ npm install path
+$ cordova platform add android@7.1.1 (latest at the time of the edit)
 ```
 Now connect your mobile device(or simply use an emulator) and execute the following:
 ```
