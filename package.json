@@ -1,0 +1,64 @@
+{
+    "name": "com.mandola.reporting",
+    "displayName": "MandolApp",
+    "version": "1.0.0",
+    "description": "A sample Apache Cordova application that responds to the deviceready event.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Apache Cordova Team",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "com.ab.cordovafloatingactivity": "file:local/com.ab.cordovafloatingactivity",
+        "cordova-android": "^7.1.1",
+        "cordova-android-support-gradle-release": "1.4.5",
+        "cordova-plugin-android-permissions": "1.0.0",
+        "cordova-plugin-app-event": "^1.2.1",
+        "cordova-plugin-background-mode": "0.7.2",
+        "cordova-plugin-camera": "^4.0.3",
+        "cordova-plugin-console": "1.1.0",
+        "cordova-plugin-core-android-extensions": "1.2.0",
+        "cordova-plugin-crop": "^0.4.0",
+        "cordova-plugin-device": "^2.0.2",
+        "cordova-plugin-dialogs": "^2.0.1",
+        "cordova-plugin-file": "^6.0.1",
+        "cordova-plugin-file-transfer": "^1.7.1",
+        "cordova-plugin-inappbrowser": "^3.0.0",
+        "cordova-plugin-whitelist": "^1.3.3",
+        "cordova-sqlite-storage": "^2.5.0",
+        "cordova.plugins.diagnostic": "^4.0.10",
+        "de.appplant.cordova.plugin.local-notification": "^0.8.5",
+        "in.lucasdup.bringtofront": "file:local/cordova-bring-to-front",
+        "urlcopynotification": "file:local/urlcopynotification"
+    },
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-whitelist": {},
+            "cordova-plugin-camera": {},
+            "cordova-plugin-crop": {},
+            "cordova-plugin-device": {},
+            "cordova-plugin-dialogs": {},
+            "cordova-plugin-file": {},
+            "cordova-plugin-file-transfer": {},
+            "cordova-plugin-inappbrowser": {},
+            "cordova-sqlite-storage": {},
+            "de.appplant.cordova.plugin.local-notification": {},
+            "cordova-plugin-app-event": {},
+            "cordova.plugins.diagnostic": {},
+            "cordova-android-support-gradle-release": {
+                "ANDROID_SUPPORT_VERSION": "27.+"
+            },
+            "cordova-plugin-background-mode": {},
+            "cordova-plugin-console": {},
+            "urlcopynotification": {},
+            "cordova-plugin-core-android-extensions": {},
+            "cordova-plugin-android-permissions": {},
+            "in.lucasdup.bringtofront": {},
+            "com.ab.cordovafloatingactivity": {}
+        },
+        "platforms": [
+            "android"
+        ]
+    }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "in.lucasdup.bringtofront",
+  "version": "0.0.1",
+  "description": "Brings current activity to front",
+  "cordova": {
+    "id": "in.lucasdup.bringtofront",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "cordova",
+    "android",
+    "activity",
+    "foreground",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova-android",
+      "version": ">=4.0.0-dev"
+    }
+  ],
+  "author": "",
+  "license": "Apache 2.0"
+}

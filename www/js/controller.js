@@ -10,11 +10,11 @@ var Controller = function() {
 
         self: null,
 
-        platform: device.platform,
-
         database: null,
 
-        mostRecentURL: "",
+        backgroundState: false,
+
+        pendingReport: null,
 
         MANDOLA_PROXY_PREFIX: "http://mandola.grid.ucy.ac.cy:9080/",
 
@@ -44,14 +44,12 @@ var Controller = function() {
         },
 
         user_settings: {
-            "default_language": 'None',
-            "default_language_code": 'none',
+            "default_language": 'English',
+            "default_language_code": 'eng',
             "keep_cropped": true,
             "hatespeech_analysis": false,
             "background_mandola": false
         },
-
-        installed_languages: [],
 
         all_languages: [
             {
@@ -440,31 +438,6 @@ var Controller = function() {
             }
         ],
 
-        request_runtime_permission: function() {
-            cordova.plugins.diagnostic.requestRuntimePermission(
-                function(status) {
-                    switch (status) {
-                        case cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED:
-                            console.log("=== WRITE_EXTERNAL_STORAGE GRANTED ===");
-                            break;
-                        case cordova.plugins.diagnostic.runtimePermissionStatus.NOT_REQUESTED:
-                            console.log("=== WRITE_EXTERNAL_STORAGE NOT REQUESTED ===");
-                            break;
-                        case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED:
-                            console.log("=== WRITE_EXTERNAL_STORAGE DENIED ===");
-                            break;
-                        case cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS:
-                            console.log("=== WRITE_EXTERNAL_STORAGE NOT PERMITTED ===");
-                            break;
-                    }
-                },
-                function(error) {
-                    console.error("The following error occurred: " + error);
-                },
-                cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
-            );
-        },
-
         setupView: function(enableURL, enableSettings, enableBack, enableEdit) {
             var $container = $('.main-container');
 
@@ -495,65 +468,11 @@ var Controller = function() {
             $container.empty();
         },
 
-        setupTesseract: function() {
-            var newLangPath = cordova.file.dataDirectory + "files/";
-            window.resolveLocalFileSystemURL(cordova.file.applicationDirectory + "tessdata/eng.traineddata", function(assetLangEntry) {
-                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-                    fileSystem.root.getDirectory('tessdata', {
-                        create: true
-                    }, function(parentDir) {
-                        console.log("=== COPYING TESSERACT FILES ===");
-                        assetLangEntry.copyTo(parentDir, "eng.traineddata", function() {
-                            console.log("=== TESSERACT FILES COPIED ===");
-                            var path = cordova.file.dataDirectory + "/files/tessdata/";
-                            console.log("=== LISTING TESSERACT FILES ===");
-                            window.resolveLocalFileSystemURL(path, function(fileSystem) {
-                                var reader = fileSystem.createReader();
-                                reader.readEntries(function(entries) {
-                                    for (var i = 0; i < entries.length; i++) {
-                                        entries[i].file(function(file) {
-                                            if (file.name.indexOf(".traineddata") !== -1) {
-                                                lang = file.name.replace(".traineddata", "");
-                                                self.installed_languages.push(lang);
-                                            }
-                                        });
-                                    }
-                                }, function(error) {
-                                    console.log("=== ERROR READING TESSERACT ENTRIES ===");
-                                    console.log(error);
-                                });
-                                console.log("=== TESSERACT FILES LISTED ===");
-                            }, function(error) {
-                                console.log("=== ERROR READING TESSERACT FILESYSTEM ===");
-                                console.log(error);
-                            });
-                        }, function(error) {
-                            console.log("=== ERROR COPYING TESSERACT FILESYSTEM ===");
-                            console.log(error);
-                        });
-                    }, function(error) {
-                        console.log("=== ERROR REQUESTING TESSERACT FILESYSTEM ===");
-                        console.log(error);
-                    });
-                }, function(error) {
-                    console.log("=== ERROR RESOLVING TESSERACT FILESYSTEM ===");
-                    console.log(error);
-                });
-            });
-        },
-
         setupSQLite: function() {
-            if(self.platform == "Android"){
-              self.database = window.sqlitePlugin.openDatabase({
-                  name: "mandola.db",
-                  location: 'default'
-              });
-            }else{
-              self.database = window.sqlitePlugin.openDatabase({
-                   name: "mandola.db",
-                   iosDatabaseLocation: 'Library'
-               });
-            }
+            self.database = window.sqlitePlugin.openDatabase({
+                name: "mandola.db",
+                location: 'default'
+            });
 
             self.database.transaction(function(transaction) {
                 transaction.executeSql('CREATE TABLE IF NOT EXISTS mandola (id TEXT PRIMARY KEY, title TEXT, text TEXT, timestamp DATETIME, url TEXT, origin TEXT, serialized TEXT, categories TEXT)', [], function(tx, result) {
@@ -565,20 +484,36 @@ var Controller = function() {
         },
 
         initialize: function() {
+            NodeList.prototype.forEach = Array.prototype.forEach;
+            HTMLCollection.prototype.forEach = Array.prototype.forEach;
 
             self = this;
+            console.log("INITIALIZING...");
+
+            //Register the device as valid device using MANDOLA Reporting Application.
+            if (window.localStorage.getItem('registered') == null){
+              console.log("REGISTERING DEVICE...");
+              $.ajax({
+                method: "POST",
+                url: "https://mandola.grid.ucy.ac.cy:8080/api/register-user",
+                data: JSON.stringify({
+                  uuid: device.uuid
+                }),
+                dataType: "json",
+                contentType:"application/json; charset=utf-8"
+              }).done(function( msg ) {
+                  console.log("DEVICE HAS BEEN REGISTERED.");
+                  window.localStorage.setItem('registered', 0);
+              });
+
+            }
+
             //Bind the navigation button events for the whole application.
             self.bindEvents();
+
             //Render the homescreen of the application, which is the report list.
             self.renderReportView();
 
-            if(self.platform == "Android"){
-              //Request WRITE_EXTERNAL_STORAGE runtime permission for the tesseract filesystem to be copied.
-              self.request_runtime_permission();
-            }
-
-            //Copy and setup tesseract filesystem for the optical character recognition functionality.
-            self.setupTesseract();
             //Setup and instanciate the SQLite and mandola table for the application.
             self.setupSQLite();
 
@@ -592,104 +527,20 @@ var Controller = function() {
                 localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
             }
 
-            if(self.platform == "Android"){
-
-              cordovafloatingactivity.onFloatPressed('mandola-btn',
+            cordovafloatingactivity.onFloatPressed('mandola-btn',
                   function(copied_url) {
-                    navigator.app.resumeApp(true);
+                    window.plugins.bringtofront();
+
+                    self.renderReportView();
                     var json = JSON.parse(copied_url);
-                    if(json.status == "error"){
-                        console.log("ERROR: "+ json.message);
-                    }else{
-                        if(json.screenshot != "" ){
-                         if (self.installed_languages.length == 0) {
-                                        swal({
-                                            title: 'No OCR languages found',
-                                            text: "You will have to download a language in order to use this functionality.",
-                                            type: 'error',
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#3085d6',
-                                            cancelButtonColor: '#CFCFCF',
-                                            confirmButtonText: 'Download'
-                                        }).then(function() {
-                                            self.renderLanguagesView();
-                                        }).catch(swal.noop);
-                                    } else if (self.user_settings.default_language_code == "none") {
-                                        swal({
-                                            title: 'No default OCR language selected',
-                                            text: "You will have to set a default language in order to use this functionality.",
-                                            type: 'error',
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#3085d6',
-                                            cancelButtonColor: '#CFCFCF',
-                                            confirmButtonText: 'Set default'
-                                        }).then(function() {
-                                            self.renderSettingsView();
-                                        }).catch(swal.noop);
-                                    } else {
-                            self.onPhotoURISuccess(json.screenshot, json.url);}
-                        }else if(json.url != ""){
-                            self.browserReport(json.url);
-                        }else{
-                            alert("SUPPORT ME!");
-                        }
-                    }
+                    self.pendingReport = json;
+
                     console.log("=== MANDOLA BUBBLE PRESSED ===");
                   },
                   function() {
                       console.log("=== MANDOLA BUBBLE PRESS FAILED ===");
                   }
               );
-
-            }else{
-
-              cordova.plugins.URLCopyNotification.onNotificationReceived('mandola-btn',
-                  function(url) {
-                      console.log("=== A URL HAS BEEN COPIED ===");
-                      self.mostRecentURL = url;
-                  },
-                  function() {
-                      console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
-                  }
-              );
-
-              cordova.plugins.notification.local.on("click",
-                  function() {
-                      if(!self.mostRecentURL){
-                          return;
-                      }
-
-                      copied_url = self.mostRecentURL;
-
-                      if (copied_url != "") {
-                          console.log("=== COPIED URL " + copied_url.toUpperCase() + " ===");
-
-                          swal({
-                              title: '<div class="float-report-url">Report ' + copied_url + '</div>',
-                              text: "How do you want to do this?",
-                              type: 'question',
-                              showCancelButton: true,
-                              confirmButtonColor: '#3085d6',
-                              cancelButtonColor: '#3085d6',
-                              confirmButtonText: '<i class="fa fa-eye" aria-hidden="true"></i>',
-                              cancelButtonText: '<i class="fa fa-globe" aria-hidden="true"></i>',
-                              confirmButtonClass: 'btn btn-success mandola-option',
-                              cancelButtonClass: 'btn btn-success mandola-option'
-                          }).then(function() {
-                              console.log("=== GO WITH SCREENSHOT ===");
-                              self.screenshotReport(copied_url);
-                          }, function(dismiss) {
-                              if (dismiss === 'cancel') {
-                                  console.log("=== GO WITH BROWSER ===");
-                                  self.browserReport(copied_url);
-                              }
-                          });
-
-                      }
-                      console.log("=== MANDOLA BUBBLE PRESSED ===");
-                  }
-              );
-            }
 
             cordova.plugins.backgroundMode.setDefaults({
                 text: 'You are still hunting for hatespeech.'
@@ -703,6 +554,22 @@ var Controller = function() {
             cordova.plugins.backgroundMode.ondeactivate = function() {
                 console.log("=== MANDOLA BUBBLE DEACTIVATED ===");
                 self.mandolaBubble.stop();
+
+                if(self.pendingReport != null){
+                    if(self.pendingReport.status == "error"){
+                        console.log("ERROR: "+ json.message);
+                    }else{
+                        if(self.pendingReport.screenshot != "" ){
+                            self.onPhotoURISuccess(self.pendingReport.screenshot, self.pendingReport.url);
+                        }else if(self.pendingReport.url != ""){
+                            self.browserReport(self.pendingReport.url);
+                        }else{
+                          self.backgroundState = true;
+                          self.renderUsageView();
+                        }
+                    }
+                    self.pendingReport=null;
+                }
             };
 
             cordova.plugins.backgroundMode.onfailure = function(errorCode) {
@@ -712,7 +579,6 @@ var Controller = function() {
             if (self.user_settings.background_mandola) {
                 cordova.plugins.backgroundMode.enable();
             }
-
         },
 
         bindEvents: function() {
@@ -736,7 +602,6 @@ var Controller = function() {
                 } else {
                     self.leaveEditMode();
                 }
-
             });
             $('#mandolapp-menu').on("click", "a", null, function() {
                 $('#mandolapp-menu').collapse('hide');
@@ -839,6 +704,9 @@ var Controller = function() {
 
         renderReportInfo: function(reportItem) {
 
+            $('.tab-button').removeClass('active');
+            $("#report-btn").addClass('active');
+
             self.setupView(true, false, true, false);
 
             $(".main-container").load("./views/info.html", function(data) {
@@ -870,6 +738,9 @@ var Controller = function() {
         renderHatespeechView: function() {
 
             self.setupView(false, false, false, false);
+
+            $('.tab-button').removeClass('active');
+            $("#hatespeech-btn").addClass('active');
 
             $(".main-container").load("./views/hatespeech.html", function(data) {
 
@@ -995,6 +866,7 @@ var Controller = function() {
 
             self.database.transaction(function(transaction) {
                 var executeQuery = "INSERT INTO mandola (id, title, text, timestamp, url, origin, serialized, categories) VALUES (?,?,?,?,?,?,?,?)";
+
                 transaction.executeSql(executeQuery, [
                     device.uuid + reportObject.timestamp,
                     reportObject.title,
@@ -1007,6 +879,71 @@ var Controller = function() {
                 ], function(tx, result) {
                     console.log("=== REPORT INSERTED IN SQLITE ===");
 
+                    var ethnicity_category = "F";
+                    var nationality_category = "F";
+                    var sexual_category = "F";
+                    var religion_category = "F";
+                    var gender_category = "F";
+                    var disability_category = "F";
+                    var politics_category = "F";
+                    var class_category = "F";
+                    var other_category = "F";
+
+                    reportObject.categories.forEach(function(category){
+                      category = category.toLowerCase();
+                      switch (category) {
+                        case 'religious':
+                        religion_category = "T";
+                        break;
+                        case 'gender':
+                        gender_category = "T";
+                        break;
+                        case 'sexual':
+                        sexual_category = "T";
+                        break;
+                        case 'class':
+                        class_category= "T";
+                        break;
+                        case 'politics':
+                        politics_category = "T";
+                        break;
+                        case 'disability':
+                        disability_category = "T";
+                        break;
+                        case 'ethnicity':
+                        ethnicity_category = "T";
+                        break;
+                        case 'nationality':
+                        nationality_category = "T";
+                        break;
+                        case 'other':
+                        other_category="T";
+                      }
+                    });
+
+                    $.ajax({
+                      method: "POST",
+                      url: "https://mandola.grid.ucy.ac.cy:8080/api/new-report",
+                      data: JSON.stringify({
+                        uuid: device.uuid,
+                        url: reportObject.url,
+                        content: reportObject.text,
+                        ethnicity: ethnicity_category,
+                        nationality: nationality_category,
+                        sexual: sexual_category,
+                        religion: religion_category,
+                        gender: gender_category,
+                        disability: disability_category,
+                        politics: politics_category,
+                        class: class_category,
+                        other: other_category
+                      }),
+                      dataType: "json",
+                      contentType:"application/json; charset=utf-8"
+                    }).done(function( msg ) {
+                        console.log("REPORT HAS BEEN SENT.");
+                    });
+
                     var title = "No title";
                     if (reportObject.title != "") {
                         title = reportObject.title;
@@ -1015,7 +952,7 @@ var Controller = function() {
                     if(reportObject.url == ""){
                     $(".report-wrapper .list").prepend('<li id="' + device.uuid + "" + reportObject.timestamp + '" data-url="' + reportObject.url + '" class="report-item">' +
                                             '<div class="source-icon">' +
-                                            '<i class="report-browser fa fa-3x fa-eye" aria-hidden="true"></i>' +
+                                            '<i class="report-image fa fa-3x fa-eye" aria-hidden="true"></i>' +
                                             '</div>' +
                                             '<div class="report-info">' +
                                             '<div class="report-title">' + title + '</div>' +
@@ -1052,39 +989,18 @@ var Controller = function() {
         mandolaBubble: {
 
             start: function() {
-              if(self.platform == "Android"){
-                cordovafloatingactivity.startFloatingActivity('mandola-btn',
-                    function() {
-                        console.log("=== MANDOLA BUBBLE ACTIVATED ===");
-                    },
-                    function() {
-                        console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
-                    }
-                );
-              }else{
-                cordova.plugins.URLCopyNotification.startURLCopyMonitoring('mandola-btn',
-                    function() {
-                        console.log("=== MANDOLA BUBBLE ACTIVATED ===");
-                    },
-                    function() {
-                        console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
-                    }
-                );
-              }
+              cordovafloatingactivity.startFloatingActivity('mandola-btn',
+                  function() {
+                      console.log("=== MANDOLA BUBBLE ACTIVATED ===");
+                  },
+                  function() {
+                      console.log("=== MANDOLA BUBBLE ACTIVATION FAILED ===");
+                  }
+              );
             },
 
             stop: function() {
-                if(self.platform == "Android"){
-                  cordovafloatingactivity.stopFloatingActivity('mandola-btn',
-                      function() {
-                          console.log("=== MANDOLA BUBBLE DEACTIVATED ===");
-                      },
-                      function() {
-                          console.log("=== MANDOLA BUBBLE DEACTIVATION FAILED ===");
-                      }
-                  );
-                }else{
-                  cordova.plugins.URLCopyNotification.cancelURLCopyMonitoring('mandola-btn',
+                cordovafloatingactivity.stopFloatingActivity('mandola-btn',
                     function() {
                         console.log("=== MANDOLA BUBBLE DEACTIVATED ===");
                     },
@@ -1092,7 +1008,6 @@ var Controller = function() {
                         console.log("=== MANDOLA BUBBLE DEACTIVATION FAILED ===");
                     }
                 );
-                }
             }
 
         },
@@ -1171,8 +1086,8 @@ var Controller = function() {
                             "categories": report.categories
                         });
                     });
-                    delete MAO;
                     clearInterval(MAOObserver);
+                    delete MAO;
                 });
             }).catch(swal.noop);
 
@@ -1185,43 +1100,17 @@ var Controller = function() {
                 copied_url = "";
             }
 
-            if (self.installed_languages.length == 0) {
-                swal({
-                    title: 'No OCR languages found',
-                    text: "You will have to download a language in order to use this functionality.",
-                    type: 'error',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#CFCFCF',
-                    confirmButtonText: 'Download'
-                }).then(function() {
-                    self.renderLanguagesView();
-                }).catch(swal.noop);
-            } else if (self.user_settings.default_language_code == "none") {
-                swal({
-                    title: 'No default OCR language selected',
-                    text: "You will have to set a default language in order to use this functionality.",
-                    type: 'error',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#CFCFCF',
-                    confirmButtonText: 'Set default'
-                }).then(function() {
-                    self.renderSettingsView();
-                }).catch(swal.noop);
-            } else {
-                navigator.camera.getPicture(function(uri) {
-                    alert(uri);
-                    self.onPhotoURISuccess(uri, copied_url);
-                }, function(error) {
-                    console.log(error);
-                }, {
-                    quality: 100,
-                    allowEdit: false,
-                    destinationType: Camera.DestinationType.FILE_URI,
-                    sourceType: Camera.PictureSourceType.PHOTOLIBRARY
-                });
-            }
+            navigator.camera.getPicture(function(uri) {
+                self.onPhotoURISuccess(uri, copied_url);
+            }, function(error) {
+                console.log(error);
+            }, {
+                quality: 100,
+                allowEdit: false,
+                destinationType: Camera.DestinationType.FILE_URI,
+                sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+            });
+
         },
 
         loadReport: function(reportID) {
@@ -1289,186 +1178,152 @@ var Controller = function() {
             }).then(function success(newPath) {
                 self.mandolaLoading.start();
 
-                //Setup tesseract's language files and
-                //default user's OCR language code from settings.
-                var newLangPath = cordova.file.dataDirectory + "files/";
-                var lang = controller.user_settings.default_language_code;
+                Tesseract.recognize(newPath, {
+                  lang: self.user_settings.default_language_code
+                }).then(function(result){
 
-                //Copy the cropped image in the application's main folder. If the
-                //user settings on keeping the image is true then keep it.
-                window.resolveLocalFileSystemURL(newPath,
-                    function(fileEntry) {
-                        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
-                            function(fileSystem) {
-                                fileSystem.root.getDirectory('mandola', {
-                                        create: true,
-                                        exclusive: false
-                                    },
-                                    function(dataDir) {
-                                        //Save the cropped image as <currentTimeInMiliseconds>-cropped.jpg
-                                        //in the /mandola folder in /emulated/0/Android/data path.
-                                        fileEntry.moveTo(dataDir, Date.now() + "-cropped.jpg", function(entry) {
+                    result = result.text;
 
-                                            //Pass the cropped image in the tesseract plugin to do the OCR.
-                                            tesseract_plugin.createEvent(entry.nativeURL, newLangPath, lang, function(result) {
+                    self.mandolaLoading.finish();
+                    //If tesseract succesfuly did the OCR then
+                    //begin the reporting flow using sweetalert2 queue.
 
-                                                self.mandolaLoading.finish();
-                                                //If tesseract succesfuly did the OCR then
-                                                //begin the reporting flow using sweetalert2 queue.
-                                                swal.setDefaults({
-                                                    input: 'text',
-                                                    confirmButtonText: 'Next',
-                                                    showCancelButton: true,
-                                                    animation: true,
-                                                    progressSteps: ['1', '2', '3', '4']
-                                                })
+                    swal.setDefaults({
+                        input: 'text',
+                        confirmButtonText: 'Next',
+                        showCancelButton: true,
+                        animation: true,
+                        progressSteps: ['1', '2', '3', '4']
+                    })
 
-                                                var steps = [{
-                                                        title: 'MANDOLA Report',
-                                                        text: 'Confirm OCR text',
-                                                        input: 'textarea',
-                                                        focusCancel: true,
-                                                        inputValue: result,
-                                                        allowOutsideClick: false,
-                                                        preConfirm: function(text) {
-                                                            return new Promise(function(resolve, reject) {
-                                                                if (!text || text == "") {
-                                                                    reject('Report text must not be empty');
-                                                                } else {
-                                                                    resolve();
-                                                                }
-                                                            })
-                                                        }
-                                                    },
-                                                    {
-                                                        title: 'Report title',
-                                                        text: 'Type a title describing the report if you want',
-                                                        input: 'text',
-                                                        focusCancel: true,
-                                                        inputPlaceholder: 'e.g Hatespeech filled comment',
-                                                        allowOutsideClick: false
-                                                    },
-                                                    {
-                                                        title: 'Source URL',
-                                                        text: 'Type the source URL',
-                                                        input: 'text',
-                                                        focusCancel: true,
-                                                        inputValue: copied_url,
-                                                        allowOutsideClick: false,
-                                                        preConfirm: function(url) {
-                                                            return new Promise(function(resolve, reject) {
-                                                                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-                                                                if (!regexp.test(url) && !url === "") {
-                                                                    reject('Please provide a valid URL.');
-                                                                } else {
-                                                                    resolve();
-                                                                }
-                                                            })
-                                                        }
-                                                    },
-                                                    {
-                                                        title: 'Categories',
-                                                        text: 'Select hate categories',
-                                                        focusCancel: true,
-                                                        preConfirm: function(categories) {
-                                                            return new Promise(function(resolve, reject) {
-                                                                if (categories === "" || categories === "") {
-                                                                    reject('Please provide a valid URL.');
-                                                                } else {
-                                                                    resolve();
-                                                                }
-                                                            })
-                                                        },
-                                                        onOpen: function() {
-                                                            $('#report-tags').on('change', function(e) {
-                                                                var hatestring = "";
-                                                                document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
-                                                                    if (index === 0) {
-                                                                        hatestring = element.textContent;
-                                                                    } else {
-                                                                        hatestring += ", " + element.textContent;
-                                                                    }
-                                                                });
-                                                                $('#redirect-hate-categories').val(hatestring);
-                                                            });
+                    var ocrstep = {
+                            title: 'MANDOLA Report',
+                            text: 'Confirm OCR text',
+                            input: 'textarea',
+                            focusCancel: true,
+                            inputValue: result,
+                            allowOutsideClick: false,
+                            preConfirm: function(text) {
+                                return new Promise(function(resolve, reject) {
+                                    if (!text || text == "") {
+                                        reject('Report text must not be empty');
+                                    } else {
+                                        resolve();
+                                    }
+                                })
+                            }
+                        };
 
-                                                            $('.selectpicker').selectpicker({
-                                                                style: 'btn-default',
-                                                                size: 12
-                                                            });
-                                                        },
-                                                        inputClass: 'hidden',
-                                                        inputAttributes: {
-                                                            'id': 'redirect-hate-categories'
-                                                        },
-                                                        html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
-                                                            '<option>Religious</option>' +
-                                                            '<option>Gender</option>' +
-                                                            '<option>Sexual</option>' +
-                                                            '<option>Class</option>' +
-                                                            '<option>Politics</option>' +
-                                                            '<option>Ethnicity</option>' +
-                                                            '<option>Nationality</option>' +
-                                                            '<option>Other</option>' +
-                                                            '</select>',
-                                                        allowOutsideClick: false
-                                                    }
-                                                ]
+                    var titlestep =   {
+                          title: 'Report title',
+                          text: 'Type a title describing the report if you want',
+                          input: 'text',
+                          focusCancel: true,
+                          inputPlaceholder: 'e.g Hatespeech filled comment',
+                          allowOutsideClick: false
+                      };
 
-                                                swal.queue(steps).then(function(result) {
-                                                    self.appendReport({
-                                                        "title": result[1],
-                                                        "timestamp": Date.now(),
-                                                        "url": result[2],
-                                                        "text": result[0],
-                                                        "serialized": null,
-                                                        "categories": result[3].split(", ")
-                                                    });
-                                                    swal.resetDefaults();
-                                                }, function() {
-                                                    swal.resetDefaults();
-                                                });
+                    var urlstep = {
+                        title: 'Source URL',
+                        text: 'Type the source URL',
+                        input: 'text',
+                        focusCancel: true,
+                        inputValue: copied_url,
+                        allowOutsideClick: false,
+                        preConfirm: function(url) {
+                            return new Promise(function(resolve, reject) {
+                                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                                if (!regexp.test(url) && !url === "") {
+                                    reject('Please provide a valid URL.');
+                                } else {
+                                    resolve();
+                                }
+                            })
+                        }
+                    };
 
-                                                //If user define to delete cropped files, then
-                                                //find the cropped image and delete it.
-                                                if (!self.user_settings.keep_cropped) {
-                                                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
-                                                        fileSystem.root.getFile(entry.fullPath, {
-                                                            create: false
-                                                        }, function(fileEntry) {
-                                                            fileEntry.remove(function(file) {
-                                                                console.log("=== FILE REMOVED ===");
-                                                            }, function() {
-                                                                console.log(error);
-                                                            });
-                                                        }, function() {
-                                                            console.log("=== FILE DOES NOT EXIST ===");
-                                                        });
-                                                    }, function(error) {
-                                                        console.log(error);
-                                                    });
-                                                }
-
-                                            }, function(error) {
-                                                self.mandolaLoading.finish();
-                                                console.log(error);
-                                            });
-                                        }, function fail(err) {
-                                            self.mandolaLoading.finish();
-                                            console.log(err);
-                                        });
-                                    },
-                                    function fail(err) {
-                                        self.mandolaLoading.finish();
-                                        console.log(err);
-                                    });
-                            },
-                            function fail(err) {
-                                self.mandolaLoading.finish();
-                                console.log(err);
+                    var categoriesstep = {
+                        title: 'Categories',
+                        text: 'Select hate categories',
+                        focusCancel: true,
+                        preConfirm: function(categories) {
+                            return new Promise(function(resolve, reject) {
+                                if (categories === "" || categories === "") {
+                                    reject('Please provide at least one category.');
+                                } else {
+                                    resolve();
+                                }
+                            })
+                        },
+                        onOpen: function() {
+                            $('#report-tags').on('change', function(e) {
+                                var hatestring = "";
+                                document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
+                                    if (index === 0) {
+                                        hatestring = element.textContent;
+                                    } else {
+                                        hatestring += ", " + element.textContent;
+                                    }
+                                });
+                                $('#redirect-hate-categories').val(hatestring);
                             });
+
+                            $('.selectpicker').selectpicker({
+                                style: 'btn-default',
+                                size: 12
+                            });
+                        },
+                        inputClass: 'hidden',
+                        inputAttributes: {
+                            'id': 'redirect-hate-categories'
+                        },
+                        html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
+                            '<option>Religious</option>' +
+                            '<option>Gender</option>' +
+                            '<option>Sexual</option>' +
+                            '<option>Class</option>' +
+                            '<option>Politics</option>' +
+                            '<option>Ethnicity</option>' +
+                            '<option>Nationality</option>' +
+                            '<option>Other</option>' +
+                            '</select>',
+                        allowOutsideClick: false
+                    };
+
+                    var steps;
+
+                    if(copied_url == ""){
+                      steps = [ocrstep, titlestep, categoriesstep];
+                    }else{
+                      steps = [ocrstep, titlestep, urlstep, categoriesstep];
                     }
-                );
+
+                    swal.queue(steps).then(function(result) {
+                        if(copied_url != ""){
+                        self.appendReport({
+                            "title": result[1],
+                            "timestamp": Date.now(),
+                            "url": result[2],
+                            "text": result[0],
+                            "serialized": null,
+                            "categories": result[3].split(", ")
+                        });
+                      }else{
+                        self.appendReport({
+                            "title": result[1],
+                            "timestamp": Date.now(),
+                            "url": "",
+                            "text": result[0],
+                            "serialized": null,
+                            "categories": result[2].split(", ")
+                        });
+                      }
+                        swal.resetDefaults();
+                    }, function() {
+                        swal.resetDefaults();
+                    });
+                });
+
             }).catch(function fail(err) {
                 console.log(err);
             });
@@ -1763,6 +1618,9 @@ var Controller = function() {
         renderReportView: function() {
             self.setupView(false, false, false, true);
 
+            $('.tab-button').removeClass('active');
+            $("#report-btn").addClass('active');
+
             $(".main-container").load("./views/report.html", function(data) {
 
                 window.sr = ScrollReveal({
@@ -1836,6 +1694,9 @@ var Controller = function() {
 
             self.setupView(false, false, false, false);
 
+            $('.tab-button').removeClass('active');
+            $("#faqs-btn").addClass('active');
+
             $(".main-container").load("./views/faqs.html", function(data) {
 
                 $('.ui.accordion').accordion();
@@ -1892,23 +1753,163 @@ var Controller = function() {
             });
         },
 
+        renderUsageView: function(){
+            self.setupView(false, true, false, false);
+            $('.tab-button').removeClass('active');
+            $("#settings-btn").addClass('active');
+
+            $(".main-container").load("./views/usage.html", function(data) {
+
+                $("#facebook-usage").on('click', function(e){
+                  swal.setDefaults({
+                    confirmButtonText: 'Next',
+                    showCancelButton: true,
+                    animation: true,
+                    progressSteps: ['1', '2', '3']
+                  })
+
+                  var steps = [
+                    {
+                        title: 'Copy the post URL',
+                        html: 'Press the chevron button <i class="fa fa-chevron-down" aria-hidden="true"></i> on the top-right corner of a post and select the \'Copy link\' option.'
+                    },
+                    {
+                        title: 'Screenshot the hate-related post content.',
+                        html: 'Take a screenshot with your device of the post content that has hate-related text.'
+                    },
+                    {
+                        title: 'Press the bubble to report',
+                        html: 'By pressing the bubble you will be prompted to crop the hate-related post, and then proceed in reporting it.'
+                    }
+                  ]
+
+                  swal.queue(steps).then(function (result) {
+                    if(self.backgroundState){
+                        self.backgroundState = false;
+                        cordova.plugins.backgroundMode.moveToBackground();
+                    }
+                  }, function () {
+                    swal.resetDefaults()
+                  })
+                });
+
+                $("#twitter-usage").on('click', function(e){
+                  swal.setDefaults({
+                    confirmButtonText: 'Next',
+                    showCancelButton: true,
+                    animation: true,
+                    progressSteps: ['1', '2', '3']
+                  })
+
+                  var steps = [
+                    {
+                        title: 'Copy the tweet URL',
+                        html: 'Press the chevron button <i class="fa fa-chevron-down" aria-hidden="true"></i> on the top-right corner of a tweet and select the \'Copy link to tweet\' option.'
+                    },
+                    {
+                        title: '[Optional] Screenshot the hate-related post content.',
+                        html: 'Take a screenshot with your device of the tweet content that has hate-related text. If you do that then automatically the OCR technique will be used.'
+                    },
+                    {
+                        title: 'Press the bubble to report',
+                        html: 'By pressing the bubble you will be prompted to crop the hate-related tweet if the OCR technique was used, or the tweet will be loaded in the browser for you to highligh it, and then proceed in reporting it.'
+                    }
+                  ]
+
+                  swal.queue(steps).then(function (result) {
+                    if(self.backgroundState){
+                        self.backgroundState = false;
+                        cordova.plugins.backgroundMode.moveToBackground();
+                    }
+                  }, function () {
+                    swal.resetDefaults()
+                  })
+                });
+
+                $("#browser-usage").on('click', function(e){
+                  swal.setDefaults({
+                    confirmButtonText: 'Next',
+                    showCancelButton: true,
+                    animation: true,
+                    progressSteps: ['1', '2', '3']
+                  })
+
+                  var steps = [
+                    {
+                        title: 'Copy the website\'s URL',
+                        html: 'Highligh the URL in the browser\'s address bar and click \'Copy\'.'
+                    },
+                    {
+                        title: '[Optional] Screenshot the hate-related website content.',
+                        html: 'Take a screenshot with your device of the website content that has hate-related text. If you do that then automatically the OCR technique will be used.'
+                    },
+                    {
+                        title: 'Press the bubble to report',
+                        html: 'By pressing the bubble you will be prompted to crop the hate-related text if the OCR technique was used, or the website will be re-loaded in the browser for you to highligh it, and then proceed in reporting it.'
+                    }
+                  ]
+
+                  swal.queue(steps).then(function (result) {
+                    if(self.backgroundState){
+                        self.backgroundState = false;
+                        cordova.plugins.backgroundMode.moveToBackground();
+                    }
+                  }, function () {
+                    swal.resetDefaults()
+                  })
+                });
+
+                $("#youtube-usage").on('click', function(e){
+                  swal.setDefaults({
+                    confirmButtonText: 'Next',
+                    showCancelButton: true,
+                    animation: true,
+                    progressSteps: ['1', '2', '3']
+                  })
+
+                  var steps = [
+                    {
+                        title: 'Copy the video URL',
+                        html: 'Press the share button <i class="fa fa-share" aria-hidden="true"></i> and select the \'Copy link\' option.'
+                    },
+                    {
+                        title: 'Screenshot the hate-related comment.',
+                        html: 'Scroll to the comment you have found to have hate related content and take a screenshot with your device.'
+                    },
+                    {
+                        title: 'Press the bubble to report',
+                        html: 'By pressing the bubble you will be prompted to crop the hate-related comment, and then proceed in reporting it.'
+                    }
+                  ]
+
+                  swal.queue(steps).then(function (result) {
+                    if(self.backgroundState){
+                        self.backgroundState = false;
+                        cordova.plugins.backgroundMode.moveToBackground();
+                    }
+                  }, function () {
+                    swal.resetDefaults()
+                  })
+                });
+            });
+
+        },
+
         renderSettingsView: function() {
 
             self.setupView(false, false, false, false);
 
+            $('.tab-button').removeClass('active');
+            $("#settings-btn").addClass('active');
+
             $(".main-container").load("./views/settings.html", function(data) {
 
                 var installedOptions = {
-                    'none': 'None'
+                    'eng': 'English'
                 };
 
                 for (i = 0; i < self.all_languages.length; i++) {
-                    for (j = 0; j < self.installed_languages.length; j++) {
-                        if (self.all_languages[i].code == self.installed_languages[j]) {
-                            installedOptions[self.all_languages[i].code] = self.all_languages[i].text;
-                            j = self.installed_languages.length;
-                        }
-                    }
+                    installedOptions[self.all_languages[i].code] = self.all_languages[i].text;
                 }
 
                 $('#default-ocr-language .preview').text(self.user_settings.default_language);
@@ -1921,16 +1922,6 @@ var Controller = function() {
                     console.log("=== ANALYSIS IS OFF ===");
                     $("#mandola-analysis-checkbox")[0].checked = false;
                     $("#mandola-analysis-checkbox").parent().removeClass('active');
-                }
-
-                if (self.user_settings.keep_cropped) {
-                    console.log("=== KEEP IMAGES IS ON ===");
-                    $("#keep-cropped-checkbox")[0].checked = true;
-                    $("#keep-cropped-checkbox").parent().addClass('active');
-                } else {
-                    console.log("=== KEEP IMAGES IS OFF ===");
-                    $("#keep-cropped-checkbox")[0].checked = false;
-                    $("#keep-cropped-checkbox").parent().removeClass('active');
                 }
 
                 if (self.user_settings.background_mandola) {
@@ -1951,56 +1942,37 @@ var Controller = function() {
                     duration: self.animationDuration
                 });
 
-                $('#default-ocr-language').on('click', function() {
-                    if (self.installed_languages.length >= 0) {
-                        swal({
-                            title: 'Select the default language',
-                            input: 'select',
-                            inputOptions: installedOptions,
-                            inputValue: self.user_settings.default_language_code,
-                            inputPlaceholder: 'Select language',
-                            inputAttributes: {
-                                'id': 'default-language-selectbox'
-                            },
-                            showCancelButton: true,
-                            inputClass: 'default-language-selectbox',
-                            inputValidator: function(value) {
-                                return new Promise(function(resolve, reject) {
-                                    if (value) {
-                                        resolve()
-                                    } else {
-                                        reject('You have to select a language.')
-                                    }
-                                })
-                            }
-                        }).then(function(result) {
-                            self.user_settings.default_language_code = result;
-                            self.user_settings.default_language = installedOptions[result];
-                            localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
-                            $('#default-ocr-language .preview').text(self.user_settings.default_language);
-                            swal({
-                                type: 'success',
-                                html: installedOptions[result] + " is now the default language."
-                            })
-                        }).catch(swal.noop);
-                    } else {
-                        swal({
-                            title: 'No languages found',
-                            text: "You will have to download a language in order to use it.",
-                            type: 'error',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#CFCFCF',
-                            confirmButtonText: 'Download'
-                        }).then(function() {
-                            self.renderLanguagesView();
-                        }).catch(swal.noop);
-                    }
-
+                $('#usage').on('click', function(){
+                  self.renderUsageView();
                 });
 
-                $('#ocr-languages').on('click', function() {
-                    self.renderLanguagesView();
+                $('#default-ocr-language').on('click', function() {
+                      swal({
+                          title: 'Select the default language',
+                          input: 'select',
+                          inputOptions: installedOptions,
+                          inputValue: self.user_settings.default_language_code,
+                          inputPlaceholder: 'Select language',
+                          inputAttributes: {
+                              'id': 'default-language-selectbox'
+                          },
+                          showCancelButton: true,
+                          inputClass: 'default-language-selectbox',
+                          inputValidator: function(value) {
+                              return new Promise(function(resolve, reject) {
+                                  if (value) {
+                                      resolve()
+                                  } else {
+                                      reject('You have to select a language.')
+                                  }
+                              })
+                          }
+                      }).then(function(result) {
+                          self.user_settings.default_language_code = result;
+                          self.user_settings.default_language = installedOptions[result];
+                          localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
+                          $('#default-ocr-language .preview').text(self.user_settings.default_language);
+                      }).catch(swal.noop);
                 });
 
                 $('#mandola-analysis-checkbox').click(function() {
@@ -2015,21 +1987,24 @@ var Controller = function() {
                     localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
                 });
 
-                $('#keep-cropped-checkbox').click(function() {
-                    var mainParent = $(this).parent('.toggle-btn');
-                    if ($(mainParent).find('input.cb-value').is(':checked')) {
-                        $(mainParent).addClass('active');
-                        self.user_settings.keep_cropped = true;
-                    } else {
-                        $(mainParent).removeClass('active');
-                        self.user_settings.keep_cropped = false;
-                    }
-                    localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
-                });
-
                 $('#mandola-background').click(function() {
                     var mainParent = $(this).parent('.toggle-btn');
+                    var permissions =  cordova.plugins.permissions;
+                    var list = [
+                          permissions.SYSTEM_ALTER_WINDOW,
+                          permissions.WRITE_EXTERNAL_STORAGE,
+                          permissions.READ_EXTERNAL_STORAGE
+                        ];
+
                     if ($(mainParent).find('input.cb-value').is(':checked')) {
+                        permissions.hasPermission(list, function(status){
+                          if(!status.hasPermission) {
+                            permissions.requestPermissions(list, function(status) {
+
+                            });
+                          }
+                        }, null);
+
                         $(mainParent).addClass('active');
                         self.user_settings.background_mandola = true;
                         cordova.plugins.backgroundMode.enable();
@@ -2076,6 +2051,20 @@ var Controller = function() {
                         console.log("=== DOWNLOADING " + lang.toUpperCase() + " ===");
                         downloadLang(lang);
                     }
+                });
+
+                $('#mandola-background').click(function() {
+                    var mainParent = $(this).parent('.toggle-btn');
+                    if ($(mainParent).find('input.cb-value').is(':checked')) {
+                        $(mainParent).addClass('active');
+                        self.user_settings.background_mandola = true;
+                        cordova.plugins.backgroundMode.enable();
+                    } else {
+                        $(mainParent).removeClass('active');
+                        self.user_settings.background_mandola = false;
+                        cordova.plugins.backgroundMode.disable();
+                    }
+                    localStorage.setItem('mandola_settings', JSON.stringify(self.user_settings));
                 });
 
                 window.sr = ScrollReveal({

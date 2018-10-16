@@ -1,0 +1,23 @@
+{
+  "name": "com.ab.cordovafloatingactivity",
+  "version": "0.7.0",
+  "description": "Facebook like Floating activity for cordova",
+  "cordova": {
+    "id": "com.ab.cordovafloatingactivity",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.4.0"
+    }
+  ],
+  "author": "",
+  "license": "ISC"
+}

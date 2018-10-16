@@ -899,6 +899,42 @@ button.menu-button {
     -webkit-transform: translate(15px);
             transform: translate(15px); } }
 
+.usage-wrapper {
+  margin-top: 70px;
+  font-size: 17px; }
+  .usage-wrapper .usage-list {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px; }
+    .usage-wrapper .usage-list hr {
+      -webkit-transition: all 0.5s ease-in-out;
+      transition: all 0.5s ease-in-out;
+      display: block;
+      height: 1px;
+      border: 0;
+      border-top: 1px solid #CDCDCD;
+      margin: 1em 0;
+      padding: 0; }
+    .usage-wrapper .usage-list .usage-item {
+      padding: 0px 10px;
+      cursor: pointer; }
+      .usage-wrapper .usage-list .usage-item .usage-content {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+            -ms-flex-align: center;
+                align-items: center; }
+        .usage-wrapper .usage-list .usage-item .usage-content .usage-logo i {
+          color: #1E88E5; }
+        .usage-wrapper .usage-list .usage-item .usage-content .usage-info {
+          padding: 0px 0px 0px 20px; }
+      .usage-wrapper .usage-list .usage-item .preview {
+        font-size: 15px;
+        color: rgba(0, 0, 0, 0.5); }
+
 .settings-wrapper {
   margin-top: 70px;
   font-size: 17px; }

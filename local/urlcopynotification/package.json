@@ -1,0 +1,17 @@
+{
+  "name": "urlcopynotification",
+  "version": "1.0.2",
+  "description": "",
+  "cordova": {
+    "id": "urlcopynotification",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "",
+  "license": "ISC"
+}
