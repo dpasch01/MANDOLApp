@@ -603,8 +603,41 @@ var Controller = function() {
                     self.leaveEditMode();
                 }
             });
-            $('#mandolapp-menu').on("click", "a", null, function() {
-                $('#mandolapp-menu').collapse('hide');
+
+            $('.report-simple').on("click", function() {
+                swal({
+                    title: 'Enter a URL to report or annotate',
+                    html:
+                        '<input id="url_input" value="' + copied_url + '" class="swal2-input">' +
+                        '<label style="display:flex" for="url_annotate_or_not class="swal2-checkbox"><input class="url_annotate_or_not" value="1" id="url_annotate_or_not" type="checkbox"><span class="swal2-label" style="padding-left:20px"> Simply report URL</span></label>',
+                    focusCancel: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Next',
+                    showLoaderOnConfirm: false,
+                    preConfirm: () => {
+    
+                        var mandolaURL = document.getElementById('url_input').value
+                        var annotate_or_report = document.querySelector('.url_annotate_or_not:checked') != null ? true : false
+    
+                        return new Promise(function(resolve, reject) {
+                            var regexp = /(ftp|http|https|Ftp|Http|Https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                            if (!regexp.test(mandolaURL.toLowerCase()) || mandolaURL === "") {
+                                reject('Please provide a valid URL.');
+                            } else {
+                                resolve([mandolaURL,annotate_or_report]);
+                            }
+                        });
+                    },
+                    allowOutsideClick: true
+                })
+            });
+
+            $('.report-proxy').on("click", function() {
+                alert('report-proxy');
+            });
+        
+            $('.report-screenshot').on("click", function() {
+                alert('report-screenshot');
             });
         },
 
@@ -950,168 +983,75 @@ var Controller = function() {
             }
 
             swal({
-                title: 'Enter a URL to report or annotate',
-                html:
-                    '<input id="url_input" value="' + copied_url + '" class="swal2-input">' +
-                    '<label style="display:flex" for="url_annotate_or_not class="swal2-checkbox"><input class="url_annotate_or_not" value="1" id="url_annotate_or_not" type="checkbox"><span class="swal2-label" style="padding-left:20px"> Simply report URL</span></label>',
+                title: 'Enter a URL to annotate',
+                input: 'text',
+                inputValue: copied_url,
                 focusCancel: true,
                 showCancelButton: true,
-                confirmButtonText: 'Next',
+                confirmButtonText: 'Load',
                 showLoaderOnConfirm: false,
-                preConfirm: () => {
-
-                    var mandolaURL = document.getElementById('url_input').value
-                    var annotate_or_report = document.querySelector('.url_annotate_or_not:checked') != null ? true : false
-
+                preConfirm: function(mandolaURL) {
                     return new Promise(function(resolve, reject) {
                         //Check if the value passed is an actual url via regex.
-                        var regexp = /(ftp|http|https|Ftp|Http|Https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
                         if (!regexp.test(mandolaURL.toLowerCase()) || mandolaURL === "") {
                             reject('Please provide a valid URL.');
                         } else {
-                            resolve([mandolaURL,annotate_or_report]);
+                            resolve();
                         }
                     });
                 },
                 allowOutsideClick: true
-            }).then(function(returnedValues) {
-                var mandolaURL = returnedValues[0];
-                if(returnedValues[1]){
-                    
-                    swal.setDefaults({
-                        input: 'text',
-                        confirmButtonText: 'Next',
-                        showCancelButton: true,
-                        animation: true,
-                        progressSteps: ['1', '2']
-                    })
-
-                    var titlestep =   {
-                          title: 'Report title',
-                          text: 'Type a title describing the report if you want',
-                          input: 'text',
-                          focusCancel: true,
-                          inputPlaceholder: 'e.g Hatespeech filled comments',
-                          allowOutsideClick: false
-                      };
-
-                    var categoriesstep = {
-                        title: 'Categories',
-                        text: 'Select hate categories',
-                        focusCancel: true,
-                        preConfirm: function(categories) {
-                            return new Promise(function(resolve, reject) {
-                                if (categories === "" || categories === "") {
-                                    reject('Please provide at least one category.');
-                                } else {
-                                    resolve();
-                                }
-                            })
-                        },
-                        onOpen: function() {
-                            $('#report-tags').on('change', function(e) {
-                                var hatestring = "";
-                                document.querySelectorAll(".dropdown-menu.inner .selected").forEach(function(element, index, array) {
-                                    if (index === 0) {
-                                        hatestring = element.textContent;
-                                    } else {
-                                        hatestring += ", " + element.textContent;
-                                    }
-                                });
-                                $('#redirect-hate-categories').val(hatestring);
-                            });
-
-                            $('.selectpicker').selectpicker({
-                                style: 'btn-default',
-                                size: 12
-                            });
-                        },
-                        inputClass: 'hidden',
-                        inputAttributes: {
-                            'id': 'redirect-hate-categories'
-                        },
-                        html: '<select class="selectpicker form-control" required id="report-tags" name="report-tags" multiple required title="Choose from the following...">' +
-                            '<option>Religious</option>' +
-                            '<option>Gender</option>' +
-                            '<option>Sexual</option>' +
-                            '<option>Class</option>' +
-                            '<option>Politics</option>' +
-                            '<option>Ethnicity</option>' +
-                            '<option>Nationality</option>' +
-                            '<option>Other</option>' +
-                            '</select>',
-                        allowOutsideClick: false
+            }).then(function(mandolaURL) {
+                self.mandolaLoading.start();
+                inAppBrowser = cordova.InAppBrowser.open(self.MANDOLA_PROXY_PREFIX + mandolaURL, '_blank', 'hidden=yes, location=yes, toolbar=no, zoom=no');
+                inAppBrowser.addEventListener('loaderror', function(e) {
+                    swal('Oops...', 'Could not load: ' + mandolaURL, 'error');
+                    self.mandolaLoading.finish();
+                    inAppBrowser.close();
+                });
+                inAppBrowser.addEventListener('loadstop', function() {
+                    MAODate = new Date();
+                    MAO = {
+                        "uuid": device.uuid,
+                        "created": MAODate,
+                        "updated": MAODate,
+                        "reports": []
                     };
-
-                    var steps;
-
-                    steps = [titlestep, categoriesstep];
-                    
-                    swal.queue(steps).then(function(result) {
-                        self.appendReport({
-                            "title": result[0],
-                            "timestamp": Date.now(),
-                            "url": mandolaURL,
-                            "text": mandolaURL,
-                            "serialized": null,
-                            "categories": result[1].split(", ")
-                        });
-                        swal.resetDefaults();
-                    }, function() {
-                        swal.resetDefaults();
+                    inAppBrowser.executeScript({
+                        code: "localStorage.setItem('MAO', '" + JSON.stringify(MAO) + "');"
                     });
-
-                }else{
-                    self.mandolaLoading.start();
-                    inAppBrowser = cordova.InAppBrowser.open(self.MANDOLA_PROXY_PREFIX + mandolaURL, '_blank', 'hidden=yes, location=yes, toolbar=no, zoom=no');
-                    inAppBrowser.addEventListener('loaderror', function(e) {
-                        swal('Oops...', 'Could not load: ' + mandolaURL, 'error');
-                        self.mandolaLoading.finish();
-                        inAppBrowser.close();
-                    });
-                    inAppBrowser.addEventListener('loadstop', function() {
-                        MAODate = new Date();
-                        MAO = {
-                            "uuid": device.uuid,
-                            "created": MAODate,
-                            "updated": MAODate,
-                            "reports": []
-                        };
+                    MAOObserver = setInterval(function() {
                         inAppBrowser.executeScript({
-                            code: "localStorage.setItem('MAO', '" + JSON.stringify(MAO) + "');"
-                        });
-                        MAOObserver = setInterval(function() {
-                            inAppBrowser.executeScript({
-                                code: "localStorage.getItem('MAO')"
-                            }, function(values) {
-                                if (values[0]) {
-                                    var tempMAO = JSON.parse(values[0]);
-                                    if (tempMAO.updated != MAODate) {
-                                        MAO = tempMAO;
-                                    }
-                                } else {
-                                    console.log("MANDOLA Application Object not found.");
+                            code: "localStorage.getItem('MAO')"
+                        }, function(values) {
+                            if (values[0]) {
+                                var tempMAO = JSON.parse(values[0]);
+                                if (tempMAO.updated != MAODate) {
+                                    MAO = tempMAO;
                                 }
-                            });
-                        }, 100);
-                        inAppBrowser.show();
-                    });
-                    inAppBrowser.addEventListener('exit', function() {
-                        self.mandolaLoading.finish();
-                        MAO.reports.forEach(function(report) {
-                            self.appendReport({
-                                "title": report.title,
-                                "timestamp": Date.now(),
-                                "url": report.url,
-                                "text": report.text,
-                                "serialized": report.serialized,
-                                "categories": report.categories
-                            });
+                            } else {
+                                console.log("MANDOLA Application Object not found.");
+                            }
                         });
-                        clearInterval(MAOObserver);
-                        delete MAO;
+                    }, 100);
+                    inAppBrowser.show();
+                });
+                inAppBrowser.addEventListener('exit', function() {
+                    self.mandolaLoading.finish();
+                    MAO.reports.forEach(function(report) {
+                        self.appendReport({
+                            "title": report.title,
+                            "timestamp": Date.now(),
+                            "url": report.url,
+                            "text": report.text,
+                            "serialized": report.serialized,
+                            "categories": report.categories
+                        });
                     });
-                }
+                    delete MAO;
+                    clearInterval(MAOObserver);
+                });
             }).catch(swal.noop);
 
         },
@@ -1660,20 +1600,60 @@ var Controller = function() {
                 //This here is the browser button which enables the browser reporting functionality.
                 //The user is prompted to load an external url in order to open it in the inAppBrowser
                 //via the mandola proxy.
-                $("#browser-btn").on("click", function(e) {
-                    self.browserReport();
-                });
+                // $("#browser-btn").on("click", function(e) {
+                //     self.browserReport();
+                // });
 
                 //This is the screenshot button where the user will be prompted to
                 //load a screenshot from within his gallery, and crop the space where
                 //the text is to do an ocr on it. Then present the form based on that.
-                $("#image-btn").on("click", function(e) {
+                // $("#image-btn").on("click", function(e) {
+                //     self.screenshotReport();
+                // });
+
+                $('.report-simple').on("click", function() {
+                    swal({
+                        title: 'Enter a URL to report',
+                        input: 'text',
+                        focusCancel: true,
+                        showCancelButton: true,
+                        confirmButtonText: 'Report',
+                        showLoaderOnConfirm: false,
+                        preConfirm: function(mandolaURL) {
+                            return new Promise(function(resolve, reject) {
+                                //Check if the value passed is an actual url via regex.
+                                var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+                                if (!regexp.test(mandolaURL.toLowerCase()) || mandolaURL === "") {
+                                    reject('Please provide a valid URL.');
+                                } else {
+                                    resolve();
+                                }
+                            });
+                        },
+                        allowOutsideClick: true
+                    }).then(function(mandolaURL) {
+                        self.appendReport({
+                            "title": mandolaURL,
+                            "timestamp": Date.now(),
+                            "url": mandolaURL,
+                            "text": "This is a simple URL report",
+                            "serialized": null,
+                            "categories": ["Undefined"]
+                        });
+                    })
+                });
+    
+                $('.report-proxy').on("click", function() {
+                    self.browserReport();
+                });
+            
+                $('.report-screenshot').on("click", function() {
                     self.screenshotReport();
                 });
 
-                $('.menu-button').on('click', function() {
-                    $('.menu-button').toggleClass('pressed');
-                });
+                // $('.menu-button').on('click', function() {
+                //     $('.menu-button').toggleClass('pressed');
+                // });
 
                 $("#report-sort-desc-btn").on("click", function(e) {
                     $('.sort-button').toggleClass('pressed');
