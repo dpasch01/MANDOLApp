@@ -1,5 +1,11 @@
 # MANDOLApp: Mobile Application for Anonymous Hate-speech Reporting 
 
+**Github Release Version**: ![GitHub (pre-)release](https://img.shields.io/github/release/dpasch01/MANDOLApp/all.svg)
+
+**Github All Releases**: ![Github All Releases](https://img.shields.io/github/downloads/dpasch01/MANDOLApp/total.svg)
+
+**Github Pre-Releases**: ![Github Pre-Releases](https://img.shields.io/github/downloads-pre/dpasch01/MANDOLApp/latest/total.svg)
+
 MANDOLApp is a hate-speech reporting mobile application that aims to provide:
 
   - The ability of anonymous reporting of hate-speech and other material found in the web and social media.
